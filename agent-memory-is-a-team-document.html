@@ -71,7 +71,7 @@ tbody tr:last-child td{border-bottom:0}
 <header class="mast">
 <h1>Agent Memory Is a Team Document, Not a Personal Recall</h1>
 <p class="sub">Two arguments that end in the same place: write knowledge down where the whole team can read it, and treat everything else as hidden state.</p>
-<div class="meta"><span>1,600 words</span><span>~7 min read</span><span>2026-10-05</span></div>
+<div class="meta"><span>2,100 words</span><span>~9 min read</span><span>2026-10-05</span></div>
 </header>
 <main>
 <h2 id="two-posts">Two posts, one conclusion</h2>
@@ -98,7 +98,28 @@ tbody tr:last-child td{border-bottom:0}
 <tr><td>Cannot be audited</td><td>Ten thousand embeddings in SQLite. Which are stale? Which are wrong and quietly steering the agent?</td></tr>
 </tbody></table></div>
 <p>The fix it proposes is simple. Give the agent a structured folder of Markdown documents (instructions, specs, decisions, research, indexes). The loop changes from <strong>prompt → build → forget</strong> to <strong>prompt → consult → build → update</strong>. The agent reads the relevant documents before it works and updates them after, while the full picture is still in context. The author has run this for over a year and released it as <a href="https://github.com/aerovato/operator-memory">Operator Memory</a>.</p>
-<p>That is an argument about <em>quality</em>. My earlier note was an argument about <em>scale</em>. They fit together.</p>
+<p>That is an argument about <em>quality</em>. My earlier note was an argument about <em>scale</em>. Before putting them together, it helps to see that “memory” is not one thing.</p>
+<hr>
+
+<h2 id="three-kinds">Three kinds of memory, three lifecycles</h2>
+<p>Cognitive science splits long-term memory into kinds. The split is useful for agents because each kind needs a different lifecycle. The basic mistake of memory plugins is one store and one lifecycle for all three.</p>
+<div class="tw"><table><thead><tr><th>Kind</th><th>Agent form</th><th>Example</th><th>Lifecycle</th></tr></thead><tbody>
+<tr><td>Episodic</td><td>Chats, session transcripts</td><td>“On Tuesday we tried a retry loop and it failed.”</td><td>Recall when relevant, then forget.</td></tr>
+<tr><td>Procedural</td><td>Skills, runbooks, SOPs</td><td>“How to deploy the auth service.”</td><td>Evolve with the system it acts on.</td></tr>
+<tr><td>Semantic</td><td>Knowledge</td><td>“Auth tokens rotate every 15 minutes.” “A settled order cannot be edited.”</td><td>Stable. Organized by domain.</td></tr>
+</tbody></table></div>
+
+<h3 id="episodic">Episodic memory: recall, then forget</h3>
+<p>A chat records what happened, not what is true. It answers “what was I doing yesterday?” and it should fade. Memory plugins keep every episode forever and serve snippets of it back as if they were facts. That is where the liao.gg problem “the past is treated as truth” comes from. For episodic memory, forgetting is a feature. Keep it personal, keep it short-lived, and never let it be the authority on how the system works.</p>
+
+<h3 id="procedural">Procedural memory: evolve with the system</h3>
+<p>A skill encodes how to do something against a specific system: which command to run, which check to pass, which order to follow. When the system changes, the skill must change too, or it breaks. So skills belong in version control next to the code they drive. They have owners, they have tests or evals, and they change in the same review as the system change. A procedure stored as a memory snippet cannot be updated when the deploy command changes, because nobody knows it exists.</p>
+
+<h3 id="semantic">Semantic memory: stable and domain-driven</h3>
+<p>Knowledge is facts and concepts: what the order service owns, what “settled” means, why the team chose event sourcing. It should be stable. It changes when someone makes a decision, not when a background job rewrites it overnight. And it should be organized by <strong>domain</strong>, in the sense of domain-driven design: one place per bounded context, written in the team’s shared language. It should not be organized by when you learned it or which session it came from.</p>
+<p>A domain structure also answers the “unknown unknowns” problem. An agent working in billing does not need similarity search to find the right context. It reads the billing document, because the structure tells it where to look.</p>
+
+<p>This maps directly onto both posts. The liao.gg brain holds instructions (procedural) and specs, decisions, and research (semantic). It leaves out transcripts (episodic) on purpose. And on the team-versus-personal axis, episodic memory is personal and short-lived, while procedural and semantic memory are team assets.</p>
 <hr>
 
 <h2 id="team-scales">Team memory scales. Personal memory does not.</h2>
@@ -125,6 +146,7 @@ tbody tr:last-child td{border-bottom:0}
 <h2 id="update-is-promotion">“Update” is the promotion step</h2>
 <p>In my earlier note I asked how knowledge should move from personal to team. Alice learns that you should always run integration tests before you deploy the auth service. It starts as her personal lesson. If it is a team-wide practice, it belongs in the runbook, not locked in Alice’s memory where Bob can never find it. I called this a <strong>promotion workflow</strong>.</p>
 <p>The <em>update</em> step in prompt → consult → build → update is that same workflow, done at the right moment. At the end of a task the agent has the full context: what it tried, what failed, what the user corrected. That is the cheapest time to write the lesson down, and the place to write it is the shared document, not a private store.</p>
+<p>In terms of the three kinds, promotion turns an episode into something durable. Alice’s lesson becomes a step in the deploy skill (procedural). A fact she discovered about token rotation goes into the auth domain document (semantic). After that, the chat it came from can be forgotten.</p>
 <p>For a team there is one more rule. Shared documents need a review gate:</p>
 <ul>
 <li><strong>Agents propose and humans approve</strong> changes to team documents. A diff in a pull request is easy to review. An embedding is not.</li>
@@ -148,8 +170,11 @@ tbody tr:last-child td{border-bottom:0}
 <h2 id="design">Putting it together</h2>
 <p>Here is the combined design for a multi-user agent:</p>
 <ol>
-<li><strong>Make team documents the main memory.</strong> Instructions, specs, decisions, research, indexes, stored as plain Markdown in version control next to the code.</li>
-<li><strong>Consult before work, update after.</strong> The agent reads the relevant documents and the index first. When it finishes, it fixes stale documents and adds missing ones while the context is fresh.</li>
+<li><strong>Sort memory by kind before you store it.</strong> Episodic, procedural, and semantic memory each get their own place and their own lifecycle.</li>
+<li><strong>Let episodes expire.</strong> Chats are personal, can be searched for a while, and are then forgotten. They are never served as facts.</li>
+<li><strong>Version skills with the system.</strong> Skills live next to the code, have owners and evals, and change in the same review as the system they act on.</li>
+<li><strong>Keep knowledge stable and organized by domain.</strong> One document per bounded context, in the team’s shared language, as plain Markdown in version control.</li>
+<li><strong>Consult before work, update after.</strong> The agent reads the relevant skill and domain documents first. When it finishes, it promotes what it learned into a skill or a domain document while the context is fresh.</li>
 <li><strong>Load team knowledge before personal memory</strong> in every prompt. The team document is the authority. Personal memory only adds to it.</li>
 <li><strong>Keep personal memory to preferences.</strong> Style, verbosity, private context. Never facts about the system.</li>
 <li><strong>Send updates through review.</strong> Agents propose changes to team documents. Humans approve them. No personal data goes in.</li>
