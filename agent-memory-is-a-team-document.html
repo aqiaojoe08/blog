@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Agent Memory Is a Team Document, Not a Personal Recall</title>
+<style>
+:root{
+  --bg:#fbfaf8; --panel:#fff; --ink:#1c1b1a; --muted:#5f5b56; --faint:#8b857e;
+  --rule:#e6e2dc; --accent:#8a5a2b; --accent-soft:#f4ede4; --code-bg:#f6f4f1;
+}
+@media (prefers-color-scheme:dark){
+  :root{ --bg:#16171a; --panel:#1c1e22; --ink:#e8e6e3; --muted:#a7a29b; --faint:#857f78;
+         --rule:#2d3035; --accent:#d9a05b; --accent-soft:#25262a; --code-bg:#21242a; }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:17px/1.72 ui-serif,Georgia,'Iowan Old Style','Times New Roman',serif;
+  padding:0 1.25rem 6rem;}
+.wrap{max-width:46rem;margin:0 auto}
+header.mast{padding:4.5rem 0 0;border-bottom:1px solid var(--rule);margin-bottom:2.5rem}
+h1{font-size:2.3rem;line-height:1.18;letter-spacing:-.02em;margin:0 0 1rem;font-weight:600}
+header.mast p.sub{color:var(--muted);font-style:italic;margin:0 0 2.2rem;font-size:1.02rem}
+.meta{display:flex;gap:1.4rem;flex-wrap:wrap;font-family:ui-sans-serif,system-ui,sans-serif;
+  font-size:.76rem;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);
+  padding-bottom:1.4rem}
+h2{font-size:1.5rem;line-height:1.25;letter-spacing:-.01em;margin:3.4rem 0 1rem;font-weight:600;
+  padding-top:.4rem}
+h3{font-size:1.13rem;margin:2.4rem 0 .7rem;font-weight:600;
+  font-family:ui-sans-serif,system-ui,sans-serif;letter-spacing:-.005em}
+p{margin:0 0 1.15rem}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid color-mix(in oklab,var(--accent) 35%,transparent)}
+a:hover{border-bottom-color:var(--accent)}
+strong{font-weight:650}
+hr{border:0;height:1px;background:var(--rule);margin:2.8rem 0}
+ul,ol{margin:0 0 1.3rem;padding-left:1.35rem}
+li{margin:0 0 .62rem}
+li>p{margin:0 0 .6rem}
+blockquote{margin:1.5rem 0;padding:.2rem 0 .2rem 1.3rem;border-left:3px solid var(--accent);
+  color:var(--muted)}
+blockquote p{margin:0 0 .6rem}
+blockquote p:last-child{margin:0}
+code{font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,monospace;font-size:.855em;
+  background:var(--code-bg);padding:.13em .38em;border-radius:4px;
+  border:1px solid color-mix(in oklab,var(--rule) 70%,transparent)}
+pre{background:var(--code-bg);border:1px solid var(--rule);border-radius:8px;
+  padding:1rem 1.1rem;overflow-x:auto;margin:0 0 1.4rem}
+pre code{background:none;border:0;padding:0;font-size:.8rem;line-height:1.62}
+.tw{overflow-x:auto;margin:0 0 1.6rem;border:1px solid var(--rule);border-radius:8px;
+  background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-family:ui-sans-serif,system-ui,sans-serif;
+  font-size:.845rem;line-height:1.5}
+th{text-align:left;font-weight:600;background:var(--accent-soft);color:var(--ink);
+  padding:.68rem .8rem;border-bottom:1px solid var(--rule);vertical-align:bottom;
+  font-size:.78rem;letter-spacing:.02em}
+td{padding:.66rem .8rem;border-bottom:1px solid color-mix(in oklab,var(--rule) 60%,transparent);
+  vertical-align:top;color:var(--muted)}
+td:first-child{color:var(--ink)}
+tbody tr:last-child td{border-bottom:0}
+@media (max-width:640px){
+  body{font-size:16px;padding:0 1rem 4rem}
+  h1{font-size:1.85rem} h2{font-size:1.32rem}
+  header.mast{padding-top:2.5rem}
+}
+@media print{
+  body{background:#fff;color:#000;font-size:11pt}
+  .tw,pre{break-inside:avoid} h2,h3{break-after:avoid}
+}
+</style>
+</head><body><div class="wrap">
+<header class="mast">
+<h1>Agent Memory Is a Team Document, Not a Personal Recall</h1>
+<p class="sub">Two arguments that end in the same place: write knowledge down where the whole team can read it, and treat everything else as hidden state.</p>
+<div class="meta"><span>1,600 words</span><span>~7 min read</span><span>2026-10-05</span></div>
+</header>
+<main>
+<h2 id="two-posts">Two posts, one conclusion</h2>
+<p>Earlier this year I wrote a short note about memory for agents that many people share: a team Slack bot, a shared coding assistant, a skill catalog. My argument was about scaling. Team memory compounds as more people use it. Personal memory does not. So build the team layer first.</p>
+<p>Then I read <a href="https://liao.gg/blog/agents-dont-need-memory">“Agents Don’t Need Memory. They Need Documentation.”</a> on liao.gg. It comes at the problem from the opposite end, a single developer with a single agent, and argues that the whole memory plugin category solves the wrong problem. Retrieval over old conversations is not understanding. Documents are.</p>
+<p>One post starts from the team and the other from the individual, and both arrive at the same design: <strong>agent knowledge should live in plain documents that humans can read, review, and share. Anything outside those documents is hidden state, and hidden state hurts.</strong> This post puts the two arguments together.</p>
+<hr>
+
+<h2 id="its-all-rag">What “memory” means today</h2>
+<p>The liao.gg post describes the standard memory plugin in five steps:</p>
+<ol>
+<li>Go through session transcripts.</li>
+<li>Generate snippets of “memories”.</li>
+<li>Insert them into a vector database.</li>
+<li>On every prompt, retrieve the top five and inject them.</li>
+<li>If that is not enough, give the agent a tool to search the database.</li>
+</ol>
+<p>Fancier tools add tiers (short-term and long-term), background jobs that merge and deduplicate, overnight “dreamers” that rewrite memories, rerankers. Each one adds tokens on top of the same base. The post names five problems with that base:</p>
+<div class="tw"><table><thead><tr><th>Problem</th><th>What goes wrong</th></tr></thead><tbody>
+<tr><td>Recall by similarity</td><td>Embedding distance tells you two snippets look alike. It does not tell you which one is correct, which one is current, or what is missing.</td></tr>
+<tr><td>No context</td><td>A snippet loses the motivation, the trade-offs, and the environment it came from.</td></tr>
+<tr><td>The past is treated as truth</td><td>The code changes every day. How many of the 500 snippets about authentication are still accurate?</td></tr>
+<tr><td>Unknown unknowns</td><td>A search tool only helps if the agent knows it should search. It does not know what it does not know.</td></tr>
+<tr><td>Cannot be audited</td><td>Ten thousand embeddings in SQLite. Which are stale? Which are wrong and quietly steering the agent?</td></tr>
+</tbody></table></div>
+<p>The fix it proposes is simple. Give the agent a structured folder of Markdown documents (instructions, specs, decisions, research, indexes). The loop changes from <strong>prompt → build → forget</strong> to <strong>prompt → consult → build → update</strong>. The agent reads the relevant documents before it works and updates them after, while the full picture is still in context. The author has run this for over a year and released it as <a href="https://github.com/aerovato/operator-memory">Operator Memory</a>.</p>
+<p>That is an argument about <em>quality</em>. My earlier note was an argument about <em>scale</em>. They fit together.</p>
+<hr>
+
+<h2 id="team-scales">Team memory scales. Personal memory does not.</h2>
+<p><strong>Team memory</strong> is a knowledge base. You write a runbook once and every engineer on the team benefits. More contributors make it richer. It is the same reason we write wikis and READMEs: pay the cost of learning once and share it.</p>
+<p><strong>Personal memory</strong> is a social layer. It makes the agent feel like it knows you: your preferences, your history, what you were working on last Tuesday. That has real value for engagement. But N users means N separate memory islands. Alice’s conversation history cannot help Bob.</p>
+<div class="tw"><table><thead><tr><th>Priority</th><th>Layer</th><th>Scales?</th><th>Private?</th><th>Purpose</th></tr></thead><tbody>
+<tr><td>1st</td><td>Team memory</td><td>Yes</td><td>No</td><td>Shared knowledge: runbooks, architecture, conventions, decisions</td></tr>
+<tr><td>2nd</td><td>Personal memory</td><td>No</td><td>Yes</td><td>Individual preferences, private context, style</td></tr>
+</tbody></table></div>
+<p>Put the two posts side by side and the link is clear. A vector store of conversation snippets is personal memory by construction: it is built from one person’s sessions, on one machine, and nobody else can read it. A folder of Markdown documents is team memory by construction: you can commit it, review it in a pull request, and give it to the next engineer. <strong>Choosing documents over recall is also choosing the layer that scales.</strong></p>
+<hr>
+
+<h2 id="a-view">Most personal memory is a view of team memory</h2>
+<p>Much of what gets stored as personal memory is not personal knowledge. It is team knowledge seen through a personal preference.</p>
+<p>Say the team has an architecture document. Alice wants the key decisions and no detail. Bob wants the full trade-offs. The knowledge is the same. Only the <strong>rendering style</strong> differs, and that is a preference, not knowledge. So you do not copy the architecture document into each person’s memory. You store <code>style: high_level</code> for Alice and <code>style: detailed</code> for Bob, and apply it when the team document goes into context.</p>
+<p>This makes the personal layer much smaller than it first looks:</p>
+<ul>
+<li><strong>Store personally:</strong> style preferences, private project context, things that are actually about you.</li>
+<li><strong>Do not store personally:</strong> anything that is true about the system. That belongs in a team document.</li>
+</ul>
+<p>A memory plugin that extracts “the auth service uses token rotation every 15 minutes” from your chat and files it in your private vector store has put team knowledge in the wrong place. It is now invisible to everyone else and will go stale without anyone noticing.</p>
+<hr>
+
+<h2 id="update-is-promotion">“Update” is the promotion step</h2>
+<p>In my earlier note I asked how knowledge should move from personal to team. Alice learns that you should always run integration tests before you deploy the auth service. It starts as her personal lesson. If it is a team-wide practice, it belongs in the runbook, not locked in Alice’s memory where Bob can never find it. I called this a <strong>promotion workflow</strong>.</p>
+<p>The <em>update</em> step in prompt → consult → build → update is that same workflow, done at the right moment. At the end of a task the agent has the full context: what it tried, what failed, what the user corrected. That is the cheapest time to write the lesson down, and the place to write it is the shared document, not a private store.</p>
+<p>For a team there is one more rule. Shared documents need a review gate:</p>
+<ul>
+<li><strong>Agents propose and humans approve</strong> changes to team documents. A diff in a pull request is easy to review. An embedding is not.</li>
+<li><strong>No personal data in team memory.</strong> Names, performance notes, and personal details stay in the personal layer.</li>
+<li><strong>Personal memory can be written automatically.</strong> It is private, small, and limited to preferences, so the risk is low.</li>
+</ul>
+<p>A plain-file brain makes all three rules cheap, because the tools already exist: git, code review, ownership files. A vector database would need you to build them from nothing.</p>
+<hr>
+
+<h2 id="hidden-state">Personal memory is hidden state</h2>
+<p>The liao.gg post calls the memory store unauditable. In a team the cost is worse than that. <strong>When memory is not portable, it becomes hidden state, and hidden state silently changes how the agent behaves.</strong> You cannot fix what you cannot reproduce, and you cannot reproduce what lives only on one person’s machine.</p>
+<p>Two cases where this hurts:</p>
+<ol>
+<li><strong>Stale memory.</strong> Your local agent remembers that your SSO token was expired. That was true on Monday. On Thursday it still plans around it. A wrong memory leads to wrong behavior, and nobody can see why.</li>
+<li><strong>Environment anchors.</strong> You keep a local folder of notes for on-call ticket work, and the agent learned to look there. On a teammate’s laptop the path does not exist. Same agent definition, same prompt, different environment, different result.</li>
+</ol>
+<p>In both cases your agent plus your hidden memories will not behave the same way for your teammate, even with an identical skill or agent definition. For that reason, in the agent tooling I work on, we <strong>prefer no-memory mode</strong>. We would rather lose some personalization than lose the ability to reproduce a teammate’s failure, add a guardrail as the fix, and confirm it works. Agents are still non-deterministic, but this removes a large class of “works on my laptop” bugs.</p>
+<p>Document-based memory changes this trade-off. If the agent’s knowledge is a set of files in the repository, it is no longer hidden. It is versioned input like any other. A teammate who checks out the same commit gets the same brain. A failure can be reproduced, and the fix can be a one-line edit to a document instead of a support thread. <strong>Documents give you much of the value of memory without the cost to reproducibility.</strong></p>
+<hr>
+
+<h2 id="design">Putting it together</h2>
+<p>Here is the combined design for a multi-user agent:</p>
+<ol>
+<li><strong>Make team documents the main memory.</strong> Instructions, specs, decisions, research, indexes, stored as plain Markdown in version control next to the code.</li>
+<li><strong>Consult before work, update after.</strong> The agent reads the relevant documents and the index first. When it finishes, it fixes stale documents and adds missing ones while the context is fresh.</li>
+<li><strong>Load team knowledge before personal memory</strong> in every prompt. The team document is the authority. Personal memory only adds to it.</li>
+<li><strong>Keep personal memory to preferences.</strong> Style, verbosity, private context. Never facts about the system.</li>
+<li><strong>Send updates through review.</strong> Agents propose changes to team documents. Humans approve them. No personal data goes in.</li>
+<li><strong>Treat anything that does not live in a document as hidden state.</strong> Default to no memory when you need to reproduce, evaluate, or debug.</li>
+</ol>
+<p>Neither post is against personalization. Both say that personalization is the small part of the problem. The large part is the agent understanding the project, and that is a documentation problem that the whole team shares.</p>
+<blockquote><p>An agent that knows the team is more useful than an agent that knows you, because it scales. An agent that reads documents is more useful than one that recalls snippets, because you can check what it knows.</p></blockquote>
+<hr>
+<h3 id="references">References</h3>
+<ul>
+<li><a href="https://liao.gg/blog/agents-dont-need-memory">Agents Don’t Need Memory. They Need Documentation.</a> — liao.gg</li>
+<li><a href="https://github.com/aerovato/operator-memory">Operator Memory</a> — document-based memory plugin, free and open source</li>
+<li>“Agent Memory: Team First, Personal Second” — my earlier note, March 2026</li>
+</ul>
+</main>
+</div></body></html>
