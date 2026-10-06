@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tech blog · Yuliang Qiao</title>
+<meta name="description" content="Essays on AI agents, specs, and software engineering.">
+<style>
+:root{
+  --bg:#fbfaf8; --panel:#fff; --ink:#1c1b1a; --muted:#5f5b56; --faint:#8b857e;
+  --rule:#e6e2dc; --accent:#8a5a2b; --accent-soft:#f4ede4;
+}
+@media (prefers-color-scheme:dark){
+  :root{ --bg:#16171a; --panel:#1c1e22; --ink:#e8e6e3; --muted:#a7a29b; --faint:#857f78;
+         --rule:#2d3035; --accent:#d9a05b; --accent-soft:#25262a; }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:17px/1.72 ui-serif,Georgia,'Iowan Old Style','Times New Roman',serif;
+  padding:0 1.25rem 6rem;}
+.wrap{max-width:46rem;margin:0 auto}
+header.mast{padding:4.5rem 0 1.6rem;border-bottom:1px solid var(--rule);margin-bottom:1rem}
+h1{font-size:2.3rem;line-height:1.18;letter-spacing:-.02em;margin:0 0 .6rem;font-weight:600}
+header.mast p{color:var(--muted);font-style:italic;margin:0;font-size:1.02rem}
+a{color:inherit;text-decoration:none}
+article{padding:1.8rem 0;border-bottom:1px solid var(--rule)}
+article h2{font-size:1.4rem;line-height:1.28;letter-spacing:-.01em;margin:0 0 .5rem;font-weight:600}
+article h2 a:hover{color:var(--accent)}
+article p{margin:0 0 .8rem;color:var(--muted)}
+.meta{display:flex;gap:1.4rem;flex-wrap:wrap;font-family:ui-sans-serif,system-ui,sans-serif;
+  font-size:.76rem;letter-spacing:.09em;text-transform:uppercase;color:var(--faint)}
+footer{margin-top:2.4rem;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.85rem;color:var(--faint)}
+footer a{color:var(--accent);border-bottom:1px solid color-mix(in oklab,var(--accent) 35%,transparent)}
+</style>
+</head>
+<body><div class="wrap">
+<header class="mast">
+<h1>Tech blog</h1>
+<p>Essays on AI agents, specs, and software engineering, by Yuliang Qiao.</p>
+</header>
+<main>
+
+<article>
+<h2><a href="agent-memory-is-a-team-document.html">Agent Memory Is a Team Document, Not a Personal Recall</a></h2>
+<p>Two arguments that end in the same place: write knowledge down where the whole team can read it, and treat everything else as hidden state.</p>
+<div class="meta"><span>2026-10-05</span><span>~9 min read</span></div>
+</article>
+
+<article>
+<h2><a href="the-missing-layer-between-prose-and-code.html">The Missing Layer Between Prose and Code: What STE, SQL, and Dogwood Teach Us About Specs</a></h2>
+<p>Free-form natural language cannot carry the precision production software needs. Controlled languages are the stage everybody skips between prose specs and tests.</p>
+<div class="meta"><span>2026-08-07</span><span>~34 min read</span></div>
+</article>
+
+</main>
+<footer>Source on <a href="https://github.com/aqiaojoe08/blog">GitHub</a>. Userscripts live at <a href="https://aqiaojoe08.github.io/daydayup/">daydayup</a>.</footer>
+</div></body>
+</html>
