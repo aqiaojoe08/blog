@@ -72,7 +72,7 @@ tbody tr:last-child td{border-bottom:0}
 <header class="mast">
 <h1>Software Factories for Brownfield Code at Amazon Scale</h1>
 <p class="sub">Agentic software factories are not only for greenfield apps and small teams. To make them work on large, old code bases, you need three things: shared primitives, self-maintenance, and a habit of small, continuous changes.</p>
-<div class="meta"><span>2,100 words</span><span>~8 min read</span><span>2026-10-11</span></div>
+<div class="meta"><span>2,500 words</span><span>~11 min read</span><span>2026-10-11</span></div>
 </header>
 <main>
 <h2 id="objection">The objection</h2>
@@ -122,7 +122,17 @@ This is how an agent tests a change end to end on its own, in minutes or hours i
 <h2 id="self-maintenance">2) Make the system maintain itself</h2>
 <p>Primitives fix the structure at one point in time. But architecture decays. Every feature leaves something behind: a flag nobody removed, a code path for a customer who left, a copy of a helper that drifted, a dependency two major versions behind. In a large system the decay grows faster than any team can clean it up.</p>
 <p>Agents make this worse before they make it better. An agent can add code much faster than a person, and it adds code in the style of whatever it reads. If the code base is messy, the agent copies the mess. If complexity keeps growing, the context problem from the last section comes back.</p>
-<p>So the factory needs a <strong>maintenance loop</strong> that runs all the time, not a cleanup project every two years. In practice that means:</p>
+<h3 id="three-streams">Three streams of work, not one</h3>
+<p>Most public writing about software factories talks about one stream of work: features. An idea comes in, and the agent turns it into a spec, code, tests, and a release. That is the stream that demos well. But on a system that has been running for years, features are only part of the work. A factory that runs only the feature stream will add code faster and faster until nobody, human or agent, can work in it.</p>
+<p>A brownfield factory runs three streams, each with its own input, loop, and measure of success:</p>
+<div class="tw"><table><thead><tr><th>Stream</th><th>Input</th><th>Loop</th><th>Success looks like</th></tr></thead><tbody>
+<tr><td>1) Features</td><td>Ideas, specs, business asks</td><td>Spec → code → test → release behind a toggle</td><td>Shorter time from idea to tested result</td></tr>
+<tr><td>2) Operational feedback</td><td>Alarms, tickets, bug reports, failed runs</td><td>Triage → find the cause → fix → add a regression test so it cannot come back</td><td>Fewer repeat issues, faster time to fix</td></tr>
+<tr><td>3) Refactoring</td><td>Complexity measures, rule violations, old flags, outdated dependencies</td><td>Find the decay → small change → prove no behavior change with regression tests</td><td>Complexity flat or falling while features keep shipping</td></tr>
+</tbody></table></div>
+<p>Splitting the work this way is what makes self-maintenance executable instead of a slogan. Each stream has a clear input that an agent can watch, a loop it can run, and a number someone can check. “Keep the code base healthy” is a wish. “Every alarm gets a root cause and a regression test” and “every retired flag is removed within two weeks” are jobs an agent can do on a schedule.</p>
+<p>The streams also feed each other. Operational feedback finds the gaps in the regression tests. Refactoring keeps the code small enough that the next feature fits in context. And the regression tests from streams 2 and 3 are what make stream 1 safe to run fast.</p>
+<p>To keep streams 2 and 3 running, the factory needs a <strong>maintenance loop</strong> that runs all the time, not a cleanup project every two years. In practice that means:</p>
 <ol>
 <li><strong>Agents do the chores.</strong> Removing dead code, retiring old feature flags, upgrading dependencies, and merging duplicate helpers are boring, well-defined tasks. They are a good fit for agents, and they should run on a schedule, not when someone has time.</li>
 <li><strong>Rules are written down and enforced in the loop.</strong> Architecture rules that live only in senior engineers’ heads get broken. Write them as checks that run at every stage, from spec review to code review to deploy: “this table is retired, don’t write to it,” “all new inputs go through the data primitive,” “no new service calls this API directly.” Then agents and humans follow the same rules, and the rules apply across the whole lifecycle instead of only at review time.</li>
@@ -153,7 +163,7 @@ This is how an agent tests a change end to end on its own, in minutes or hours i
 <p>Put together, the factory for a large brownfield system looks like this:</p>
 <ol>
 <li><strong>A small set of shared primitives</strong> (data, testing and evaluation, explainability, knowledge base) absorbs the cross-cutting complexity, so each application is a mid-sized project again.</li>
-<li><strong>A maintenance loop</strong> keeps the code base from decaying. Agents do the chores, written rules guard the architecture at every stage, and a complexity budget keeps the numbers honest.</li>
+<li><strong>Three streams of work</strong> (features, operational feedback, and refactoring) run side by side, and <strong>a maintenance loop</strong> keeps the code base from decaying. Agents do the chores, written rules guard the architecture at every stage, and a complexity budget keeps the numbers honest.</li>
 <li><strong>Small, continuous changes</strong> keep each task within an agent’s context. Feature toggles let unfinished work ship safely, and regression tests make refactoring safe.</li>
 </ol>
 <p>None of this is new. Abstraction, maintenance, and continuous delivery are decades old. What is new is that agents change the economics. Writing the code for a primitive, a cleanup, or a regression suite used to be the expensive part, so teams skipped it. Now it is the cheap part. The expensive parts are the ones agents cannot do alone: agreeing on interfaces across teams, and proving that a change is safe. Put your effort there.</p>
@@ -168,5 +178,10 @@ This is how an agent tests a change end to end on its own, in minutes or hours i
 <li><strong>Set a size limit on changes</strong> and put everything bigger behind a toggle.</li>
 </ul>
 <p>Then measure the one number that matters: how long it takes to go from an idea to a tested result. If that number is falling, the factory is working, no matter how old the code is.</p>
+<hr>
+
+<h2 id="next">Next: what is “software”?</h2>
+<p>This post treated software as a code base. That is only half of it. Software is also its runtime: the requests it receives, the dependencies it calls, the data it reads, and the environment it runs in. Much of a system’s real behavior lives there, not in the code. Two copies of the same code can behave very differently under different traffic and different dependencies.</p>
+<p>That is why end-to-end testing for brownfield systems needs more than unit tests. It needs regression tests together with sampled production data, so the test sees the requests and dependency responses the system really gets. The next post will cover that view of software and how to build testing around it.</p>
 </main>
 </div></body></html>
