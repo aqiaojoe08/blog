@@ -6,5 +6,6 @@ The `.html` files in this repo are the source for each post. GitHub shows them a
 
 ## Posts
 
+- [Software Factories for Brownfield Code at Amazon Scale](https://aqiaojoe08.github.io/blog/software-factories-for-brownfield.html) (2026-10-11)
 - [Agent Memory Is a Team Document, Not a Personal Recall](https://aqiaojoe08.github.io/blog/agent-memory-is-a-team-document.html) (2026-10-05)
 - [The Missing Layer Between Prose and Code: What STE, SQL, and Dogwood Teach Us About Specs](https://aqiaojoe08.github.io/blog/the-missing-layer-between-prose-and-code.html) (2026-08-07)

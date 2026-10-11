@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Software Factories for Brownfield Code at Amazon Scale</title>
+<style>
+:root{
+  --bg:#fbfaf8; --panel:#fff; --ink:#1c1b1a; --muted:#5f5b56; --faint:#8b857e;
+  --rule:#e6e2dc; --accent:#8a5a2b; --accent-soft:#f4ede4; --code-bg:#f6f4f1;
+}
+@media (prefers-color-scheme:dark){
+  :root{ --bg:#16171a; --panel:#1c1e22; --ink:#e8e6e3; --muted:#a7a29b; --faint:#857f78;
+         --rule:#2d3035; --accent:#d9a05b; --accent-soft:#25262a; --code-bg:#21242a; }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:17px/1.72 ui-serif,Georgia,'Iowan Old Style','Times New Roman',serif;
+  padding:0 1.25rem 6rem;}
+.wrap{max-width:46rem;margin:0 auto}
+header.mast{padding:4.5rem 0 0;border-bottom:1px solid var(--rule);margin-bottom:2.5rem}
+h1{font-size:2.3rem;line-height:1.18;letter-spacing:-.02em;margin:0 0 1rem;font-weight:600}
+header.mast p.sub{color:var(--muted);font-style:italic;margin:0 0 2.2rem;font-size:1.02rem}
+.meta{display:flex;gap:1.4rem;flex-wrap:wrap;font-family:ui-sans-serif,system-ui,sans-serif;
+  font-size:.76rem;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);
+  padding-bottom:1.4rem}
+h2{font-size:1.5rem;line-height:1.25;letter-spacing:-.01em;margin:3.4rem 0 1rem;font-weight:600;
+  padding-top:.4rem}
+h3{font-size:1.13rem;margin:2.4rem 0 .7rem;font-weight:600;
+  font-family:ui-sans-serif,system-ui,sans-serif;letter-spacing:-.005em}
+p{margin:0 0 1.15rem}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid color-mix(in oklab,var(--accent) 35%,transparent)}
+a:hover{border-bottom-color:var(--accent)}
+strong{font-weight:650}
+hr{border:0;height:1px;background:var(--rule);margin:2.8rem 0}
+ul,ol{margin:0 0 1.3rem;padding-left:1.35rem}
+li{margin:0 0 .62rem}
+li>p{margin:0 0 .6rem}
+blockquote{margin:1.5rem 0;padding:.2rem 0 .2rem 1.3rem;border-left:3px solid var(--accent);
+  color:var(--muted)}
+blockquote p{margin:0 0 .6rem}
+blockquote p:last-child{margin:0}
+code{font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,monospace;font-size:.855em;
+  background:var(--code-bg);padding:.13em .38em;border-radius:4px;
+  border:1px solid color-mix(in oklab,var(--rule) 70%,transparent)}
+pre{background:var(--code-bg);border:1px solid var(--rule);border-radius:8px;
+  padding:1rem 1.1rem;overflow-x:auto;margin:0 0 1.4rem}
+pre code{background:none;border:0;padding:0;font-size:.8rem;line-height:1.62}
+.tw{overflow-x:auto;margin:0 0 1.6rem;border:1px solid var(--rule);border-radius:8px;
+  background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-family:ui-sans-serif,system-ui,sans-serif;
+  font-size:.845rem;line-height:1.5}
+th{text-align:left;font-weight:600;background:var(--accent-soft);color:var(--ink);
+  padding:.68rem .8rem;border-bottom:1px solid var(--rule);vertical-align:bottom;
+  font-size:.78rem;letter-spacing:.02em}
+td{padding:.66rem .8rem;border-bottom:1px solid color-mix(in oklab,var(--rule) 60%,transparent);
+  vertical-align:top;color:var(--muted)}
+td:first-child{color:var(--ink)}
+tbody tr:last-child td{border-bottom:0}
+@media (max-width:640px){
+  body{font-size:16px;padding:0 1rem 4rem}
+  h1{font-size:1.85rem} h2{font-size:1.32rem}
+  header.mast{padding-top:2.5rem}
+}
+@media print{
+  body{background:#fff;color:#000;font-size:11pt}
+  .tw,pre{break-inside:avoid} h2,h3{break-after:avoid}
+}
+</style>
+</head><body><div class="wrap">
+<nav style="padding-top:1.6rem;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.85rem"><a href="./" style="border:0">&larr; All posts</a></nav>
+<header class="mast">
+<h1>Software Factories for Brownfield Code at Amazon Scale</h1>
+<p class="sub">Agentic software factories are not only for greenfield apps and small teams. To make them work on large, old code bases, you need three things: shared primitives, self-maintenance, and a habit of small, continuous changes.</p>
+<div class="meta"><span>2,100 words</span><span>~8 min read</span><span>2026-10-11</span></div>
+</header>
+<main>
+<h2 id="objection">The objection</h2>
+<p>A software factory is a repeatable loop where agents take an idea through spec, code, test, and release, and humans review the parts that matter. Demos of this loop look great. An agent builds a to-do app, a dashboard, or a new microservice from a prompt, and it works.</p>
+<p>Then someone who owns a ten-year-old system with millions of lines of code, dozens of upstream feeds, and a pager asks the fair question: <em>does this work for us?</em> The usual answer is no. Factories are for greenfield work and small or mid-sized projects. Large brownfield systems are too tangled, too risky, and too hard to fit in an agent’s context.</p>
+<p>At Amazon scale, most of the code that matters looks like that system. If factories only work on greenfield projects, they miss most of the work.</p>
+<p>I think that answer is wrong, but the objection points at something real. It is worth asking <strong>why</strong> factories work on small projects, because that tells us what to build for large ones.</p>
+<hr>
+
+<h2 id="why-small-works">Why factories work on small projects</h2>
+<p>Small projects have three properties that agents depend on:</p>
+<ol>
+<li><strong>The context fits.</strong> The agent can read the parts of the code it needs and hold them in view. Nothing important hides in another repo or in someone’s head.</li>
+<li><strong>Feedback is fast.</strong> Building and testing take minutes. The agent can try, fail, and fix in one session.</li>
+<li><strong>The blast radius is small.</strong> A bad change breaks one thing, and it is easy to see and roll back.</li>
+</ol>
+<p>Large brownfield systems lose all three. The context is spread across many services. End-to-end testing takes days and needs people from several teams. A bad change can reach customers, partners, or money.</p>
+<p>So the goal is not to give up on large systems. The goal is to <strong>bring those three properties back</strong>. Each of the three ideas below restores one or more of them.</p>
+<hr>
+
+<h2 id="primitives">1) Break down complexity with shared primitives</h2>
+<p>Most large systems are not one big problem. They are several mid-sized applications that keep rebuilding the same hard parts: getting clean input data, replaying past decisions, explaining why the system did what it did, and remembering how the pieces connect. Each team builds its own version, each version drifts, and every agent session has to learn all of it again.</p>
+<p>The fix is to pull those hard parts out into a small set of <strong>common primitives</strong>, owned once and used by everyone. Four primitives cover most of it:</p>
+<ol>
+<li><strong>Data.</strong> One place to get inputs, both live and as they were at any point in the past. If every application reads the same inputs the same way, a whole class of “your numbers don’t match mine” bugs goes away.</li>
+<li><strong>Testing and evaluation systems.</strong> A test environment that lets you run end-to-end tests as much as possible, without waiting for production or for other teams. One kind of test is not enough, because different systems fail in different ways:
+<ul>
+<li><strong>Unit and contract tests</strong> check one module, and the interfaces between modules, in seconds.</li>
+<li><strong>Replay and regression tests</strong> run the old and new code on the same recorded inputs and compare the outputs.</li>
+<li><strong>Gyms for RL and optimization systems</strong> simulate the world the system acts on, so you can score a policy over many periods before it touches real customers or money.</li>
+<li><strong>Evals for agentic systems</strong> score an agent against a set of tasks with known good answers, using checks, rubrics, or a judge model, and catch regressions when a prompt, tool, or model changes.</li>
+<li><strong>Online experiments</strong> (shadow runs and A/B tests) are the last step, for what offline tests cannot prove.</li>
+</ul>
+This is how an agent tests a change end to end on its own, in minutes or hours instead of weeks.</li>
+<li><strong>Explainability.</strong> If you can replay a decision, you can explain it. Run the old and new logic on the same inputs, and you can say whether a change in output came from the code or from the inputs.</li>
+<li><strong>Knowledge base.</strong> A written map of the system: what each part does, who owns it, how parts connect, and which patterns to follow. Agents read it before they work and update it after.</li>
+</ol>
+<p>Once these primitives exist, each application on top of them becomes a mid-sized project again. An agent working on one application does not need to understand how data is collected for the whole company. It calls the data primitive. It does not need to build a test environment. It onboards to the shared testing and evaluation systems. <strong>The primitives absorb the complexity so the applications don’t have to.</strong></p>
+<p>Two rules make primitives safe to share:</p>
+<ul>
+<li><strong>Share the code, isolate the runtime.</strong> A shared primitive that fails can take every application down with it. Let each team run its own instance from a shared code base, so a bad deploy in one place stays in one place. Share a runtime only where sharing is the point, like data.</li>
+<li><strong>Give each primitive one owner.</strong> A primitive with no owner becomes the next legacy system. The owner keeps the interface stable and the docs current.</li>
+</ul>
+<p>This is the oldest idea in software, abstraction, applied for a new reason. We used to build abstractions so people could manage complexity. Now they also decide how much context an agent needs to do useful work. AI makes this more valuable, not less: coding is cheap now, so teams can build and maintain primitives that used to be too expensive to justify.</p>
+<hr>
+
+<h2 id="self-maintenance">2) Make the system maintain itself</h2>
+<p>Primitives fix the structure at one point in time. But architecture decays. Every feature leaves something behind: a flag nobody removed, a code path for a customer who left, a copy of a helper that drifted, a dependency two major versions behind. In a large system the decay grows faster than any team can clean it up.</p>
+<p>Agents make this worse before they make it better. An agent can add code much faster than a person, and it adds code in the style of whatever it reads. If the code base is messy, the agent copies the mess. If complexity keeps growing, the context problem from the last section comes back.</p>
+<p>So the factory needs a <strong>maintenance loop</strong> that runs all the time, not a cleanup project every two years. In practice that means:</p>
+<ol>
+<li><strong>Agents do the chores.</strong> Removing dead code, retiring old feature flags, upgrading dependencies, and merging duplicate helpers are boring, well-defined tasks. They are a good fit for agents, and they should run on a schedule, not when someone has time.</li>
+<li><strong>Rules are written down and enforced in the loop.</strong> Architecture rules that live only in senior engineers’ heads get broken. Write them as checks that run at every stage, from spec review to code review to deploy: “this table is retired, don’t write to it,” “all new inputs go through the data primitive,” “no new service calls this API directly.” Then agents and humans follow the same rules, and the rules apply across the whole lifecycle instead of only at review time.</li>
+<li><strong>Measure complexity and set a budget.</strong> Track a few numbers that show decay, like dead code, open flags, duplicate logic, and time to onboard a new application to the testing and evaluation systems. Spend a fixed share of capacity on keeping them flat or falling.</li>
+<li><strong>Keep the knowledge base current.</strong> When an agent finishes a change, it updates the map. A stale map is worse than none, because agents trust it.</li>
+</ol>
+<p>The test of self-maintenance is simple. A year from now, is the code base easier or harder for an agent to work in? If the answer is “harder,” the factory is building its own legacy system.</p>
+<hr>
+
+<h2 id="continuous-delivery">3) Ship small changes, continuously</h2>
+<p>The last idea is cultural, and it is the one large teams resist most. Large systems tend to ship in big batches: long-lived branches, quarterly releases, “the migration.” Big batches are bad for people, and they are worse for agents. A big change needs a big context, takes a long time to review, and is hard to test and hard to roll back. It throws away all three properties from the start of this post.</p>
+<p>Small changes bring them back. A change that touches one module needs only that module in context. It can be reviewed in minutes and rolled back in seconds. And when changes are small, they can ship continuously, which keeps feedback fast.</p>
+<p>Two practices make small, continuous changes safe on a system that cannot break:</p>
+
+<h3 id="toggles">Feature toggles: separate deploy from release</h3>
+<p>Big batches usually exist because a feature is not finished, and nobody wants half a feature in production. Feature toggles remove that reason. Code ships to production behind a toggle that is off. The agent can land twenty small changes over two weeks, each one deployed and tested, and the feature turns on only when it is ready. Turning it on is a config change, and so is turning it off.</p>
+<p>Toggles also let you release slowly: first to one region, one product group, or a small sample, then wider. A two-step path works well. First a light test on a small sample that one team can run on its own. Then a formal experiment that involves the other teams. Most bad ideas die cheaply in the first step.</p>
+<p>Toggles are also decay. Every toggle is a branch in the code. This is why the self-maintenance loop matters: once a feature is fully on, an agent removes the toggle and the dead path.</p>
+
+<h3 id="regression">Regression tests: the contract that makes refactoring safe</h3>
+<p>Sections 1 and 2 both ask you to refactor a lot: move logic into primitives, remove dead code, merge duplicates. On a large brownfield system, refactoring is scary because nobody is sure what the old behavior was. That fear is what keeps complexity in place.</p>
+<p>Regression tests remove the fear. If you can show that the system makes the same decisions after a refactor as before, the refactor is safe. For many systems the strongest form is a replay test: run the old and new code on the same recorded inputs and compare the outputs. Where they match, the refactor is proven. Where they differ, the difference is either a bug or an intended change, and the explainability primitive tells you which.</p>
+<p>This is the point where the three ideas connect. Primitives (testing and evaluation, and data) make regression testing cheap. Regression testing makes self-maintenance safe. Self-maintenance keeps the code base small enough that each change stays small. And small changes keep the factory fast.</p>
+<blockquote><p>Coding is cheap. Communication and end-to-end testing are still expensive. A brownfield factory spends its effort on the expensive parts: shared primitives so teams talk less, and replay and regression tests so changes need less end-to-end testing.</p></blockquote>
+<hr>
+
+<h2 id="loop">How the pieces fit</h2>
+<p>Put together, the factory for a large brownfield system looks like this:</p>
+<ol>
+<li><strong>A small set of shared primitives</strong> (data, testing and evaluation, explainability, knowledge base) absorbs the cross-cutting complexity, so each application is a mid-sized project again.</li>
+<li><strong>A maintenance loop</strong> keeps the code base from decaying. Agents do the chores, written rules guard the architecture at every stage, and a complexity budget keeps the numbers honest.</li>
+<li><strong>Small, continuous changes</strong> keep each task within an agent’s context. Feature toggles let unfinished work ship safely, and regression tests make refactoring safe.</li>
+</ol>
+<p>None of this is new. Abstraction, maintenance, and continuous delivery are decades old. What is new is that agents change the economics. Writing the code for a primitive, a cleanup, or a regression suite used to be the expensive part, so teams skipped it. Now it is the cheap part. The expensive parts are the ones agents cannot do alone: agreeing on interfaces across teams, and proving that a change is safe. Put your effort there.</p>
+<hr>
+
+<h2 id="start">Where to start</h2>
+<p>If you own a large brownfield system and want to try this, don’t start with the factory. Start with the properties:</p>
+<ul>
+<li><strong>Pick one painful, repeated thing</strong> (usually input data or test environments) and turn it into a primitive that two teams share.</li>
+<li><strong>Build one replay test</strong> for your most important decision path. It will pay for itself the first time someone refactors it.</li>
+<li><strong>Write down three architecture rules</strong> that keep getting broken, and turn them into checks that run on every change.</li>
+<li><strong>Set a size limit on changes</strong> and put everything bigger behind a toggle.</li>
+</ul>
+<p>Then measure the one number that matters: how long it takes to go from an idea to a tested result. If that number is falling, the factory is working, no matter how old the code is.</p>
+</main>
+</div></body></html>
