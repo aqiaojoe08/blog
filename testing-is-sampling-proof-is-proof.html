@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Two Ways to Verify Software: Sample the Behavior, or Prove It</title>
+<style>
+:root{
+  --bg:#fbfaf8; --panel:#fff; --ink:#1c1b1a; --muted:#5f5b56; --faint:#8b857e;
+  --rule:#e6e2dc; --accent:#8a5a2b; --accent-soft:#f4ede4; --code-bg:#f6f4f1;
+}
+@media (prefers-color-scheme:dark){
+  :root{ --bg:#16171a; --panel:#1c1e22; --ink:#e8e6e3; --muted:#a7a29b; --faint:#857f78;
+         --rule:#2d3035; --accent:#d9a05b; --accent-soft:#25262a; --code-bg:#21242a; }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:17px/1.72 ui-serif,Georgia,'Iowan Old Style','Times New Roman',serif;
+  padding:0 1.25rem 6rem;}
+.wrap{max-width:46rem;margin:0 auto}
+header.mast{padding:4.5rem 0 0;border-bottom:1px solid var(--rule);margin-bottom:2.5rem}
+h1{font-size:2.3rem;line-height:1.18;letter-spacing:-.02em;margin:0 0 1rem;font-weight:600}
+header.mast p.sub{color:var(--muted);font-style:italic;margin:0 0 2.2rem;font-size:1.02rem}
+.meta{display:flex;gap:1.4rem;flex-wrap:wrap;font-family:ui-sans-serif,system-ui,sans-serif;
+  font-size:.76rem;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);
+  padding-bottom:1.4rem}
+h2{font-size:1.5rem;line-height:1.25;letter-spacing:-.01em;margin:3.4rem 0 1rem;font-weight:600;
+  padding-top:.4rem}
+h3{font-size:1.13rem;margin:2.4rem 0 .7rem;font-weight:600;
+  font-family:ui-sans-serif,system-ui,sans-serif;letter-spacing:-.005em}
+p{margin:0 0 1.15rem}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid color-mix(in oklab,var(--accent) 35%,transparent)}
+a:hover{border-bottom-color:var(--accent)}
+strong{font-weight:650}
+hr{border:0;height:1px;background:var(--rule);margin:2.8rem 0}
+ul,ol{margin:0 0 1.3rem;padding-left:1.35rem}
+li{margin:0 0 .62rem}
+li>p{margin:0 0 .6rem}
+blockquote{margin:1.5rem 0;padding:.2rem 0 .2rem 1.3rem;border-left:3px solid var(--accent);
+  color:var(--muted)}
+blockquote p{margin:0 0 .6rem}
+blockquote p:last-child{margin:0}
+code{font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,monospace;font-size:.855em;
+  background:var(--code-bg);padding:.13em .38em;border-radius:4px;
+  border:1px solid color-mix(in oklab,var(--rule) 70%,transparent)}
+pre{background:var(--code-bg);border:1px solid var(--rule);border-radius:8px;
+  padding:1rem 1.1rem;overflow-x:auto;margin:0 0 1.4rem}
+pre code{background:none;border:0;padding:0;font-size:.8rem;line-height:1.62}
+.tw{overflow-x:auto;margin:0 0 1.6rem;border:1px solid var(--rule);border-radius:8px;
+  background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-family:ui-sans-serif,system-ui,sans-serif;
+  font-size:.845rem;line-height:1.5}
+th{text-align:left;font-weight:600;background:var(--accent-soft);color:var(--ink);
+  padding:.68rem .8rem;border-bottom:1px solid var(--rule);vertical-align:bottom;
+  font-size:.78rem;letter-spacing:.02em}
+td{padding:.66rem .8rem;border-bottom:1px solid color-mix(in oklab,var(--rule) 60%,transparent);
+  vertical-align:top;color:var(--muted)}
+td:first-child{color:var(--ink)}
+tbody tr:last-child td{border-bottom:0}
+@media (max-width:640px){
+  body{font-size:16px;padding:0 1rem 4rem}
+  h1{font-size:1.85rem} h2{font-size:1.32rem}
+  header.mast{padding-top:2.5rem}
+}
+@media print{
+  body{background:#fff;color:#000;font-size:11pt}
+  .tw,pre{break-inside:avoid} h2,h3{break-after:avoid}
+}
+</style>
+</head><body><div class="wrap">
+<nav style="padding-top:1.6rem;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.85rem"><a href="./" style="border:0">&larr; All posts</a></nav>
+<header class="mast">
+<h1>Two Ways to Verify Software: Sample the Behavior, or Prove It</h1>
+<p class="sub">Tests are behavior samples, and the best samples come from production. When 99.99% is not enough, you need a proof, and proofs just got much cheaper.</p>
+<div class="meta"><span>1,900 words</span><span>~8 min read</span><span>2026-11-04</span></div>
+</header>
+<main>
+<h2 id="two-ways">Two ways, not one</h2>
+<p>There are two ways to verify that software does what it should.</p>
+<ol>
+<li><strong>Sample its behavior.</strong> Pick inputs, run the system, check the outputs. Unit tests, integration tests, load tests, canaries, and evals are all this. The result is statistical: the system is correct on the samples, and probably correct on inputs that look like them.</li>
+<li><strong>Prove it.</strong> Describe the system, or a model of it, in mathematics, state the property you care about, and show the property holds for <em>every</em> input. Type systems, model checkers, SMT solvers, and proof assistants are all this. The result is logical: no input violates the property, within the limits of the model.</li>
+</ol>
+<p>Most teams do only the first and talk about it as if it were the second. This post is about getting both right: where the best samples come from, and when it is worth paying for a proof.</p>
+<hr>
+
+<h2 id="sampling">Testing is sampling, not exhaustion</h2>
+<p>There is a persistent illusion that if you write enough tests, you can show a system is correct. It feels like rigor. It is not. You pick a finite set of inputs, observe the outputs, and conclude the system behaves as expected <em>for those inputs</em>. The rest of the behavior space is unobserved. This is not a failure of discipline. It is arithmetic.</p>
+
+<h3 id="combinatorial-wall">The combinatorial wall</h3>
+<p>For a function with three independent input dimensions (say user role, request type, and environment), the test space is the product of all three. Add a fourth and it multiplies again. Real systems have dozens of dimensions. Exhaustive testing is not a goal you reach with more effort. It is a goal that does not exist.</p>
+<p>“Just cover the edge cases” does not escape the wall either. For one string input, edge cases include empty, single character, maximum length, Unicode, null bytes, newlines, surrounding whitespace, strings that look like numbers, SQL, or HTML. That is ten categories already, and each one combines with every other dimension. Edge cases multiply like everything else.</p>
+
+<h3 id="evidence">Tests are evidence, not proof</h3>
+<p>A good suite is a <em>stratified</em> sample: boundary conditions, the common paths that carry most traffic, known failure modes, and adversarial inputs. Even then, a passing suite means the system is correct on the sampled behaviors. The strength of that evidence depends on three things:</p>
+<ul>
+<li><strong>How well the sample covers the risk surface</strong>, not how many tests there are.</li>
+<li><strong>How stable the behavior is.</strong> A flaky test is negative evidence.</li>
+<li><strong>How close the sample is to production.</strong> A test that passes in isolation and fails under real load is a gap in the sample.</li>
+</ul>
+<p>This matters more now that agents can generate hundreds of tests in minutes. If an agent keeps sampling the same region of the behavior space, because that is where its training signal is dense, coverage of low-risk behavior goes up while high-risk behavior stays unsampled. The metric improves and the confidence is misplaced. 100% line coverage means every line ran once. It says nothing about the combinations.</p>
+<p>Data-driven and ML systems make this sharper. Their behavior space is defined by a data distribution, and the test set is a sample of last year’s distribution. Production drifts, and many of these systems shape the data they later learn from. A passing eval is evidence about the old distribution, not the live one.</p>
+<p>The third bullet above is the important one. It leads to the first meta-point.</p>
+<hr>
+
+<h2 id="production">The best samples come from production</h2>
+<p>If tests are samples, the question is no longer “do we have enough tests?” but “is our sample representative of the behavior that matters?” And there is exactly one place where the real distribution of behavior lives: production.</p>
+<p>Every test written before launch is a <em>guess</em> about that distribution. A good engineer guesses well, but the guess is shaped by what the engineer imagined: the happy path, a few boundaries, the bugs they have seen before. Production does not need to imagine. It contains the combinations nobody thought of, in the proportions they actually occur. That is why so many bugs are first found in production even in well-tested systems: <strong>the pre-production sample was drawn from the wrong distribution.</strong></p>
+<p>So treat production as the primary source of behavior samples, and pre-production tests as the seed. There are two ways to collect them.</p>
+
+<h3 id="blind">1. Collect blindly</h3>
+<p>Capture real requests (all of them, or a uniform or stratified slice) and replay them against new versions of the system. Shadow traffic, record-and-replay, and diffing the output of the old and new versions all fall here. You do not need to know in advance what the interesting inputs are. The traffic tells you.</p>
+<ul>
+<li><strong>Strength:</strong> representative by construction. The sample has the right shape, including the long tail of odd combinations.</li>
+<li><strong>Weakness:</strong> mostly redundant. Most requests look like each other, and rare dangerous inputs stay rare. You also need an oracle. Comparing against the previous version catches regressions, not bugs both versions share.</li>
+<li><strong>Cost to manage:</strong> privacy and data handling. Scrub or synthesize sensitive fields before a request becomes a test fixture.</li>
+</ul>
+
+<h3 id="feedback">2. Collect by feedback</h3>
+<p>Let production find the bugs, then turn each bug into a permanent sample. Every incident, customer ticket, alarm, and on-call fix contributes the exact input that broke the system, plus the expected output somebody had to work out to fix it. That input becomes a regression test, and the suite grows toward the regions where the system actually fails.</p>
+<ul>
+<li><strong>Strength:</strong> high signal. Each sample is known to matter, because it already hurt once, and it comes with an oracle.</li>
+<li><strong>Weakness:</strong> reactive. Someone pays for the bug before it becomes a sample.</li>
+</ul>
+<p>The two work well together. Blind capture gives you the shape of normal behavior and catches regressions early. Feedback gives you the sharp edges. Over time the suite becomes a record of how the system is really used and how it really fails, not of what someone predicted before launch. This is also where agents help most: turning an incident into a minimal reproducing test, and deduplicating a million captured requests into a few hundred that cover distinct behavior, are both jobs an agent does well.</p>
+<p>Done well, this gets you a system that is statistically correct: 99.9%, 99.99%, maybe more, on the traffic it actually sees. For most software, that is the right target. But both methods share one limit. They learn from what already happened. Some failures are not allowed to happen even once.</p>
+<hr>
+
+<h2 id="proof">When 99.99% is not enough: prove it</h2>
+<p>In security, aerospace, industrial control, medical devices, and cryptography, “we will add the bug as a test after it happens” is not an acceptable plan. The first failure is the catastrophe. An authorization check that is right on 99.99% of requests is a vulnerability, because an attacker does not sample from your traffic distribution. They search for the 0.01%.</p>
+<p>No amount of sampling closes that gap. For these properties you need the second kind of verification: state the property precisely and prove it holds for all inputs. This is what formal methods do. A proof assistant such as Lean or Coq checks a proof step by step. A model checker such as TLA+ explores every reachable state of a design. An SMT solver such as Z3 either proves a property for all inputs or produces a concrete counterexample.</p>
+
+<h3 id="barrier">The barrier just dropped</h3>
+<p>Formal methods have always been the right answer for these domains, and the wrong answer for almost everyone else, because of cost. Writing a specification took specialists. Writing the proof took more specialists, and often more time than writing the code. That cost is falling fast.</p>
+<ul>
+<li><strong>Agents can draft specifications and proofs.</strong> Translating code or a design into a formal model, writing lemmas, and grinding through proof obligations are tedious, mechanical, and checkable. That is the ideal job for an agent: when it is wrong, the checker says so.</li>
+<li><strong>The checker is the oracle.</strong> With generated tests, you still have to trust that the agent picked meaningful cases. With generated proofs, you only have to trust the property you stated and the checker that verified it. The agent’s output no longer needs to be trusted.</li>
+<li><strong>Tooling is closer to everyday code.</strong> Teams are now proving properties of agent harnesses in Lean (see <a href="https://kiro.dev/blog/harness-properties-in-lean/">Kiro’s post on harness properties in Lean</a>), and SMT solvers are a library call away from most languages.</li>
+</ul>
+<p>This changes formal verification from a special project into a tool you reach for when sampling is not enough. It also makes AI-driven development safer at scale: if a property is proven, it does not matter whether a person or an agent wrote the code that satisfies it.</p>
+
+<h3 id="models">You do not need to be in aerospace to use it</h3>
+<p>Most business systems do not need 100% correctness everywhere. But many contain a small mathematical core where an assumption, if wrong, silently breaks everything above it. There, formal methods can be a good complement to sampling, and sometimes the <em>cheaper</em> option, provided the problem can be abstracted into a clean mathematical model.</p>
+<p>One example from my own area: an inventory planning model searches over order quantities and relies on its weekly net-present-value function being <strong>quasiconcave</strong>, so that a local search finds the global optimum. You could test that with thousands of sampled parameter combinations and still miss the corner where it fails. Instead, the team encoded the function and the property in Z3 and asked the solver for a counterexample. If none exists, the property holds for every input in the model, and the optimizer’s core assumption is proven, not hoped for. A few hundred lines of solver code replaced an unbounded amount of sampling.</p>
+<p>Leslie Lamport put the progression well: <em>writing is nature’s way of letting you know how sloppy your thinking is, and mathematics is nature’s way of letting you know how sloppy your writing is.</em> For software, I would add one step in the middle: <strong>writing shows how sloppy your thinking is, coding shows how sloppy your writing is, and mathematics shows how sloppy your coding is.</strong></p>
+<hr>
+
+<h2 id="choosing">Choosing between them</h2>
+<div class="tw"><table><thead><tr><th></th><th>Behavior sampling</th><th>Formal proof</th></tr></thead><tbody>
+<tr><td>Guarantee</td><td>Statistical: correct on observed and similar inputs</td><td>Logical: correct for all inputs, within the model</td></tr>
+<tr><td>Best source</td><td>Production traffic, blind capture plus bugs fed back</td><td>A precise property and a clean mathematical model</td></tr>
+<tr><td>Fails when</td><td>The sample misses the region where the bug lives</td><td>The model or the property does not match reality</td></tr>
+<tr><td>Right for</td><td>Most business logic, UIs, integrations, ML systems</td><td>Security boundaries, safety-critical control, core algorithms and their assumptions</td></tr>
+<tr><td>Agent’s role</td><td>Turn incidents into tests, deduplicate captured traffic</td><td>Draft specs and proofs that a checker verifies</td></tr>
+</tbody></table></div>
+<p>The two are not rivals. A proof covers only what the model captures, and models leave things out: I/O, configuration, the environment. Sampling from production checks the whole system as it really runs, with the gaps described above. A mature system uses proofs for the small core that must never fail, and production-driven sampling for everything around it.</p>
+<blockquote><p>Tests are samples, so take them from where the real distribution lives: production. Proofs are guarantees, so spend them where one failure is too many. Both just got cheaper.</p></blockquote>
+<hr>
+<h3 id="references">References</h3>
+<ul>
+<li><a href="https://kiro.dev/blog/harness-properties-in-lean/">Proving harness properties in Lean</a> — Kiro blog</li>
+<li><a href="https://github.com/Z3Prover/z3">Z3</a> — SMT solver from Microsoft Research</li>
+<li>“Testing Is Sampling, Not Exhaustion” — my earlier note, 2026</li>
+</ul>
+</main>
+</div></body></html>
