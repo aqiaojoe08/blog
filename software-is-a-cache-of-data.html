@@ -72,8 +72,8 @@ tbody tr:last-child td{border-bottom:0}
 <nav style="padding-top:1.6rem;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.85rem"><a href="./" style="border:0">&larr; All posts</a></nav>
 <header class="mast">
 <h1>Software Is a Cache of Data: Redefining Software for 1.0, 2.0, and 3.0</h1>
-<p class="sub">We used to store data to cache the results of software. Now, more and more often, the software is the cache: a distilled, compressed form of data too large to keep in hand. That flips how we should build, version, and test it.</p>
-<div class="meta"><span>1,300 words</span><span>~6 min read</span><span>2026-11-12</span></div>
+<p class="sub">We used to store data to cache the results of software. More and more often, the software is now the cache: a distilled form of data too large to keep in hand. Code that models how a system behaves is still essential, but this trend changes how we build, version, and test software.</p>
+<div class="meta"><span>1,600 words</span><span>~7 min read</span><span>2026-11-12</span></div>
 </header>
 <main>
 <h2 id="three-forms">Every organization now runs three kinds of software</h2>
@@ -96,7 +96,7 @@ tbody tr:last-child td{border-bottom:0}
 
 <h2 id="inversion">The cache inversion</h2>
 <p>In traditional software, the arrow points the other way. Software is the source of truth, and data is the cache. We memoize function results. We build materialized views so we do not have to run the same query again. We put computed pages on a CDN. The computation is primary, and data saves us from repeating it.</p>
-<p>That model breaks when the data gets big enough. Take operational logs. Ours are so large that no engineer, and no single query, can hold them in view. To get value from them, we have to distill them: into aggregates, into a minimized summary, or into the weights of a neural network that has learned the patterns. Inference on those weights, which is what Software 3.0 does all day, is then a fast lookup into a compressed form of all that data.</p>
+<p>That arrangement strains when the data gets big enough. Take operational logs. Ours are so large that no engineer, and no single query, can hold them in view. To get value from them, we have to distill them: into aggregates, into a minimized summary, or into the weights of a neural network that has learned the patterns. Inference on those weights, which is what Software 3.0 does all day, is then a fast lookup into a compressed form of all that data.</p>
 <blockquote><p>In Software 1.0, data is a cache of computation. In Software 2.0 and 3.0, computation is a cache of data.</p></blockquote>
 <p>The inversion is useful because the vocabulary of caching transfers directly, and it tells us which problems to expect:</p>
 <div class="tw"><table>
@@ -109,7 +109,16 @@ tbody tr:last-child td{border-bottom:0}
 <tr><td><strong>Lossy compression</strong></td><td>Distillation keeps the common patterns and drops the rare ones. Rare cases are where the bugs hide.</td></tr>
 <tr><td><strong>Cache poisoning</strong></td><td>Bad or biased data in the source flows straight into behavior</td></tr>
 </tbody></table></div>
-<p>The cache-miss row is the dangerous one. A key-value cache tells you when it does not have the answer. A distilled model does not. That is why the next shift matters.</p>
+<p>The cache-miss row is the dangerous one. A key-value cache tells you when it does not have the answer. A distilled model does not. That is one reason the next two points matter.</p>
+
+<h2 id="still-needed">Traditional software still models the system</h2>
+<p>None of this means we can retire traditional software. Code that explicitly models the dynamics of a system is still very useful, and we cannot do without it. That covers code for how inventory moves, how queues build up, how capacity limits throughput, and how a decision today changes the state tomorrow. It does three things a model distilled from data cannot:</p>
+<ul>
+<li><strong>It extrapolates.</strong> An explicit model of the dynamics gives a reasonable answer for a situation that has never happened, such as a new constraint or a spike larger than any in the history. A distilled model only interpolates between the cases it has seen.</li>
+<li><strong>It enforces hard constraints.</strong> Some rules must hold every time, not 99.99% of the time. Those belong in code that you can test thoroughly or prove.</li>
+<li><strong>It explains itself.</strong> When an explicit model gives a surprising answer, you can trace why. When weights give a surprising answer, you mostly cannot.</li>
+</ul>
+<p>So the inversion is a trend, not a replacement. The systems that work best for us combine the two. The explicit model of the dynamics sets the structure and the hard limits. The parts distilled from data fill in what is too large or too fuzzy to write by hand. For each part of a system, the useful question is which way its arrow should point.</p>
 
 <h2 id="behavior-by-data">Behavior is defined by data, not only by static code</h2>
 <p>If behavior comes from data, you cannot fully define or check it by reading code. Reading a model’s weights tells you nothing useful. Even for Software 1.0, the code that matters more and more is code that an agent wrote, and humans review it by outcome, not line by line.</p>
@@ -135,7 +144,8 @@ tbody tr:last-child td{border-bottom:0}
 <h2 id="lessons">What we learned</h2>
 <ul>
 <li><strong>Software is no longer just the codebase.</strong> Across 1.0, 2.0, and 3.0, more and more behavior lives in data.</li>
-<li><strong>The arrow has flipped.</strong> Data used to cache computation. Now models are a cached, distilled form of data too large to use directly.</li>
+<li><strong>The arrow is flipping.</strong> Data used to cache computation. More and more, models are a cached, distilled form of data too large to use directly.</li>
+<li><strong>Keep the explicit model.</strong> Code that models a system’s dynamics extrapolates, enforces hard constraints, and explains itself. Combine it with what you distill from data instead of replacing it.</li>
 <li><strong>Use the caching vocabulary.</strong> Source of truth, invalidation, TTL, and misses map directly to data, retraining, drift, and out-of-distribution inputs.</li>
 <li><strong>Define behavior with data.</strong> Eval sets and production data from end to end are the spec and the test for software you cannot read.</li>
 <li><strong>Engineer the source, not only the cache.</strong> Version, review, and trace the data and the recipe, and let agents keep the cache fresh.</li>
