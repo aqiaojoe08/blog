@@ -72,14 +72,21 @@ tbody tr:last-child td{border-bottom:0}
 <header class="mast">
 <h1>Slice by Intent, Not by Phase: Organizing a Software Factory Around Three Change Streams</h1>
 <p class="sub">We used to drive AI transformation one SDLC phase at a time. It helped, but it was slow. Organizing the work by what triggered a change, and what it is trying to achieve, changed minds much faster, and it has helped us reach a 2x productivity increase.</p>
-<div class="meta"><span>2,600 words</span><span>~11 min read</span><span>2026-11-12</span></div>
+<div class="meta"><span>2,800 words</span><span>~12 min read</span><span>2026-11-12</span></div>
 </header>
 <main>
 <h2 id="old-way">How we used to do it</h2>
 <p>When we first drove AI adoption across our team, we did what most engineering organizations do. We cut the software development lifecycle into phases and gave each phase an owner. One person drove AI for operations: oncall agents, smarter alarms, ticket triage. Another drove AI for development: spec-driven development, agent-assisted code review, continuous delivery. A third owned the knowledge base: <code>AGENTS.md</code> files, steering docs, wiki sync.</p>
 <p>It worked, up to a point. Each phase got measurably better. Alarms got less noisy, ticket volume went down, regression testing built from production traffic became a template other teams adopted, and we planned a productivity gain into our annual plan.</p>
 <p>But it was not efficient. Phase owners optimized their own phase. A faster code review did nothing for a fix that then waited two days in a deployment pipeline. A better knowledge base did nothing for a feature whose real delay was three meetings to agree on what to build. Every phase got faster, and the time from “we need this” to “this is in production” barely moved. Engineers kept treating AI as tools bolted onto the old process, not as a reason to change the process.</p>
-<p>The underlying problem: <strong>as AI raises the speed of writing and reviewing code, the bottleneck moves away from the code.</strong> Where it moves depends on the kind of change. A per-phase plan cannot see that, because every kind of change flows through the same phases.</p>
+<p>Looking back, the phase-by-phase model had three deeper problems:</p>
+<ol>
+<li><strong>Operational feedback never reached product development.</strong> In a phase model, operations is the last phase. Alarms, tickets, and defects were handled and closed inside that phase. They did not go back to development as signals about the software: where it is fragile, which designs keep breaking, and what the next change should be. The same class of issue kept coming back, and we got faster at closing it instead of removing it.</li>
+<li><strong>Nobody thought the codebase needed a mechanism to stay evergreen.</strong> No phase owns dependency upgrades, security patches, or complexity reduction, so nobody expected a mechanism that does them continuously. They happened when someone had spare time, or when a deadline or a security campaign forced them. In the meantime, the codebase got harder to change, for humans and agents alike.</li>
+<li><strong>Development started at a feature request.</strong> If you think of development as “a feature request arrives, then we build it,” every change needs someone outside the team to ask for it. Self-maintenance never has that requester, so it drops out of the picture. It is also the work agents can do almost entirely on their own, and the phase model had no place to put it.</li>
+</ol>
+<p>All three come from the same blind spot. A phase plan describes how a change moves through the lifecycle, but not where the change comes from. Operational feedback and self-maintenance start from different triggers than a feature request, so a plan built around phases has no natural place for them.</p>
+<p>AI made that blind spot more costly: <strong>as AI raises the speed of writing and reviewing code, the bottleneck moves away from the code.</strong> Where it moves depends on the kind of change. A per-phase plan cannot see that, because every kind of change flows through the same phases.</p>
 <hr>
 
 <h2 id="intent">Working backwards from intent</h2>
