@@ -66,6 +66,28 @@ tbody tr:last-child td{border-bottom:0}
   body{background:#fff;color:#000;font-size:11pt}
   .tw,pre{break-inside:avoid} h2,h3{break-after:avoid}
 }
+.fig{--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--o1:#1c5cab;--o2:#2a78d6;--o3:#5598e7;--o4:#86b6ef;
+  --grid:#e1e0d9;--axis:#c3c2b7;--lab:#898781;
+  margin:2.1rem 0 2.3rem;border:1px solid var(--rule);border-radius:8px;background:var(--panel);
+  padding:1.1rem 1.15rem .95rem}
+@media (prefers-color-scheme:dark){.fig{--s1:#3987e5;--s2:#d95926;--s3:#199e70;
+  --o1:#184f95;--o2:#256abf;--o3:#3987e5;--o4:#6da7ec;--grid:#2c2c2a;--axis:#383835}}
+.fig svg{display:block;width:100%;height:auto}
+.fig .ft{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.86rem;font-weight:600;
+  color:var(--ink);margin:0 0 .55rem;line-height:1.35}
+.fig figcaption{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.76rem;line-height:1.55;
+  color:var(--muted);margin:.8rem 0 0}
+.fig .lgd{display:flex;flex-wrap:wrap;gap:.3rem 1.1rem;font-family:ui-sans-serif,system-ui,sans-serif;
+  font-size:.76rem;color:var(--muted);margin:0 0 .75rem}
+.fig .lgd span{display:inline-flex;align-items:center;gap:.4rem}
+.fig .lgd i{width:10px;height:10px;border-radius:3px;display:inline-block;flex:0 0 auto}
+.fig text{font-family:ui-sans-serif,system-ui,sans-serif}
+.fig .t-pri{fill:var(--ink)}.fig .t-sec{fill:var(--muted)}.fig .t-mut{fill:var(--lab)}
+.fig .gr{stroke:var(--grid);stroke-width:1;fill:none}
+.fig .ax{stroke:var(--axis);stroke-width:1;fill:none}
+.fig .ln{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.fig .dsh{fill:none;stroke-width:1.5;stroke-dasharray:4 5}
+.fig .box{fill:none;stroke-width:1.5}
 </style>
 </head><body><div class="wrap">
 <body><div class="wrap">
@@ -98,6 +120,38 @@ tbody tr:last-child td{border-bottom:0}
 <p>In traditional software, the arrow points the other way. Software is the source of truth, and data is the cache. We memoize function results. We build materialized views so we do not have to run the same query again. We put computed pages on a CDN. The computation is primary, and data saves us from repeating it.</p>
 <p>That arrangement strains when the data gets big enough. Take operational logs. Ours are so large that no engineer, and no single query, can hold them in view. To get value from them, we have to distill them: into aggregates, into a minimized summary, or into the weights of a neural network that has learned the patterns. Inference on those weights, which is what Software 3.0 does all day, is then a fast lookup into a compressed form of all that data.</p>
 <blockquote><p>In Software 1.0, data is a cache of computation. In Software 2.0 and 3.0, computation is a cache of data.</p></blockquote>
+<figure class="fig">
+<p class="ft">Which one is the cache?</p>
+<div class="lgd"><span><i style="background:var(--s2)"></i>Code and models</span><span><i style="background:var(--s1)"></i>Data</span></div><svg viewBox="0 0 720 300" role="img" aria-labelledby="figB-t figB-d">
+<title id="figB-t">Which one is the cache?</title><desc id="figB-d">Two rows showing a filled source-of-truth box and an outlined cache box. The arrow between them points from code to data in Software 1.0 and from data to model in Software 2.0 and 3.0.</desc>
+<text class="t-pri" x="40" y="54" font-size="12.5" font-weight="600">Software 1.0</text>
+<rect x="40" y="72" width="230" height="54" rx="7" fill="var(--s2)"/>
+<text x="54" y="95" font-size="13.5" font-weight="600" fill="#fff">Code</text>
+<text x="54" y="113" font-size="11" fill="#fff" opacity=".88">computation, written by hand</text>
+<text class="t-mut" x="40" y="66" font-size="10.5" letter-spacing=".07em">SOURCE OF TRUTH</text>
+<rect class="box" x="440" y="72" width="240" height="54" rx="7" stroke="var(--s1)"/>
+<text class="t-pri" x="454" y="95" font-size="13.5" font-weight="600">Data</text>
+<text class="t-mut" x="454" y="113" font-size="11">memo tables, views, CDN</text>
+<text class="t-mut" x="440" y="66" font-size="10.5" letter-spacing=".07em">CACHE</text>
+<line x1="288" y1="99" x2="415" y2="99" stroke="var(--axis)" stroke-width="2" stroke-linecap="round"/><polygon points="422,99 415,94.66 415,103.34" fill="var(--axis)"/>
+<text class="t-sec" x="355" y="88" font-size="11.5" text-anchor="middle">data caches the computation</text>
+<text class="t-mut" x="355" y="118" font-size="10.5" text-anchor="middle">rebuild it by running the code</text>
+<text class="t-pri" x="40" y="192" font-size="12.5" font-weight="600">Software 2.0 / 3.0</text>
+<rect class="box" x="40" y="210" width="230" height="54" rx="7" stroke="var(--s2)"/>
+<text class="t-pri" x="54" y="233" font-size="13.5" font-weight="600">Model</text>
+<text class="t-mut" x="54" y="251" font-size="11">weights, inference</text>
+<text class="t-mut" x="40" y="204" font-size="10.5" letter-spacing=".07em">CACHE</text>
+<rect x="440" y="210" width="240" height="54" rx="7" fill="var(--s1)"/>
+<text x="454" y="233" font-size="13.5" font-weight="600" fill="#fff">Data</text>
+<text x="454" y="251" font-size="11" fill="#fff" opacity=".88">logs, history, outcomes</text>
+<text class="t-mut" x="440" y="204" font-size="10.5" letter-spacing=".07em">SOURCE OF TRUTH</text>
+<line x1="422" y1="237" x2="295" y2="237" stroke="var(--axis)" stroke-width="2" stroke-linecap="round"/><polygon points="288,237 295,232.66 295,241.34" fill="var(--axis)"/>
+<text class="t-sec" x="355" y="226" font-size="11.5" text-anchor="middle">the model caches the data</text>
+<text class="t-mut" x="355" y="256" font-size="10.5" text-anchor="middle">rebuild it by retraining</text>
+<line class="gr" x1="40" y1="176" x2="680" y2="176"/>
+</svg>
+<figcaption>A schematic, not measured data. In Software 1.0 the code is the source of truth and data saves us from recomputing it. In Software 2.0 and 3.0 the data is the source of truth and the model is the derived copy: smaller, faster to query, rebuilt from the data when it goes stale.</figcaption>
+</figure>
 <p>The inversion is useful because the vocabulary of caching transfers directly, and it tells us which problems to expect:</p>
 <div class="tw"><table>
 <thead><tr><th>Caching concept</th><th>What it means when the model is the cache</th></tr></thead>

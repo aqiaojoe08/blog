@@ -66,6 +66,28 @@ tbody tr:last-child td{border-bottom:0}
   body{background:#fff;color:#000;font-size:11pt}
   .tw,pre{break-inside:avoid} h2,h3{break-after:avoid}
 }
+.fig{--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--o1:#1c5cab;--o2:#2a78d6;--o3:#5598e7;--o4:#86b6ef;
+  --grid:#e1e0d9;--axis:#c3c2b7;--lab:#898781;
+  margin:2.1rem 0 2.3rem;border:1px solid var(--rule);border-radius:8px;background:var(--panel);
+  padding:1.1rem 1.15rem .95rem}
+@media (prefers-color-scheme:dark){.fig{--s1:#3987e5;--s2:#d95926;--s3:#199e70;
+  --o1:#184f95;--o2:#256abf;--o3:#3987e5;--o4:#6da7ec;--grid:#2c2c2a;--axis:#383835}}
+.fig svg{display:block;width:100%;height:auto}
+.fig .ft{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.86rem;font-weight:600;
+  color:var(--ink);margin:0 0 .55rem;line-height:1.35}
+.fig figcaption{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.76rem;line-height:1.55;
+  color:var(--muted);margin:.8rem 0 0}
+.fig .lgd{display:flex;flex-wrap:wrap;gap:.3rem 1.1rem;font-family:ui-sans-serif,system-ui,sans-serif;
+  font-size:.76rem;color:var(--muted);margin:0 0 .75rem}
+.fig .lgd span{display:inline-flex;align-items:center;gap:.4rem}
+.fig .lgd i{width:10px;height:10px;border-radius:3px;display:inline-block;flex:0 0 auto}
+.fig text{font-family:ui-sans-serif,system-ui,sans-serif}
+.fig .t-pri{fill:var(--ink)}.fig .t-sec{fill:var(--muted)}.fig .t-mut{fill:var(--lab)}
+.fig .gr{stroke:var(--grid);stroke-width:1;fill:none}
+.fig .ax{stroke:var(--axis);stroke-width:1;fill:none}
+.fig .ln{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.fig .dsh{fill:none;stroke-width:1.5;stroke-dasharray:4 5}
+.fig .box{fill:none;stroke-width:1.5}
 </style>
 </head><body><div class="wrap">
 <nav style="padding-top:1.6rem;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.85rem"><a href="./" style="border:0">&larr; All posts</a></nav>
@@ -166,6 +188,41 @@ This is how an agent tests a change end to end on its own, in minutes or hours i
 <li><strong>Three streams of work</strong> (features, operational feedback, and refactoring) run side by side, and <strong>a maintenance loop</strong> keeps the code base from decaying. Agents do the chores, written rules guard the architecture at every stage, and a complexity budget keeps the numbers honest.</li>
 <li><strong>Small, continuous changes</strong> keep each task within an agent’s context. Feature toggles let unfinished work ship safely, and regression tests make refactoring safe.</li>
 </ol>
+<figure class="fig">
+<p class="ft">How the pieces of a brownfield factory fit</p>
+<div class="lgd"><span><i style="background:var(--s1)"></i>Features</span><span><i style="background:var(--s2)"></i>Operational feedback</span><span><i style="background:var(--s3)"></i>Self-maintenance</span></div><svg viewBox="0 0 720 320" role="img" aria-labelledby="figC-t figC-d">
+<title id="figC-t">How the pieces of a brownfield factory fit</title><desc id="figC-d">Three parallel stream arrows running into a production box, a shared primitives layer beneath them, and a dashed maintenance loop returning from production to the streams.</desc>
+<text class="t-pri" x="20" y="51" font-size="12.5" font-weight="600">Features</text>
+<text class="t-mut" x="20" y="66" font-size="10.5">a person asks for it</text>
+<g><title>Features: a person asks for it</title><line x1="196" y1="56" x2="550" y2="56" stroke="var(--s1)" stroke-width="2.5" stroke-linecap="round"/><polygon points="558,56 550,51.04 550,60.96" fill="var(--s1)"/></g>
+<text class="t-mut" x="381" y="40" font-size="10.5" text-anchor="middle">every stream ships small, continuous changes</text>
+<text class="t-pri" x="20" y="101" font-size="12.5" font-weight="600">Operational feedback</text>
+<text class="t-mut" x="20" y="116" font-size="10.5">production signals it</text>
+<g><title>Operational feedback: production signals it</title><line x1="196" y1="106" x2="550" y2="106" stroke="var(--s2)" stroke-width="2.5" stroke-linecap="round"/><polygon points="558,106 550,101.04 550,110.96" fill="var(--s2)"/></g>
+<text class="t-pri" x="20" y="151" font-size="12.5" font-weight="600">Self-maintenance</text>
+<text class="t-mut" x="20" y="166" font-size="10.5">the code’s health triggers it</text>
+<g><title>Self-maintenance: the code’s health triggers it</title><line x1="196" y1="156" x2="550" y2="156" stroke="var(--s3)" stroke-width="2.5" stroke-linecap="round"/><polygon points="558,156 550,151.04 550,160.96" fill="var(--s3)"/></g>
+<rect x="566" y="40" width="112" height="128" rx="7" fill="none" stroke="var(--axis)" stroke-width="1.5"/>
+<text class="t-pri" x="622" y="108" font-size="13" font-weight="600" text-anchor="middle">Production</text>
+<rect class="box" x="190" y="196" width="488" height="52" rx="7" stroke="var(--axis)"/>
+<text class="t-pri" x="206" y="218" font-size="12.5" font-weight="600">Shared primitives</text>
+<text class="t-mut" x="206" y="235" font-size="11">data · testing and evaluation · explainability · knowledge base</text>
+<line class="gr" x1="330" y1="196" x2="330" y2="176" stroke="var(--axis)"/>
+<polygon points="330,170 326,178 334,178" fill="var(--axis)"/>
+<line class="gr" x1="420" y1="196" x2="420" y2="176" stroke="var(--axis)"/>
+<polygon points="420,170 416,178 424,178" fill="var(--axis)"/>
+<line class="gr" x1="510" y1="196" x2="510" y2="176" stroke="var(--axis)"/>
+<polygon points="510,170 506,178 514,178" fill="var(--axis)"/>
+<text class="t-mut" x="616" y="218" font-size="10.5" text-anchor="middle">they absorb</text>
+<text class="t-mut" x="616" y="233" font-size="10.5" text-anchor="middle">shared complexity</text>
+<path class="dsh" stroke="var(--lab)" d="M622,250 L622,282 C622,302 320,302 176,302"/>
+<path class="dsh" stroke="var(--lab)" d="M176,302 L176,187"/>
+<polygon points="176,176 171,188 181,188" fill="var(--lab)"/>
+<rect x="196" y="285" width="420" height="17" fill="var(--panel)"/>
+<text class="t-sec" x="406" y="298" font-size="11.5" text-anchor="middle">maintenance loop: production feeds the next change</text>
+</svg>
+<figcaption>A schematic, not measured data. Three streams run side by side from their own trigger to production. A layer of shared primitives absorbs the complexity they have in common, so each application is a mid-sized project again, and a maintenance loop feeds what production reveals back into the next change.</figcaption>
+</figure>
 <p>None of this is new. Abstraction, maintenance, and continuous delivery are decades old. What is new is that agents change the economics. Writing the code for a primitive, a cleanup, or a regression suite used to be the expensive part, so teams skipped it. Now it is the cheap part. The expensive parts are the ones agents cannot do alone: agreeing on interfaces across teams, and proving that a change is safe. Put your effort there.</p>
 <hr>
 

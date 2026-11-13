@@ -66,6 +66,28 @@ tbody tr:last-child td{border-bottom:0}
   body{background:#fff;color:#000;font-size:11pt}
   .tw,pre{break-inside:avoid} h2,h3{break-after:avoid}
 }
+.fig{--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--o1:#1c5cab;--o2:#2a78d6;--o3:#5598e7;--o4:#86b6ef;
+  --grid:#e1e0d9;--axis:#c3c2b7;--lab:#898781;
+  margin:2.1rem 0 2.3rem;border:1px solid var(--rule);border-radius:8px;background:var(--panel);
+  padding:1.1rem 1.15rem .95rem}
+@media (prefers-color-scheme:dark){.fig{--s1:#3987e5;--s2:#d95926;--s3:#199e70;
+  --o1:#184f95;--o2:#256abf;--o3:#3987e5;--o4:#6da7ec;--grid:#2c2c2a;--axis:#383835}}
+.fig svg{display:block;width:100%;height:auto}
+.fig .ft{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.86rem;font-weight:600;
+  color:var(--ink);margin:0 0 .55rem;line-height:1.35}
+.fig figcaption{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.76rem;line-height:1.55;
+  color:var(--muted);margin:.8rem 0 0}
+.fig .lgd{display:flex;flex-wrap:wrap;gap:.3rem 1.1rem;font-family:ui-sans-serif,system-ui,sans-serif;
+  font-size:.76rem;color:var(--muted);margin:0 0 .75rem}
+.fig .lgd span{display:inline-flex;align-items:center;gap:.4rem}
+.fig .lgd i{width:10px;height:10px;border-radius:3px;display:inline-block;flex:0 0 auto}
+.fig text{font-family:ui-sans-serif,system-ui,sans-serif}
+.fig .t-pri{fill:var(--ink)}.fig .t-sec{fill:var(--muted)}.fig .t-mut{fill:var(--lab)}
+.fig .gr{stroke:var(--grid);stroke-width:1;fill:none}
+.fig .ax{stroke:var(--axis);stroke-width:1;fill:none}
+.fig .ln{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.fig .dsh{fill:none;stroke-width:1.5;stroke-dasharray:4 5}
+.fig .box{fill:none;stroke-width:1.5}
 </style>
 </head><body><div class="wrap">
 <nav style="padding-top:1.6rem;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.85rem"><a href="./" style="border:0">&larr; All posts</a></nav>
@@ -128,6 +150,58 @@ tbody tr:last-child td{border-bottom:0}
 
 <h2 id="proof">When 99.99% is not enough: prove it</h2>
 <p>In security, aerospace, industrial control, medical devices, and cryptography, “we will add the bug as a test after it happens” is not an acceptable plan. The first failure is the catastrophe. An authorization check that is right on 99.99% of requests is a vulnerability, because an attacker does not sample from your traffic distribution. They search for the 0.01%.</p>
+<figure class="fig">
+<p class="ft">What a rate of nines costs you per day</p>
+<div class="lgd"><span><i style="background:var(--s2)"></i>99.99% correct</span><span><i style="background:var(--s1)"></i>99.9999% correct</span></div><svg viewBox="0 0 720 300" role="img" aria-labelledby="figD-t figD-d">
+<title id="figD-t">What a rate of nines costs you per day</title><desc id="figD-d">Two log-log lines showing wrong results a day rising with traffic, one for 99.99 percent correct and one for 99.9999 percent, both crossing the one-per-day reference line.</desc>
+<line class="gr" x1="68" y1="248" x2="548" y2="248"/>
+<text class="t-mut" x="60" y="251.5" font-size="11" text-anchor="end">0.01</text>
+<line class="gr" x1="68" y1="211.67" x2="548" y2="211.67"/>
+<text class="t-mut" x="60" y="215.17" font-size="11" text-anchor="end">0.1</text>
+<line class="gr" x1="68" y1="175.33" x2="548" y2="175.33"/>
+<text class="t-mut" x="60" y="178.83" font-size="11" text-anchor="end">1</text>
+<line class="gr" x1="68" y1="139" x2="548" y2="139"/>
+<text class="t-mut" x="60" y="142.5" font-size="11" text-anchor="end">10</text>
+<line class="gr" x1="68" y1="102.67" x2="548" y2="102.67"/>
+<text class="t-mut" x="60" y="106.17" font-size="11" text-anchor="end">100</text>
+<line class="gr" x1="68" y1="66.33" x2="548" y2="66.33"/>
+<text class="t-mut" x="60" y="69.83" font-size="11" text-anchor="end">1,000</text>
+<line class="gr" x1="68" y1="30" x2="548" y2="30"/>
+<text class="t-mut" x="60" y="33.5" font-size="11" text-anchor="end">10,000</text>
+<line class="ax" x1="68" y1="248" x2="548" y2="248"/>
+<line class="ax" x1="68" y1="248" x2="68" y2="253"/>
+<text class="t-mut" x="68" y="267" font-size="11" text-anchor="middle">10k</text>
+<line class="ax" x1="188" y1="248" x2="188" y2="253"/>
+<text class="t-mut" x="188" y="267" font-size="11" text-anchor="middle">100k</text>
+<line class="ax" x1="308" y1="248" x2="308" y2="253"/>
+<text class="t-mut" x="308" y="267" font-size="11" text-anchor="middle">1M</text>
+<line class="ax" x1="428" y1="248" x2="428" y2="253"/>
+<text class="t-mut" x="428" y="267" font-size="11" text-anchor="middle">10M</text>
+<line class="ax" x1="548" y1="248" x2="548" y2="253"/>
+<text class="t-mut" x="548" y="267" font-size="11" text-anchor="middle">100M</text>
+<text class="t-sec" x="308" y="286" font-size="11.5" text-anchor="middle">Requests a day</text>
+<text class="t-sec" x="16" y="139" font-size="11.5" text-anchor="middle" transform="rotate(-90 16 139)">Wrong results a day</text>
+<line class="dsh" x1="68" y1="175.33" x2="668" y2="175.33" stroke="var(--lab)"/>
+<text class="t-sec" x="556" y="168.33" font-size="11" font-style="italic">one a day</text>
+<path class="ln" d="M68,175.33 L188,139 L308,102.67 L428,66.33 L548,30" stroke="var(--s2)"/>
+<g><title>99.99% correct at 10k requests a day: 1 wrong a day</title><circle cx="68" cy="175.33" r="4.5" fill="var(--s2)" stroke="var(--panel)" stroke-width="2"/></g>
+<g><title>99.99% correct at 100k requests a day: 10 wrong a day</title><circle cx="188" cy="139" r="4.5" fill="var(--s2)" stroke="var(--panel)" stroke-width="2"/></g>
+<g><title>99.99% correct at 1M requests a day: 100 wrong a day</title><circle cx="308" cy="102.67" r="4.5" fill="var(--s2)" stroke="var(--panel)" stroke-width="2"/></g>
+<g><title>99.99% correct at 10M requests a day: 1000 wrong a day</title><circle cx="428" cy="66.33" r="4.5" fill="var(--s2)" stroke="var(--panel)" stroke-width="2"/></g>
+<g><title>99.99% correct at 100M requests a day: 10000 wrong a day</title><circle cx="548" cy="30" r="4.5" fill="var(--s2)" stroke="var(--panel)" stroke-width="2"/></g>
+<text class="t-pri" x="560" y="34" font-size="12" font-weight="600">99.99% correct</text>
+<path class="ln" d="M68,248 L188,211.67 L308,175.33 L428,139 L548,102.67" stroke="var(--s1)"/>
+<g><title>99.9999% correct at 10k requests a day: 0.01 wrong a day</title><circle cx="68" cy="248" r="4.5" fill="var(--s1)" stroke="var(--panel)" stroke-width="2"/></g>
+<g><title>99.9999% correct at 100k requests a day: 0.1 wrong a day</title><circle cx="188" cy="211.67" r="4.5" fill="var(--s1)" stroke="var(--panel)" stroke-width="2"/></g>
+<g><title>99.9999% correct at 1M requests a day: 1 wrong a day</title><circle cx="308" cy="175.33" r="4.5" fill="var(--s1)" stroke="var(--panel)" stroke-width="2"/></g>
+<g><title>99.9999% correct at 10M requests a day: 10 wrong a day</title><circle cx="428" cy="139" r="4.5" fill="var(--s1)" stroke="var(--panel)" stroke-width="2"/></g>
+<g><title>99.9999% correct at 100M requests a day: 100 wrong a day</title><circle cx="548" cy="102.67" r="4.5" fill="var(--s1)" stroke="var(--panel)" stroke-width="2"/></g>
+<text class="t-pri" x="560" y="106.67" font-size="12" font-weight="600">99.9999% correct</text>
+<text class="t-sec" x="365.25" y="53.89" font-size="11.5" font-style="italic" text-anchor="middle">an attacker searches here</text>
+<path class="dsh" stroke="var(--lab)" d="M365.25,57.96 L428,64.83"/>
+</svg>
+<figcaption>Plain arithmetic: wrong results a day = requests a day × the error rate, on log scales. 99.99% correct means one wrong result in 10,000. At a million requests a day that is 100 a day. Adding two nines moves the line down, not to zero, which is why a property that must never fail needs a proof rather than more samples.</figcaption>
+</figure>
 <p>No amount of sampling closes that gap. For these properties you need the second kind of verification: state the property precisely and prove it holds for all inputs. This is what formal methods do. A proof assistant such as Lean or Coq checks a proof step by step. A model checker such as TLA+ explores every reachable state of a design. An SMT solver such as Z3 either proves a property for all inputs or produces a concrete counterexample.</p>
 
 <h3 id="barrier">The barrier just dropped</h3>

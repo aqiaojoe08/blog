@@ -66,6 +66,28 @@ tbody tr:last-child td{border-bottom:0}
   body{background:#fff;color:#000;font-size:11pt}
   .tw,pre{break-inside:avoid} h2,h3{break-after:avoid}
 }
+.fig{--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--o1:#1c5cab;--o2:#2a78d6;--o3:#5598e7;--o4:#86b6ef;
+  --grid:#e1e0d9;--axis:#c3c2b7;--lab:#898781;
+  margin:2.1rem 0 2.3rem;border:1px solid var(--rule);border-radius:8px;background:var(--panel);
+  padding:1.1rem 1.15rem .95rem}
+@media (prefers-color-scheme:dark){.fig{--s1:#3987e5;--s2:#d95926;--s3:#199e70;
+  --o1:#184f95;--o2:#256abf;--o3:#3987e5;--o4:#6da7ec;--grid:#2c2c2a;--axis:#383835}}
+.fig svg{display:block;width:100%;height:auto}
+.fig .ft{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.86rem;font-weight:600;
+  color:var(--ink);margin:0 0 .55rem;line-height:1.35}
+.fig figcaption{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.76rem;line-height:1.55;
+  color:var(--muted);margin:.8rem 0 0}
+.fig .lgd{display:flex;flex-wrap:wrap;gap:.3rem 1.1rem;font-family:ui-sans-serif,system-ui,sans-serif;
+  font-size:.76rem;color:var(--muted);margin:0 0 .75rem}
+.fig .lgd span{display:inline-flex;align-items:center;gap:.4rem}
+.fig .lgd i{width:10px;height:10px;border-radius:3px;display:inline-block;flex:0 0 auto}
+.fig text{font-family:ui-sans-serif,system-ui,sans-serif}
+.fig .t-pri{fill:var(--ink)}.fig .t-sec{fill:var(--muted)}.fig .t-mut{fill:var(--lab)}
+.fig .gr{stroke:var(--grid);stroke-width:1;fill:none}
+.fig .ax{stroke:var(--axis);stroke-width:1;fill:none}
+.fig .ln{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.fig .dsh{fill:none;stroke-width:1.5;stroke-dasharray:4 5}
+.fig .box{fill:none;stroke-width:1.5}
 </style>
 </head><body><div class="wrap">
 <nav style="padding-top:1.6rem;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.85rem"><a href="./" style="border:0">&larr; All posts</a></nav>
@@ -79,6 +101,41 @@ tbody tr:last-child td{border-bottom:0}
 <p>Spec-driven development has a load-bearing assumption: that if we write requirements carefully enough, an LLM can turn them into correct code. The problem is not effort. It is that free-form natural language — even organized with <a href="https://alistairmavin.com/ears/">EARS</a> — cannot carry the precision production software needs. Two engineers read the same paragraph and build two different systems. Neither is wrong, because the paragraph never decided.</p>
 <p>The way out is to treat ambiguity reduction as a four-stage pipeline, where each stage compresses the ambiguity of the one before it:</p>
 <p><strong>Free-form natural language → Controlled language → Executable tests → Verified implementation</strong></p>
+<figure class="fig">
+<p class="ft">Four stages, each one compressing the ambiguity of the last</p>
+<svg viewBox="0 0 720 305" role="img" aria-labelledby="figF-t figF-d">
+<title id="figF-t">Four stages, each one compressing the ambiguity of the last</title><desc id="figF-d">Four descending bars, one per stage, from free-form prose down to verified implementation, with stage two marked as the stage most teams skip.</desc>
+<g><title>Stage 1, Free-form prose: the baseline</title><path d="M56,48 h128 a4,4 0 0 1 4,4 v180 h-136 v-180 a4,4 0 0 1 4,-4 z" fill="var(--o1)"/></g>
+<text x="68" y="66" font-size="12" font-weight="600" fill="#fff" opacity=".9">1</text>
+<text class="t-pri" x="56" y="248" font-size="12" font-weight="600">Free-form prose</text>
+<text class="t-mut" x="56" y="264" font-size="10.5">the baseline</text>
+<line x1="195" y1="216" x2="203" y2="216" stroke="var(--axis)" stroke-width="1.5" stroke-linecap="round"/><polygon points="209,216 203,212.28 203,219.72" fill="var(--axis)"/>
+<g><title>Stage 2, Controlled language: removes how two readers can read it differently</title><path d="M214,94 h128 a4,4 0 0 1 4,4 v134 h-136 v-134 a4,4 0 0 1 4,-4 z" fill="var(--o2)"/></g>
+<text x="226" y="112" font-size="12" font-weight="600" fill="#fff" opacity=".9">2</text>
+<text class="t-pri" x="214" y="248" font-size="12" font-weight="600">Controlled language</text>
+<text class="t-mut" x="214" y="264" font-size="10.5">removes how two readers</text>
+<text class="t-mut" x="214" y="277" font-size="10.5">can read it differently</text>
+<line x1="353" y1="216" x2="361" y2="216" stroke="var(--axis)" stroke-width="1.5" stroke-linecap="round"/><polygon points="367,216 361,212.28 361,219.72" fill="var(--axis)"/>
+<g><title>Stage 3, Executable tests: removes doubt about the behaviour wanted</title><path d="M372,140 h128 a4,4 0 0 1 4,4 v88 h-136 v-88 a4,4 0 0 1 4,-4 z" fill="var(--o3)"/></g>
+<text x="384" y="158" font-size="12" font-weight="600" fill="#0b0b0b" opacity=".9">3</text>
+<text class="t-pri" x="372" y="248" font-size="12" font-weight="600">Executable tests</text>
+<text class="t-mut" x="372" y="264" font-size="10.5">removes doubt about</text>
+<text class="t-mut" x="372" y="277" font-size="10.5">the behaviour wanted</text>
+<line x1="511" y1="216" x2="519" y2="216" stroke="var(--axis)" stroke-width="1.5" stroke-linecap="round"/><polygon points="525,216 519,212.28 519,219.72" fill="var(--axis)"/>
+<g><title>Stage 4, Verified implementation: removes drift between spec and code</title><path d="M530,186 h128 a4,4 0 0 1 4,4 v42 h-136 v-42 a4,4 0 0 1 4,-4 z" fill="var(--o4)"/></g>
+<text x="542" y="204" font-size="12" font-weight="600" fill="#0b0b0b" opacity=".9">4</text>
+<text class="t-pri" x="530" y="248" font-size="12" font-weight="600">Verified implementation</text>
+<text class="t-mut" x="530" y="264" font-size="10.5">removes drift between</text>
+<text class="t-mut" x="530" y="277" font-size="10.5">spec and code</text>
+<line class="ax" x1="42" y1="228" x2="672" y2="228"/>
+<text class="t-sec" x="20" y="136" font-size="11.5" text-anchor="middle" transform="rotate(-90 20 136)">Ambiguity left in the spec</text>
+<line x1="34" y1="50" x2="34" y2="222" stroke="var(--axis)" stroke-width="1.5"/>
+<polygon points="34,228 30,219 38,219" fill="var(--axis)"/>
+<text class="t-sec" x="282" y="24" font-size="11.5" font-style="italic" text-anchor="middle">the stage most teams skip</text>
+<path class="dsh" stroke="var(--lab)" d="M282,30 L282,84"/>
+</svg>
+<figcaption>A schematic of the pipeline, not measured data: the bars show the order in which ambiguity is removed, not how much. Most teams jump from stage 1 to an unverified implementation, or from stage 1 to tests. Stage 2 is the only one that fixes the spec itself instead of catching a bad spec’s consequences later.</figcaption>
+</figure>
 <div class="tw"><table><thead><tr><th>Stage</th><th>What it is</th><th>What it removes</th></tr></thead><tbody><tr><td>1</td><td>Free-form prose</td><td>Nothing — the baseline</td></tr><tr><td>2</td><td>Controlled language</td><td>Interpretation ambiguity, unstated constraints</td></tr><tr><td>3</td><td>Executable tests</td><td>Ambiguity about intended behaviour — the test <em>is</em> the answer</td></tr><tr><td>4</td><td>Verified implementation</td><td>Drift between spec and code</td></tr></tbody></table></div>
 <p>Most teams jump from 1 straight to unverified implementation (vibe it, hope), or from 1 to 3 (write tests, let the AI code). Stage 2 is the one everybody skips, and it is the only stage that fixes the spec itself rather than catching a bad spec's consequences downstream.</p>
 <p>This post is about stage 2, through three examples that are unusually instructive because they come from three completely different worlds: aerospace maintenance manuals, relational data query languages, and agent authorization.</p>

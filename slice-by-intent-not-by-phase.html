@@ -70,6 +70,28 @@ tbody tr:last-child td{border-bottom:0}
 .tldr .tl-h{font-size:.74rem;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);margin:0 0 .5rem}
 .tldr ul{margin:0 0 .8rem}
 .tldr li{margin:0 0 .45rem}
+.fig{--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--o1:#1c5cab;--o2:#2a78d6;--o3:#5598e7;--o4:#86b6ef;
+  --grid:#e1e0d9;--axis:#c3c2b7;--lab:#898781;
+  margin:2.1rem 0 2.3rem;border:1px solid var(--rule);border-radius:8px;background:var(--panel);
+  padding:1.1rem 1.15rem .95rem}
+@media (prefers-color-scheme:dark){.fig{--s1:#3987e5;--s2:#d95926;--s3:#199e70;
+  --o1:#184f95;--o2:#256abf;--o3:#3987e5;--o4:#6da7ec;--grid:#2c2c2a;--axis:#383835}}
+.fig svg{display:block;width:100%;height:auto}
+.fig .ft{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.86rem;font-weight:600;
+  color:var(--ink);margin:0 0 .55rem;line-height:1.35}
+.fig figcaption{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.76rem;line-height:1.55;
+  color:var(--muted);margin:.8rem 0 0}
+.fig .lgd{display:flex;flex-wrap:wrap;gap:.3rem 1.1rem;font-family:ui-sans-serif,system-ui,sans-serif;
+  font-size:.76rem;color:var(--muted);margin:0 0 .75rem}
+.fig .lgd span{display:inline-flex;align-items:center;gap:.4rem}
+.fig .lgd i{width:10px;height:10px;border-radius:3px;display:inline-block;flex:0 0 auto}
+.fig text{font-family:ui-sans-serif,system-ui,sans-serif}
+.fig .t-pri{fill:var(--ink)}.fig .t-sec{fill:var(--muted)}.fig .t-mut{fill:var(--lab)}
+.fig .gr{stroke:var(--grid);stroke-width:1;fill:none}
+.fig .ax{stroke:var(--axis);stroke-width:1;fill:none}
+.fig .ln{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.fig .dsh{fill:none;stroke-width:1.5;stroke-dasharray:4 5}
+.fig .box{fill:none;stroke-width:1.5}
 </style>
 </head><body><div class="wrap">
 <nav style="padding-top:1.6rem;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.85rem"><a href="./" style="border:0">&larr; All posts</a></nav>
@@ -124,6 +146,51 @@ tbody tr:last-child td{border-bottom:0}
 </tbody></table></div>
 <p>This new view changed mindsets faster than any tool we rolled out. Engineers stopped asking “how do I use AI in code review?” They started asking “why does this kind of change take a week, and what is holding it up?”</p>
 <p><strong>From 2x to 10x and beyond.</strong> Slicing by phase got us to 2x. Slicing by intent is how we plan to go further. Each stream owns a change from its trigger all the way to production, so the waits between phases become visible, and someone owns removing them. That is the path to 10x. The path to 100x runs through the two streams that the system triggers. When agents fix production issues and maintain the code on their own, most of the work no longer waits for a human at all.</p>
+<figure class="fig">
+<p class="ft">Making one phase faster has a ceiling</p>
+<div class="lgd"><span><i style="background:var(--s1)"></i>33% of the path</span><span><i style="background:var(--s2)"></i>50% of the path</span><span><i style="background:var(--s3)"></i>70% of the path</span></div><svg viewBox="0 0 720 300" role="img" aria-labelledby="figA-t figA-d">
+<title id="figA-t">Making one phase faster has a ceiling</title><desc id="figA-d">Three curves of overall speedup against the speedup of a single phase. Each flattens at its own ceiling, far below the 10x reference line.</desc>
+<line class="gr" x1="58" y1="248" x2="556" y2="248"/>
+<text class="t-mut" x="50" y="251.5" font-size="11" text-anchor="end">1×</text>
+<line class="gr" x1="58" y1="212.43" x2="556" y2="212.43"/>
+<text class="t-mut" x="50" y="215.93" font-size="11" text-anchor="end">1.5×</text>
+<line class="gr" x1="58" y1="187.19" x2="556" y2="187.19"/>
+<text class="t-mut" x="50" y="190.69" font-size="11" text-anchor="end">2×</text>
+<line class="gr" x1="58" y1="151.62" x2="556" y2="151.62"/>
+<text class="t-mut" x="50" y="155.12" font-size="11" text-anchor="end">3×</text>
+<line class="gr" x1="58" y1="106.8" x2="556" y2="106.8"/>
+<text class="t-mut" x="50" y="110.3" font-size="11" text-anchor="end">5×</text>
+<line class="gr" x1="58" y1="46" x2="556" y2="46"/>
+<text class="t-mut" x="50" y="49.5" font-size="11" text-anchor="end">10×</text>
+<line class="dsh" x1="58" y1="46" x2="706" y2="46" stroke="var(--lab)"/>
+<text class="t-sec" x="564" y="39" font-size="12" font-weight="600">10× goal</text>
+<line class="ax" x1="58" y1="248" x2="556" y2="248"/>
+<line class="ax" x1="58" y1="248" x2="58" y2="253"/>
+<text class="t-mut" x="58" y="267" font-size="11" text-anchor="middle">1×</text>
+<line class="ax" x1="162.84" y1="248" x2="162.84" y2="253"/>
+<text class="t-mut" x="162.84" y="267" font-size="11" text-anchor="middle">5×</text>
+<line class="ax" x1="293.89" y1="248" x2="293.89" y2="253"/>
+<text class="t-mut" x="293.89" y="267" font-size="11" text-anchor="middle">10×</text>
+<line class="ax" x1="424.95" y1="248" x2="424.95" y2="253"/>
+<text class="t-mut" x="424.95" y="267" font-size="11" text-anchor="middle">15×</text>
+<line class="ax" x1="556" y1="248" x2="556" y2="253"/>
+<text class="t-mut" x="556" y="267" font-size="11" text-anchor="middle">20×</text>
+<text class="t-sec" x="307" y="286" font-size="11.5" text-anchor="middle">How much faster that one phase gets</text>
+<text class="t-sec" x="14" y="139" font-size="11.5" text-anchor="middle" transform="rotate(-90 14 139)">Overall speedup, request → production</text>
+<g><title>70 of the lead time in that phase: ceiling 3.33×</title><path class="ln" d="M58,248 L64.55,234.77 L71.11,224.69 L77.66,216.71 L84.21,210.21 L90.76,204.8 L97.32,200.21 L103.87,196.27 L110.42,192.85 L116.97,189.85 L123.53,187.19 L130.08,184.82 L136.63,182.69 L143.18,180.77 L149.74,179.02 L156.29,177.43 L162.84,175.98 L169.39,174.64 L175.95,173.4 L182.5,172.26 L189.05,171.2 L195.61,170.21 L202.16,169.29 L208.71,168.42 L215.26,167.61 L221.82,166.85 L228.37,166.14 L234.92,165.47 L241.47,164.83 L248.03,164.23 L254.58,163.66 L261.13,163.11 L267.68,162.6 L274.24,162.11 L280.79,161.64 L287.34,161.2 L293.89,160.77 L300.45,160.37 L307,159.98 L313.55,159.61 L320.11,159.25 L326.66,158.91 L333.21,158.58 L339.76,158.27 L346.32,157.96 L352.87,157.67 L359.42,157.39 L365.97,157.12 L372.53,156.86 L379.08,156.61 L385.63,156.36 L392.18,156.13 L398.74,155.9 L405.29,155.68 L411.84,155.47 L418.39,155.26 L424.95,155.06 L431.5,154.87 L438.05,154.68 L444.61,154.5 L451.16,154.32 L457.71,154.15 L464.26,153.98 L470.82,153.82 L477.37,153.66 L483.92,153.51 L490.47,153.36 L497.03,153.21 L503.58,153.07 L510.13,152.93 L516.68,152.8 L523.24,152.67 L529.79,152.54 L536.34,152.41 L542.89,152.29 L549.45,152.17 L556,152.06" stroke="var(--s3)"/><line class="dsh" x1="556" y1="142.38" x2="562" y2="142.38" stroke="var(--s3)" opacity=".75"/></g>
+<text class="t-pri" x="568" y="142.38" font-size="12" font-weight="600">70% of the path</text>
+<text class="t-mut" x="568" y="156.38" font-size="11">ceiling 3.3×</text>
+<g><title>50 of the lead time in that phase: ceiling 2×</title><path class="ln" d="M58,248 L64.55,238.76 L71.11,232 L77.66,226.84 L84.21,222.76 L90.76,219.45 L97.32,216.71 L103.87,214.4 L110.42,212.43 L116.97,210.73 L123.53,209.24 L130.08,207.93 L136.63,206.77 L143.18,205.73 L149.74,204.8 L156.29,203.95 L162.84,203.19 L169.39,202.49 L175.95,201.85 L182.5,201.26 L189.05,200.71 L195.61,200.21 L202.16,199.74 L208.71,199.31 L215.26,198.91 L221.82,198.53 L228.37,198.17 L234.92,197.84 L241.47,197.52 L248.03,197.23 L254.58,196.95 L261.13,196.68 L267.68,196.43 L274.24,196.2 L280.79,195.97 L287.34,195.76 L293.89,195.55 L300.45,195.36 L307,195.17 L313.55,194.99 L320.11,194.82 L326.66,194.66 L333.21,194.51 L339.76,194.36 L346.32,194.21 L352.87,194.07 L359.42,193.94 L365.97,193.81 L372.53,193.69 L379.08,193.57 L385.63,193.46 L392.18,193.35 L398.74,193.24 L405.29,193.14 L411.84,193.04 L418.39,192.95 L424.95,192.85 L431.5,192.76 L438.05,192.68 L444.61,192.59 L451.16,192.51 L457.71,192.43 L464.26,192.35 L470.82,192.28 L477.37,192.2 L483.92,192.13 L490.47,192.07 L497.03,192 L503.58,191.93 L510.13,191.87 L516.68,191.81 L523.24,191.75 L529.79,191.69 L536.34,191.63 L542.89,191.58 L549.45,191.52 L556,191.47" stroke="var(--s2)"/><line class="dsh" x1="556" y1="187.19" x2="562" y2="187.19" stroke="var(--s2)" opacity=".75"/></g>
+<text class="t-pri" x="568" y="184.19" font-size="12" font-weight="600">50% of the path</text>
+<text class="t-mut" x="568" y="198.19" font-size="11">ceiling 2×</text>
+<g><title>33 of the lead time in that phase: ceiling 1.49×</title><path class="ln" d="M58,248 L64.55,242.01 L71.11,237.78 L77.66,234.62 L84.21,232.18 L90.76,230.23 L97.32,228.64 L103.87,227.32 L110.42,226.2 L116.97,225.25 L123.53,224.42 L130.08,223.69 L136.63,223.05 L143.18,222.49 L149.74,221.98 L156.29,221.52 L162.84,221.11 L169.39,220.73 L175.95,220.39 L182.5,220.08 L189.05,219.79 L195.61,219.52 L202.16,219.27 L208.71,219.04 L215.26,218.83 L221.82,218.63 L228.37,218.45 L234.92,218.27 L241.47,218.11 L248.03,217.95 L254.58,217.81 L261.13,217.67 L267.68,217.54 L274.24,217.42 L280.79,217.3 L287.34,217.19 L293.89,217.08 L300.45,216.98 L307,216.89 L313.55,216.8 L320.11,216.71 L326.66,216.63 L333.21,216.55 L339.76,216.47 L346.32,216.4 L352.87,216.32 L359.42,216.26 L365.97,216.19 L372.53,216.13 L379.08,216.07 L385.63,216.01 L392.18,215.95 L398.74,215.9 L405.29,215.85 L411.84,215.8 L418.39,215.75 L424.95,215.7 L431.5,215.65 L438.05,215.61 L444.61,215.57 L451.16,215.53 L457.71,215.49 L464.26,215.45 L470.82,215.41 L477.37,215.37 L483.92,215.34 L490.47,215.3 L497.03,215.27 L503.58,215.23 L510.13,215.2 L516.68,215.17 L523.24,215.14 L529.79,215.11 L536.34,215.08 L542.89,215.05 L549.45,215.03 L556,215" stroke="var(--s1)"/><line class="dsh" x1="556" y1="212.87" x2="562" y2="212.87" stroke="var(--s1)" opacity=".75"/></g>
+<text class="t-pri" x="568" y="225.24" font-size="12" font-weight="600">33% of the path</text>
+<text class="t-mut" x="568" y="239.24" font-size="11">ceiling 1.5×</text>
+<text class="t-sec" x="280.79" y="85.15" font-size="11.5" font-style="italic" text-anchor="middle">where phase-by-phase got us</text>
+<path class="dsh" stroke="var(--lab)" d="M335.83,89.36 C398.74,100.05 414.46,151.62 422.33,184.17"/>
+</svg>
+<figcaption>Amdahl’s law applied to lead time: if one phase is <em>p</em> of the time from request to production, speeding it up can never beat 1/(1−<em>p</em>) overall, however fast it gets. At 33% of the path the ceiling is 1.5×; at half the path, 2×. Reaching 10× means shrinking the other 90% as well, which is what organizing end to end by stream is for.</figcaption>
+</figure>
 <hr>
 
 <h2 id="autonomy">Match AI autonomy to how clear the intent is</h2>
