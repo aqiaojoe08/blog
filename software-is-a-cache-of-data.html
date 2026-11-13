@@ -2,7 +2,7 @@
 <html lang="en"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Software Is a Cache of Data: Redefining Software for 1.0, 2.0, and 3.0</title>
+<title>The Cache Inversion: Software Is Becoming a Cache of Data</title>
 <style>
 :root{
   --bg:#fbfaf8; --panel:#fff; --ink:#1c1b1a; --muted:#5f5b56; --faint:#8b857e;
@@ -71,12 +71,12 @@ tbody tr:last-child td{border-bottom:0}
 <body><div class="wrap">
 <nav style="padding-top:1.6rem;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.85rem"><a href="./" style="border:0">&larr; All posts</a></nav>
 <header class="mast">
-<h1>Software Is a Cache of Data: Redefining Software for 1.0, 2.0, and 3.0</h1>
+<h1>The Cache Inversion: Software Is Becoming a Cache of Data</h1>
 <p class="sub">We used to store data to cache the results of software. More and more often, the software is now the cache: a distilled form of data too large to keep in hand. Code that models how a system behaves is still essential, but this trend changes how we build, version, and test software.</p>
 <div class="meta"><span>1,700 words</span><span>~7 min read</span><span>2026-11-12</span></div>
 </header>
 <main>
-<h2 id="three-forms">Every organization now runs three kinds of software</h2>
+<h2 id="three-forms">Software 1.0, 2.0, and 3.0, all at once</h2>
 <p>Andrej Karpathy gave us useful names. <strong>Software 1.0</strong> is code that humans write. <strong>Software 2.0</strong> is the weights of a neural network, learned from data instead of written by hand. <strong>Software 3.0</strong> is a large language model steered by prompts, context, and instructions in natural language.</p>
 <p>These are not eras that replace one another. Our organization runs all three at the same time, often in the same request path. A service written in Java calls a model retrained every quarter, and an agent driven by a prompt reviews the code of both.</p>
 <div class="tw"><table>
@@ -89,7 +89,7 @@ tbody tr:last-child td{border-bottom:0}
 <p>If you read down the third column, you see a trend. The further right we move on this spectrum, the less the behavior lives in something a human wrote, and the more it lives in data. So the old definition, “software is the codebase,” no longer covers what we ship.</p>
 <p>This is not abstract for us. Our organization has invested deeply in automation and optimization for many years. Every automated decision and every optimization run leaves a record of what we decided, what happened next, and what we learned from it. Over time that has built up into a huge amount of data, and that data, more than any one codebase, now defines how our software behaves.</p>
 
-<h2 id="regenerated">Software that is regenerated, not edited</h2>
+<h2 id="regenerated">Regenerated, not edited</h2>
 <p>Look at how a machine learning or reinforcement learning system changes over time. Nobody opens the weights and edits them. Every quarter, or every year, we regenerate them from the historical data that has built up since the last run.</p>
 <p>In that loop, the model file is not the real asset. The real assets are the data and the recipe that turns the data into weights. If you lost the weights but kept the data and the recipe, you could rebuild them. If you kept the weights but lost the data, you would have a system you can no longer improve, explain, or reproduce.</p>
 <p>That is exactly the relationship between a cache and its source of truth. The weights are a <strong>cached, distilled form of the historical data</strong>. They are fast to query and much smaller than the data, but they are a derived artifact. You throw them away and rebuild them when the source changes.</p>
@@ -111,7 +111,7 @@ tbody tr:last-child td{border-bottom:0}
 </tbody></table></div>
 <p>The cache-miss row is the dangerous one. A key-value cache tells you when it does not have the answer. A distilled model does not. That is one reason the next two points matter.</p>
 
-<h2 id="still-needed">Traditional software still models the system</h2>
+<h2 id="still-needed">The explicit model stays</h2>
 <p>None of this means we can retire traditional software. Code that explicitly models the dynamics of a system is still very useful, and we cannot do without it. That covers code for how inventory moves, how queues build up, how capacity limits throughput, and how a decision today changes the state tomorrow. It does three things a model distilled from data cannot:</p>
 <ul>
 <li><strong>It extrapolates.</strong> An explicit model of the dynamics gives a reasonable answer for a situation that has never happened, such as a new constraint or a spike larger than any in the history. A distilled model only interpolates between the cases it has seen.</li>
@@ -120,7 +120,7 @@ tbody tr:last-child td{border-bottom:0}
 </ul>
 <p>So the inversion is a trend, not a replacement. The systems that work best for us combine the two. The explicit model of the dynamics sets the structure and the hard limits. The parts distilled from data fill in what is too large or too fuzzy to write by hand. For each part of a system, the useful question is which way its arrow should point.</p>
 
-<h2 id="behavior-by-data">Behavior is defined by data, not only by static code</h2>
+<h2 id="behavior-by-data">Data is the spec</h2>
 <p>If behavior comes from data, you cannot fully define or check it by reading code. Reading a model’s weights tells you nothing useful. Even for Software 1.0, the code that matters more and more is code that an agent wrote, and humans review it by outcome, not line by line.</p>
 <p>So we increasingly define software by how it behaves on a broad, end-to-end set of data, and not by its static code. The definition of “correct” moves from the source file to the dataset:</p>
 <ul>
@@ -130,7 +130,7 @@ tbody tr:last-child td{border-bottom:0}
 </ul>
 <p>This also closes the loop on the cache miss. Wide, realistic behavioral data is how we find the inputs where the distilled model is confidently wrong, before customers find them.</p>
 
-<h2 id="practice">What changes in practice</h2>
+<h2 id="practice">Data as a first-class citizen</h2>
 <p>Once we accept that data defines the software, the biggest consequence is a change in what we treat as an asset. We have always treated the codebase as a core asset: we version it, review it, protect it, and invest in it. Data that defines behavior deserves the same standing. It is a <strong>first-class citizen</strong>, not a by-product of running the software.</p>
 <p>So the engineering discipline has to cover the data, not only the code. These are the changes we are making:</p>
 <ol>
