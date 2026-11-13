@@ -73,7 +73,7 @@ tbody tr:last-child td{border-bottom:0}
 <header class="mast">
 <h1>Software Is a Cache of Data: Redefining Software for 1.0, 2.0, and 3.0</h1>
 <p class="sub">We used to store data to cache the results of software. More and more often, the software is now the cache: a distilled form of data too large to keep in hand. Code that models how a system behaves is still essential, but this trend changes how we build, version, and test software.</p>
-<div class="meta"><span>1,600 words</span><span>~7 min read</span><span>2026-11-12</span></div>
+<div class="meta"><span>1,700 words</span><span>~7 min read</span><span>2026-11-12</span></div>
 </header>
 <main>
 <h2 id="three-forms">Every organization now runs three kinds of software</h2>
@@ -131,8 +131,10 @@ tbody tr:last-child td{border-bottom:0}
 <p>This also closes the loop on the cache miss. Wide, realistic behavioral data is how we find the inputs where the distilled model is confidently wrong, before customers find them.</p>
 
 <h2 id="practice">What changes in practice</h2>
-<p>If the software is a cache of data, then the engineering discipline has to cover the data, not only the code. These are the changes we are making:</p>
+<p>Once we accept that data defines the software, the biggest consequence is a change in what we treat as an asset. We have always treated the codebase as a core asset: we version it, review it, protect it, and invest in it. Data that defines behavior deserves the same standing. It is a <strong>first-class citizen</strong>, not a by-product of running the software.</p>
+<p>So the engineering discipline has to cover the data, not only the code. These are the changes we are making:</p>
 <ol>
+<li><strong>Collect more data, on purpose, beyond the codebase.</strong> Record each automated decision with its context and the outcome that followed. Keep production traffic so we can replay it. Capture every time a human corrects a model or an agent, because each correction is a labeled example. Data you did not collect cannot teach the next version anything.</li>
 <li><strong>Version the source, not only the artifact.</strong> A release is code, plus the data snapshot, plus the training recipe, plus the prompts and context. If any one of them is missing, you cannot reproduce the behavior.</li>
 <li><strong>Set a freshness goal for every distilled artifact.</strong> Every model, summary, and knowledge base has a time-to-live, even if nobody wrote it down. Write it down and alarm on it.</li>
 <li><strong>Treat regeneration as routine maintenance.</strong> Retraining and re-distilling are non-functional work with a mechanical success check: the eval set passes and drift goes down. That makes them a natural job for the self-maintenance stream I described in <a href="slice-by-intent-not-by-phase.html">Slice by Intent, Not by Phase</a>. Agents should run them on a schedule, not on someone’s memory.</li>
@@ -148,6 +150,7 @@ tbody tr:last-child td{border-bottom:0}
 <li><strong>Keep the explicit model.</strong> Code that models a system’s dynamics extrapolates, enforces hard constraints, and explains itself. Combine it with what you distill from data instead of replacing it.</li>
 <li><strong>Use the caching vocabulary.</strong> Source of truth, invalidation, TTL, and misses map directly to data, retraining, drift, and out-of-distribution inputs.</li>
 <li><strong>Define behavior with data.</strong> Eval sets and production data from end to end are the spec and the test for software you cannot read.</li>
+<li><strong>Make data a first-class citizen.</strong> Collect more of it beyond the codebase, on purpose, and treat it as an asset as important as the code.</li>
 <li><strong>Engineer the source, not only the cache.</strong> Version, review, and trace the data and the recipe, and let agents keep the cache fresh.</li>
 </ul>
 <hr>
