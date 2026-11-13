@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Software Is a Cache of Data: Redefining Software for 1.0, 2.0, and 3.0</title>
+<style>
+:root{
+  --bg:#fbfaf8; --panel:#fff; --ink:#1c1b1a; --muted:#5f5b56; --faint:#8b857e;
+  --rule:#e6e2dc; --accent:#8a5a2b; --accent-soft:#f4ede4; --code-bg:#f6f4f1;
+}
+@media (prefers-color-scheme:dark){
+  :root{ --bg:#16171a; --panel:#1c1e22; --ink:#e8e6e3; --muted:#a7a29b; --faint:#857f78;
+         --rule:#2d3035; --accent:#d9a05b; --accent-soft:#25262a; --code-bg:#21242a; }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:17px/1.72 ui-serif,Georgia,'Iowan Old Style','Times New Roman',serif;
+  padding:0 1.25rem 6rem;}
+.wrap{max-width:46rem;margin:0 auto}
+header.mast{padding:4.5rem 0 0;border-bottom:1px solid var(--rule);margin-bottom:2.5rem}
+h1{font-size:2.3rem;line-height:1.18;letter-spacing:-.02em;margin:0 0 1rem;font-weight:600}
+header.mast p.sub{color:var(--muted);font-style:italic;margin:0 0 2.2rem;font-size:1.02rem}
+.meta{display:flex;gap:1.4rem;flex-wrap:wrap;font-family:ui-sans-serif,system-ui,sans-serif;
+  font-size:.76rem;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);
+  padding-bottom:1.4rem}
+h2{font-size:1.5rem;line-height:1.25;letter-spacing:-.01em;margin:3.4rem 0 1rem;font-weight:600;
+  padding-top:.4rem}
+h3{font-size:1.13rem;margin:2.4rem 0 .7rem;font-weight:600;
+  font-family:ui-sans-serif,system-ui,sans-serif;letter-spacing:-.005em}
+p{margin:0 0 1.15rem}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid color-mix(in oklab,var(--accent) 35%,transparent)}
+a:hover{border-bottom-color:var(--accent)}
+strong{font-weight:650}
+hr{border:0;height:1px;background:var(--rule);margin:2.8rem 0}
+ul,ol{margin:0 0 1.3rem;padding-left:1.35rem}
+li{margin:0 0 .62rem}
+li>p{margin:0 0 .6rem}
+blockquote{margin:1.5rem 0;padding:.2rem 0 .2rem 1.3rem;border-left:3px solid var(--accent);
+  color:var(--muted)}
+blockquote p{margin:0 0 .6rem}
+blockquote p:last-child{margin:0}
+code{font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,monospace;font-size:.855em;
+  background:var(--code-bg);padding:.13em .38em;border-radius:4px;
+  border:1px solid color-mix(in oklab,var(--rule) 70%,transparent)}
+pre{background:var(--code-bg);border:1px solid var(--rule);border-radius:8px;
+  padding:1rem 1.1rem;overflow-x:auto;margin:0 0 1.4rem}
+pre code{background:none;border:0;padding:0;font-size:.8rem;line-height:1.62}
+.tw{overflow-x:auto;margin:0 0 1.6rem;border:1px solid var(--rule);border-radius:8px;
+  background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-family:ui-sans-serif,system-ui,sans-serif;
+  font-size:.845rem;line-height:1.5}
+th{text-align:left;font-weight:600;background:var(--accent-soft);color:var(--ink);
+  padding:.68rem .8rem;border-bottom:1px solid var(--rule);vertical-align:bottom;
+  font-size:.78rem;letter-spacing:.02em}
+td{padding:.66rem .8rem;border-bottom:1px solid color-mix(in oklab,var(--rule) 60%,transparent);
+  vertical-align:top;color:var(--muted)}
+td:first-child{color:var(--ink)}
+tbody tr:last-child td{border-bottom:0}
+@media (max-width:640px){
+  body{font-size:16px;padding:0 1rem 4rem}
+  h1{font-size:1.85rem} h2{font-size:1.32rem}
+  header.mast{padding-top:2.5rem}
+}
+@media print{
+  body{background:#fff;color:#000;font-size:11pt}
+  .tw,pre{break-inside:avoid} h2,h3{break-after:avoid}
+}
+</style>
+</head><body><div class="wrap">
+<body><div class="wrap">
+<nav style="padding-top:1.6rem;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.85rem"><a href="./" style="border:0">&larr; All posts</a></nav>
+<header class="mast">
+<h1>Software Is a Cache of Data: Redefining Software for 1.0, 2.0, and 3.0</h1>
+<p class="sub">We used to store data to cache the results of software. Now, more and more often, the software is the cache: a distilled, compressed form of data too large to keep in hand. That flips how we should build, version, and test it.</p>
+<div class="meta"><span>1,300 words</span><span>~6 min read</span><span>2026-11-12</span></div>
+</header>
+<main>
+<h2 id="three-forms">Every organization now runs three kinds of software</h2>
+<p>Andrej Karpathy gave us useful names. <strong>Software 1.0</strong> is code that humans write. <strong>Software 2.0</strong> is the weights of a neural network, learned from data instead of written by hand. <strong>Software 3.0</strong> is a large language model steered by prompts, context, and instructions in natural language.</p>
+<p>These are not eras that replace one another. Our organization runs all three at the same time, often in the same request path. A service written in Java calls a model retrained every quarter, and an agent driven by a prompt reviews the code of both.</p>
+<div class="tw"><table>
+<thead><tr><th>Form</th><th>What defines behavior</th><th>Where the behavior comes from</th><th>How it changes</th></tr></thead>
+<tbody>
+<tr><td><strong>Software 1.0</strong></td><td>Source code</td><td>An engineer’s understanding of the problem</td><td>Someone edits the code</td></tr>
+<tr><td><strong>Software 2.0</strong></td><td>Model weights</td><td>Historical data plus a training recipe</td><td>Retrain on newer data</td></tr>
+<tr><td><strong>Software 3.0</strong></td><td>Prompts, context, and the base model</td><td>Pretraining data, plus the context we give at run time</td><td>Change the context, or swap the model</td></tr>
+</tbody></table></div>
+<p>If you read down the third column, you see a trend. The further right we move on this spectrum, the less the behavior lives in something a human wrote, and the more it lives in data. So the old definition, “software is the codebase,” no longer covers what we ship.</p>
+
+<h2 id="regenerated">Software that is regenerated, not edited</h2>
+<p>Look at how a machine learning or reinforcement learning system changes over time. Nobody opens the weights and edits them. Every quarter, or every year, we regenerate them from the historical data that has built up since the last run.</p>
+<p>In that loop, the model file is not the real asset. The real assets are the data and the recipe that turns the data into weights. If you lost the weights but kept the data and the recipe, you could rebuild them. If you kept the weights but lost the data, you would have a system you can no longer improve, explain, or reproduce.</p>
+<p>That is exactly the relationship between a cache and its source of truth. The weights are a <strong>cached, distilled form of the historical data</strong>. They are fast to query and much smaller than the data, but they are a derived artifact. You throw them away and rebuild them when the source changes.</p>
+
+<h2 id="inversion">The cache inversion</h2>
+<p>In traditional software, the arrow points the other way. Software is the source of truth, and data is the cache. We memoize function results. We build materialized views so we do not have to run the same query again. We put computed pages on a CDN. The computation is primary, and data saves us from repeating it.</p>
+<p>That model breaks when the data gets big enough. Take operational logs. Ours are so large that no engineer, and no single query, can hold them in view. To get value from them, we have to distill them: into aggregates, into a minimized summary, or into the weights of a neural network that has learned the patterns. Inference on those weights, which is what Software 3.0 does all day, is then a fast lookup into a compressed form of all that data.</p>
+<blockquote><p>In Software 1.0, data is a cache of computation. In Software 2.0 and 3.0, computation is a cache of data.</p></blockquote>
+<p>The inversion is useful because the vocabulary of caching transfers directly, and it tells us which problems to expect:</p>
+<div class="tw"><table>
+<thead><tr><th>Caching concept</th><th>What it means when the model is the cache</th></tr></thead>
+<tbody>
+<tr><td><strong>Source of truth</strong></td><td>The data and the training recipe, not the weights</td></tr>
+<tr><td><strong>Invalidation</strong></td><td>Retraining, re-distilling, or refreshing the context</td></tr>
+<tr><td><strong>Staleness and TTL</strong></td><td>Drift: the world moved on since the last training run. A retraining cadence is a time-to-live.</td></tr>
+<tr><td><strong>Cache miss</strong></td><td>An input outside the training distribution. The model answers anyway, with confidence, which a real cache never does.</td></tr>
+<tr><td><strong>Lossy compression</strong></td><td>Distillation keeps the common patterns and drops the rare ones. Rare cases are where the bugs hide.</td></tr>
+<tr><td><strong>Cache poisoning</strong></td><td>Bad or biased data in the source flows straight into behavior</td></tr>
+</tbody></table></div>
+<p>The cache-miss row is the dangerous one. A key-value cache tells you when it does not have the answer. A distilled model does not. That is why the next shift matters.</p>
+
+<h2 id="behavior-by-data">Behavior is defined by data, not only by static code</h2>
+<p>If behavior comes from data, you cannot fully define or check it by reading code. Reading a model’s weights tells you nothing useful. Even for Software 1.0, the code that matters more and more is code that an agent wrote, and humans review it by outcome, not line by line.</p>
+<p>So we increasingly define software by how it behaves on a broad, end-to-end set of data, and not by its static code. The definition of “correct” moves from the source file to the dataset:</p>
+<ul>
+<li><strong>Evaluation sets are specs.</strong> For a model or an agent, the eval set is the most precise statement of what we want. Change the eval set, and you have changed the requirements.</li>
+<li><strong>Production data is the widest test.</strong> Replaying real traffic covers the interactions no one thought to write a test for. I wrote about this in <a href="testing-is-sampling-proof-is-proof.html">Two Ways to Verify Software</a>: tests are behavior samples, and the best samples come from production.</li>
+<li><strong>End to end beats unit, when the unit is learned.</strong> A model has no meaningful unit boundary. The useful test is the full path: real input, through every model and service, to the outcome the customer sees.</li>
+</ul>
+<p>This also closes the loop on the cache miss. Wide, realistic behavioral data is how we find the inputs where the distilled model is confidently wrong, before customers find them.</p>
+
+<h2 id="practice">What changes in practice</h2>
+<p>If the software is a cache of data, then the engineering discipline has to cover the data, not only the code. These are the changes we are making:</p>
+<ol>
+<li><strong>Version the source, not only the artifact.</strong> A release is code, plus the data snapshot, plus the training recipe, plus the prompts and context. If any one of them is missing, you cannot reproduce the behavior.</li>
+<li><strong>Set a freshness goal for every distilled artifact.</strong> Every model, summary, and knowledge base has a time-to-live, even if nobody wrote it down. Write it down and alarm on it.</li>
+<li><strong>Treat regeneration as routine maintenance.</strong> Retraining and re-distilling are non-functional work with a mechanical success check: the eval set passes and drift goes down. That makes them a natural job for the self-maintenance stream I described in <a href="slice-by-intent-not-by-phase.html">Slice by Intent, Not by Phase</a>. Agents should run them on a schedule, not on someone’s memory.</li>
+<li><strong>Review data changes like code changes.</strong> A change to the training data or the eval set changes behavior as surely as a code change does. It deserves the same review, and the same rollback path.</li>
+<li><strong>Keep lineage.</strong> When a behavior looks wrong, the question is “what data taught it this?” You can only answer that if you can trace from the artifact back to its sources.</li>
+</ol>
+
+<hr>
+<h2 id="lessons">What we learned</h2>
+<ul>
+<li><strong>Software is no longer just the codebase.</strong> Across 1.0, 2.0, and 3.0, more and more behavior lives in data.</li>
+<li><strong>The arrow has flipped.</strong> Data used to cache computation. Now models are a cached, distilled form of data too large to use directly.</li>
+<li><strong>Use the caching vocabulary.</strong> Source of truth, invalidation, TTL, and misses map directly to data, retraining, drift, and out-of-distribution inputs.</li>
+<li><strong>Define behavior with data.</strong> Eval sets and production data from end to end are the spec and the test for software you cannot read.</li>
+<li><strong>Engineer the source, not only the cache.</strong> Version, review, and trace the data and the recipe, and let agents keep the cache fresh.</li>
+</ul>
+<hr>
+<p style="font-size:.92rem;color:var(--muted)">Further reading: Andrej Karpathy, <a href="https://karpathy.medium.com/software-2-0-a64152b37c35">Software 2.0</a>; Andrej Karpathy, <em>Software Is Changing (Again)</em>, Y Combinator AI Startup School talk (2025).</p>
+</main>
+</div></body></html>
