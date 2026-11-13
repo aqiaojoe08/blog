@@ -87,6 +87,7 @@ tbody tr:last-child td{border-bottom:0}
 <tr><td><strong>Software 3.0</strong></td><td>Prompts, context, and the base model</td><td>Pretraining data, plus the context we give at run time</td><td>Change the context, or swap the model</td></tr>
 </tbody></table></div>
 <p>If you read down the third column, you see a trend. The further right we move on this spectrum, the less the behavior lives in something a human wrote, and the more it lives in data. So the old definition, “software is the codebase,” no longer covers what we ship.</p>
+<p>This is not abstract for us. Our organization has invested deeply in automation and optimization for many years. Every automated decision and every optimization run leaves a record of what we decided, what happened next, and what we learned from it. Over time that has built up into a huge amount of data, and that data, more than any one codebase, now defines how our software behaves.</p>
 
 <h2 id="regenerated">Software that is regenerated, not edited</h2>
 <p>Look at how a machine learning or reinforcement learning system changes over time. Nobody opens the weights and edits them. Every quarter, or every year, we regenerate them from the historical data that has built up since the last run.</p>
