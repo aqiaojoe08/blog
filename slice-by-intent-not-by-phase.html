@@ -72,7 +72,7 @@ tbody tr:last-child td{border-bottom:0}
 <header class="mast">
 <h1>Slice by Intent, Not by Phase: Organizing a Software Factory Around Three Change Streams</h1>
 <p class="sub">We used to drive AI transformation one SDLC phase at a time. It helped, but it was slow. Organizing the work by what triggered a change, and what it is trying to achieve, changed minds much faster.</p>
-<div class="meta"><span>2,400 words</span><span>~11 min read</span><span>2026-11-12</span></div>
+<div class="meta"><span>2,600 words</span><span>~11 min read</span><span>2026-11-12</span></div>
 </header>
 <main>
 <h2 id="old-way">How we used to do it</h2>
@@ -89,7 +89,7 @@ tbody tr:last-child td{border-bottom:0}
 <li><strong>Operational feedback.</strong> Production is telling us something is wrong. An alarm fired, a ticket was cut, a defect surfaced. This is not a new requirement; the signal itself carries the intent. These are the signals we want to automate, with AI fixing the bugs.</li>
 <li><strong>Non-functional requirements (self-maintenance).</strong> Nobody outside the team asks for it, but the software has to keep changing anyway: dependency and runtime upgrades, security patches, complexity reduction, dead-code removal. This is the work that keeps the code base in a state where agents can keep working on it.</li>
 </ol>
-<p>I introduced these three streams in <a href="software-factories-for-brownfield.html">Software Factories for Brownfield Code at Amazon Scale</a> as a way to make self-maintenance executable. This post is about the other thing they turned out to be: a better way to organize the transformation itself.</p>
+<p>If these look familiar, they are the same three streams from <a href="software-factories-for-brownfield.html">Software Factories for Brownfield Code at Amazon Scale</a>. That post covered what each stream’s loop looks like, and the shared primitives, maintenance loop, and small changes that make them work on large systems. This post is about something else: using the streams to <strong>organize the transformation itself</strong>, set a goal for each one, decide how much autonomy each one gets, and decide who runs the agents.</p>
 <p>We stopped slicing the lifecycle vertically by phase and started slicing it horizontally by trigger. Each stream runs end to end, from its own trigger to production, and each gets one velocity goal on the stage that actually gates it:</p>
 <div class="tw"><table><thead><tr><th>Stream</th><th>Trigger</th><th>Velocity goal</th></tr></thead><tbody>
 <tr><td>1) Features</td><td>Business intent</td><td>Feature description → agreed spec in &lt; 2 hours; → first lab readout in &lt; 1 week</td></tr>
@@ -121,7 +121,7 @@ tbody tr:last-child td{border-bottom:0}
 
 <h3 id="ops">Stream 2: operational feedback, where the signal is the spec</h3>
 <p>An operational issue arrives with its intent already attached: make the alarm stop firing. The fix is usually small. The delay is getting it safely to production. A merged fix does not close an issue; only the deploy that clears the signal does.</p>
-<p>So the goal is <strong>issue raised → fix deployed to production in under 2 hours</strong>. That does not mean skipping bake time, approvals, or blocked days. It means building pipelines where a small, incremental fix can pass every safety gate in that window. Where a pipeline cannot, that gap is the next improvement item.</p>
+<p>So the goal is <strong>issue raised → fix deployed to production in under 2 hours</strong>. That does not mean skipping bake time, approvals, or blocked days. It means building pipelines where a small, incremental fix can pass every safety gate in that window (see <a href="software-factories-for-brownfield.html#continuous-delivery">small, continuous changes</a>). Where a pipeline cannot, that gap is the next improvement item.</p>
 <p>We also learned not to over-optimize this stream. Getting faster and faster at resolving the same recurring ticket is a trap. Each issue is a signal about where the software is fragile, so we treat an issue as a <strong>router</strong>: clear the instance, then send the root cause to the right kind of change.</p>
 <ul>
 <li><strong>Operational gaps</strong> (a missing alarm, retry, timeout, or permission) become an infrastructure-as-code change, so every environment inherits the fix and it cannot quietly reappear.</li>
@@ -131,16 +131,9 @@ tbody tr:last-child td{border-bottom:0}
 <p>Speed to deploy matters because it shortens the feedback loop. It is a means to a more robust system, so we pair it with a recurrence check. The goal is to improve the software, not just our ticket handling.</p>
 
 <h3 id="maintenance">Stream 3: self-maintenance, where agents should do the work</h3>
-<p>This is the stream that changed our thinking the most.</p>
-<p>A factory has two properties a single piece of software lacks. It has a <strong>production flow</strong>, a paved path from intent to deployed artifact. And it <strong>maintains itself</strong>, so it can keep producing. A factory that only ships degrades: complexity piles up, the paved path erodes, and context such as <code>AGENTS.md</code>, specs, and docs drifts away from the code until agents start guessing.</p>
-<p>This matters more with agents than it did with humans. Tangled code and stale context slow a human down. They make an agent produce wrong changes with confidence.</p>
-<p>Non-functional work has no external customer pulling it, so it always loses priority to features and incidents. But it has a useful property: <strong>success is mechanical.</strong> An agent can reduce complexity on its own as long as it can check two things without a human:</p>
-<ul>
-<li><strong>Did complexity go down?</strong> A complexity scanner that combines cyclomatic complexity, function length, nesting, duplication, and defect patterns into a per-repo score and a hotspot map gives the agent a number to push down.</li>
-<li><strong>Did behavior stay the same?</strong> The production-traffic regression tests we built for continuous delivery double as the behavior-preservation check.</li>
-</ul>
-<p>With both checks, the refactoring loop closes without a human in the middle: pick a hotspot, restructure it, confirm the score dropped and the regression suite passes, then send it for review. The goal is the outcome (complexity trends down every quarter), not the number of refactoring changes. A guardrail keeps each change under 2 hours from hotspot to merge, so changes stay small enough to review. We also report complexity added by feature work separately from complexity removed by refactoring, so feature growth does not hide progress.</p>
-<p><strong>This already works at small scale.</strong> One of our agent pipelines opened two code reviews on its own that removed catalog entries pointing at skill files that no longer existed. Nobody asked for them. The factory found the dead references and fixed them before a human noticed. The next step is the same pattern on bigger targets. When a line of business moves out of a system, the deprecation notice or the drop to zero traffic should trigger cleanup jobs that remove the dead code paths, configs, and tests, with regression tests confirming nothing changed. Humans review the removal. They should not have to remember to start it.</p>
+<p>The <a href="software-factories-for-brownfield.html#self-maintenance">brownfield post</a> explains why a factory that only ships decays, and the maintenance loop that stops it. What changed in our thinking was the level of autonomy. Non-functional work has no external customer pulling it, so it always loses priority to features and incidents. But its success is mechanical, so it does not need a human in the loop. It needs two checks an agent can run on its own: a complexity score that should go down, and a regression suite that should still pass. With both in place, the agent picks a hotspot, restructures it, and sends it for review. Nobody has to start it.</p>
+<p>Two rules keep the goal honest. The goal is the outcome (complexity trends down every quarter), not the number of refactoring changes, and complexity added by feature work is reported separately from complexity removed by refactoring, so feature growth does not hide progress. A guardrail caps each change at 2 hours from hotspot to merge.</p>
+<p><strong>This already works at small scale.</strong> One of our agent pipelines opened two code reviews on its own that removed catalog entries pointing at skill files that no longer existed. Nobody asked for them. The next step is to let business events trigger cleanup: when a line of business moves out of a system, the deprecation notice or the drop to zero traffic should start the jobs that remove the dead code paths, configs, and tests. Humans review the removal. They should not have to remember to start it.</p>
 <hr>
 
 <h2 id="consensus">Agents will own non-functional work</h2>
@@ -160,7 +153,7 @@ tbody tr:last-child td{border-bottom:0}
 <p>That is the move from AI-assisted to <strong>AI-native</strong> development. In an AI-native team, every team member works with <strong>a single team-level agent</strong>, instead of each person running a separate agent of their own. The team agent carries the team’s context, rules, and history. When one engineer corrects it, the whole team benefits on the next run. Ten personal agents give you ten slightly different versions of the team’s practices; one team agent gives you one, and it gets better every week.</p>
 <p>Self-maintenance on a cadence only works if something actually runs it on that cadence. Over the past year most of us built real fluency with agents through local, personal skills. That was the right first step, but personal skills depend on a person remembering to run them. The next step is to bring the practice back to the team level:</p>
 <ul>
-<li><strong>Team-owned scheduled jobs.</strong> A centralized scheduler runs team jobs daily or weekly instead of waiting for someone to trigger them. We started with four: <strong>auto-refactor</strong> (a daily pass on complexity added by recent commits), <strong>doc sync</strong> (realigning docs to the code), <strong>release notes</strong>, and <strong>retrospectives</strong>. Next are a weekly hotspot scan that opens refactoring tasks, a daily small-fix change from package health findings, and a recurring check for repeat issue classes.</li>
+<li><strong>Team-owned scheduled jobs.</strong> A centralized scheduler runs team jobs daily or weekly instead of waiting for someone to trigger them. The chores from the brownfield post’s maintenance loop now run as team jobs, not personal ones. We started with <strong>auto-refactor</strong>, <strong>doc sync</strong>, <strong>release notes</strong>, and <strong>retrospectives</strong>.</li>
 <li><strong>Retrospectives as scheduled analysis.</strong> Much of an ops review or sprint retro is recurring analysis over data we already have. Which review rules fire and get accepted? Where is the bottleneck in time to production? <strong>At which steps did a human have to step in?</strong> That last question is the factory’s own backlog, because every human intervention names the next piece of automation.</li>
 <li><strong>Remote, team-hosted agents.</strong> Local agents stay great for exploration. Team-hosted agents apply the team’s practices the same way on every run and build up shared knowledge, so each improvement benefits everyone. That compounding is what a factory depends on.</li>
 </ul>
@@ -181,8 +174,8 @@ tbody tr:last-child td{border-bottom:0}
 <ul>
 <li><strong>Slice by intent, not by phase.</strong> Phase owners make phases faster. Stream owners make changes faster, because each stream’s goal sits on the stage that actually gates it.</li>
 <li><strong>Let the feedback loop set the autonomy.</strong> High-ambiguity work keeps humans in charge of intent. Mechanically verifiable work should run on its own.</li>
-<li><strong>Self-maintenance is the factory.</strong> A pipeline that only ships features degrades. The mechanism that keeps the code base evergreen and agent-ready is what makes the speed last.</li>
-<li><strong>Give agents two measurements and a leash.</strong> A complexity score, a behavior-preservation suite, and a cap on change size are enough to let agents refactor on their own.</li>
+<li><strong>Put the goal on the gate.</strong> Each stream stalls somewhere different: features at the spec, fixes at the deploy, maintenance at prioritization. Measure there.</li>
+<li><strong>Hand non-functional work to agents.</strong> Humans own intent, functional requirements, and guardrails.</li>
 <li><strong>Let the system manage the agents.</strong> Move from one agent per person, tracked by hand, to one team-level agent driven by triggers and schedules. If upkeep depends on someone remembering, it will not happen.</li>
 </ul>
 <p>The human role does not shrink in this model. It moves up: from writing each change to defining intent, agreeing specs, and designing the guardrails and self-maintenance mechanisms that let the factory run. That work is harder and more valuable, and it is the work senior engineers are best placed to lead.</p>
