@@ -66,128 +66,151 @@ tbody tr:last-child td{border-bottom:0}
   body{background:#fff;color:#000;font-size:11pt}
   .tw,pre{break-inside:avoid} h2,h3{break-after:avoid}
 }
+.tldr{background:var(--accent-soft);border:1px solid var(--rule);border-radius:8px;padding:1.1rem 1.3rem .4rem;margin:0 0 2.4rem;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.93rem;line-height:1.6}
+.tldr .tl-h{font-size:.74rem;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);margin:0 0 .5rem}
+.tldr ul{margin:0 0 .8rem}
+.tldr li{margin:0 0 .45rem}
 </style>
 </head><body><div class="wrap">
 <nav style="padding-top:1.6rem;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.85rem"><a href="./" style="border:0">&larr; All posts</a></nav>
 <header class="mast">
 <h1>Slice by Intent, Not by Phase: Organizing a Software Factory Around Three Change Streams</h1>
-<p class="sub">We used to drive AI transformation one SDLC phase at a time. It helped, but it was slow. Organizing the work by what triggered a change, and what it is trying to achieve, changed minds much faster, and it has helped us reach a 2x productivity increase.</p>
-<div class="meta"><span>2,900 words</span><span>~12 min read</span><span>2026-11-12</span></div>
+<p class="sub">We used to drive AI adoption one phase of the development lifecycle at a time. It helped, but it was slow. Organizing the work by what triggered each change shifted mindsets much faster, and it helped us reach a 2x productivity increase.</p>
+<div class="meta"><span>2,400 words</span><span>~10 min read</span><span>2026-11-12</span></div>
 </header>
 <main>
-<h2 id="old-way">How we used to do it</h2>
-<p>When we first drove AI adoption across our team, we did what most engineering organizations do. We cut the software development lifecycle into phases and gave each phase an owner. One person drove AI for operations: oncall agents, smarter alarms, ticket triage. Another drove AI for development: spec-driven development, agent-assisted code review, continuous delivery. A third owned the knowledge base: <code>AGENTS.md</code> files, steering docs, wiki sync.</p>
-<p>It worked, up to a point. Each phase got measurably better. Alarms got less noisy, ticket volume went down, regression testing built from production traffic became a template other teams adopted, and we planned a productivity gain into our annual plan.</p>
-<p>But it was not efficient. Phase owners optimized their own phase. A faster code review did nothing for a fix that then waited two days in a deployment pipeline. A better knowledge base did nothing for a feature whose real delay was three meetings to agree on what to build. Every phase got faster, and the time from “we need this” to “this is in production” barely moved. Engineers kept treating AI as tools bolted onto the old process, not as a reason to change the process.</p>
-<p>Looking back, the phase-by-phase model had three deeper problems:</p>
-<ol>
-<li><strong>Operational feedback never reached product development.</strong> In a phase model, operations is the last phase. Alarms, tickets, and defects were handled and closed inside that phase. They did not go back to development as signals about the software: where it is fragile, which designs keep breaking, and what the next change should be. The same class of issue kept coming back, and we got faster at closing it instead of removing it.</li>
-<li><strong>Nobody thought the codebase needed a mechanism to stay evergreen.</strong> No phase owns dependency upgrades, security patches, or complexity reduction, so nobody expected a mechanism that does them continuously. They happened when someone had spare time, or when a deadline or a security campaign forced them. In the meantime, the codebase got harder to change, for humans and agents alike.</li>
-<li><strong>Development started at a feature request.</strong> If you think of development as “a feature request arrives, then we build it,” every change needs someone outside the team to ask for it. Self-maintenance never has that requester, so it drops out of the picture. It is also the work agents can do almost entirely on their own, and the phase model had no place to put it.</li>
-</ol>
-<p>All three come from the same blind spot. A phase plan describes how a change moves through the lifecycle, but not where the change comes from. Operational feedback and self-maintenance start from different triggers than a feature request, so a plan built around phases has no natural place for them.</p>
-<p>AI made that blind spot more costly: <strong>as AI raises the speed of writing and reviewing code, the bottleneck moves away from the code.</strong> Where it moves depends on the kind of change. A per-phase plan cannot see that, because every kind of change flows through the same phases.</p>
-<hr>
-
-<h2 id="intent">Working backwards from intent</h2>
-<p>So we started over from first principles. We set the SDLC aside and asked one question about every change: <strong>what triggered it, and what is it trying to achieve?</strong> The answers fall into three streams:</p>
-<ol>
-<li><strong>Business intent (features).</strong> Someone wants the software to do something new or behave differently: a new capability, a new decision the system can make, a new customer-facing behavior.</li>
-<li><strong>Operational feedback.</strong> Production is telling us something is wrong. An alarm fired, a ticket was cut, a defect surfaced. This is not a new requirement; the signal itself carries the intent. These are the signals we want to automate, with AI fixing the bugs.</li>
-<li><strong>Non-functional requirements (self-maintenance).</strong> Nobody outside the team asks for it, but the software has to keep changing anyway: dependency and runtime upgrades, security patches, complexity reduction, dead-code removal. This is the work that keeps the code base in a state where agents can keep working on it.</li>
-</ol>
-<p>If these look familiar, they are the same three streams from <a href="software-factories-for-brownfield.html">Software Factories for Brownfield Code at Amazon Scale</a>. That post covered what each stream’s loop looks like, and the shared primitives, maintenance loop, and small changes that make them work on large systems. This post is about something else: using the streams to <strong>organize the transformation itself</strong>, set a goal for each one, decide how much autonomy each one gets, and decide who runs the agents.</p>
-<p>We stopped slicing the lifecycle vertically by phase and started slicing it horizontally by trigger. Each stream runs end to end, from its own trigger to production, and each gets one velocity goal on the stage that actually gates it:</p>
-<div class="tw"><table><thead><tr><th>Stream</th><th>Trigger</th><th>Velocity goal</th></tr></thead><tbody>
-<tr><td>1) Features</td><td>Business intent</td><td>Feature description → agreed spec in &lt; 2 hours; → first lab readout in &lt; 1 week</td></tr>
-<tr><td>2) Operational feedback</td><td>Production signal</td><td>Issue raised → fix deployed to production in &lt; 2 hours</td></tr>
-<tr><td>3) Self-maintenance</td><td>Engineering health</td><td>Complexity trends down every quarter; each change lands in &lt; 2 hours</td></tr>
-</tbody></table></div>
-<p>This framing did more for the mindset shift than any tool we rolled out. Engineers stopped asking “how do I use AI in code review?” and started asking “why does this kind of change take a week, and which stage is holding it?”</p>
-<p><strong>The results followed.</strong> Our team has achieved a <strong>2x productivity increase</strong>. Phase-by-phase work gave us steady gains in each phase. Organizing by stream let those gains add up end to end, because every stream now has one goal on the stage that actually gates it.</p>
-<hr>
-
-<h2 id="autonomy">Match AI autonomy to how ambiguous the intent is</h2>
-<p>The three streams differ in one property that matters a great deal for AI: how ambiguous the intent behind the change is. That sets how much autonomy an agent should get.</p>
-<div class="tw"><table><thead><tr><th>Stream</th><th>Intent ambiguity</th><th>AI’s role</th><th>Where it gets stuck</th><th>What we measure</th></tr></thead><tbody>
-<tr><td>Features</td><td>High</td><td>Accelerator, after humans align on intent</td><td>The front: reaching an agreed spec</td><td>Time to agreed spec, then to lab insights</td></tr>
-<tr><td>Operational feedback</td><td>Low (the signal supplies the intent)</td><td>Compounding flywheel</td><td>The back: the deployment gate</td><td>Time to production deploy</td></tr>
-<tr><td>Self-maintenance</td><td>None externally (success is mechanical)</td><td>Autonomous, on a leash</td><td>Never prioritized, because nothing pulls it</td><td>Complexity outcome</td></tr>
-</tbody></table></div>
-<p>The deeper reason the gates differ is the <strong>feedback loop</strong> each change gets. Marc Brooker calls this the feedback loop hypothesis in <a href="https://brooker.co.za/blog/2026/05/18/whats-easy-whats-hard.html">What’s Easy Now? What’s Hard Now?</a>: the availability of accurate feedback sets the limit on what agents can do. A change that can verify itself inside your own pipeline (tests, evals, regression suites) can run at high autonomy. A change whose success depends on customer behavior needs a production experiment, and a human has to own the judgment.</p>
-
-<h3 id="features">Stream 1: features, where humans own the intent</h3>
-<p>For a feature, the delay lives at the front. Once there is a crisp, buildable spec, AI makes implementation cheap. Getting to that spec is human work: agreeing what to build, with whom, and how we will know it worked.</p>
-<p>So the primary goal is <strong>feature description → agreed spec in under 2 hours</strong>, and the secondary goal is <strong>feature description → first lab readout in under a week</strong>. To keep the metric honest, we split features into three cases:</p>
-<ol>
-<li><strong>Straightforward.</strong> The intent plus existing context is enough. AI drives it end to end with human alignment.</li>
-<li><strong>Algorithm change.</strong> Same 2-hour spec target, plus a separately tracked formal verification gate that proves the algorithm behaves as specified.</li>
-<li><strong>Needs more input.</strong> Upstream data, another team’s decision, a missing dependency. The wait for that input is taken off the clock, and data availability has to be confirmed at spec time, not discovered mid-build.</li>
-</ol>
-<p>A slow case-3 feature is then visibly a dependency problem. It does not look like slow spec drafting.</p>
-<p>Large projects are not exempt. A big release cannot run through the factory as one unit, because it needs too many judgment calls. But it is made of many small deliveries, and many of those pieces do fit. Humans own the split and the judgment calls; the factory carries the well-defined pieces. We track the share of each large project’s deliveries that qualify for the fast path. A low share means the project needs a better split.</p>
-
-<h3 id="ops">Stream 2: operational feedback, where the signal is the spec</h3>
-<p>An operational issue arrives with its intent already attached: make the alarm stop firing. The fix is usually small. The delay is getting it safely to production. A merged fix does not close an issue; only the deploy that clears the signal does.</p>
-<p>So the goal is <strong>issue raised → fix deployed to production in under 2 hours</strong>. That does not mean skipping bake time, approvals, or blocked days. It means building pipelines where a small, incremental fix can pass every safety gate in that window (see <a href="software-factories-for-brownfield.html#continuous-delivery">small, continuous changes</a>). Where a pipeline cannot, that gap is the next improvement item.</p>
-<p>We also learned not to over-optimize this stream. Getting faster and faster at resolving the same recurring ticket is a trap. Each issue is a signal about where the software is fragile, so we treat an issue as a <strong>router</strong>: clear the instance, then send the root cause to the right kind of change.</p>
+<div class="tldr">
+<p class="tl-h">In short</p>
 <ul>
-<li><strong>Operational gaps</strong> (a missing alarm, retry, timeout, or permission) become an infrastructure-as-code change, so every environment inherits the fix and it cannot quietly reappear.</li>
-<li><strong>Tangled code</strong> that keeps breaking goes to the self-maintenance stream for refactoring.</li>
-<li><strong>Brittle service boundaries</strong> call for re-architecting the interface, not a workaround on one side of it.</li>
+<li>We used to drive AI adoption one SDLC phase at a time. Each phase got faster, but changes did not reach production much faster.</li>
+<li>Now we organize work by what triggered each change: a feature request, a production signal, or the health of the code.</li>
+<li>Each of these three streams gets one goal, placed on the step where it usually gets stuck.</li>
+<li>Agents should fully own non-functional work. Humans own the intent, the functional requirements, and the guardrails.</li>
+<li>The system, not each engineer, runs the agents, through one team-level agent. The result so far: a 2x productivity increase.</li>
 </ul>
-<p>Speed to deploy matters because it shortens the feedback loop. It is a means to a more robust system, so we pair it with a recurrence check. The goal is to improve the software, not just our ticket handling.</p>
+</div>
 
-<h3 id="maintenance">Stream 3: self-maintenance, where agents should do the work</h3>
-<p>The <a href="software-factories-for-brownfield.html#self-maintenance">brownfield post</a> explains why a factory that only ships decays, and the maintenance loop that stops it. What changed in our thinking was the level of autonomy. Non-functional work has no external customer pulling it, so it always loses priority to features and incidents. But its success is mechanical, so it does not need a human in the loop. It needs two checks an agent can run on its own: a complexity score that should go down, and a regression suite that should still pass. With both in place, the agent picks a hotspot, restructures it, and sends it for review. Nobody has to start it.</p>
-<p>Two rules keep the goal honest. The goal is the outcome (complexity trends down every quarter), not the number of refactoring changes, and complexity added by feature work is reported separately from complexity removed by refactoring, so feature growth does not hide progress. A guardrail caps each change at 2 hours from hotspot to merge.</p>
-<p><strong>This already works at small scale.</strong> One of our agent pipelines opened two code reviews on its own that removed catalog entries pointing at skill files that no longer existed. Nobody asked for them. The next step is to let business events trigger cleanup: when a line of business moves out of a system, the deprecation notice or the drop to zero traffic should start the jobs that remove the dead code paths, configs, and tests. Humans review the removal. They should not have to remember to start it.</p>
+<h2 id="old-way">How we used to do it</h2>
+<p>When we started driving AI adoption, we did what most teams do. We split the software development lifecycle (SDLC) into phases and gave each phase an owner:</p>
+<ul>
+<li><strong>Operations:</strong> oncall agents, smarter alarms, ticket triage.</li>
+<li><strong>Development:</strong> spec-driven development, AI code review, continuous delivery.</li>
+<li><strong>Knowledge base:</strong> <code>AGENTS.md</code> files, steering docs, wiki sync.</li>
+</ul>
+<p>It helped. Alarms got less noisy, ticket volume went down, and other teams adopted the regression tests we built from production traffic.</p>
+<p>But it was not efficient. Each owner made their own phase faster, and the total time barely moved. A faster code review did not help a fix that then waited two days to deploy. A better knowledge base did not help a feature stuck in three meetings about what to build.</p>
+<p>We also found three deeper problems:</p>
+<ol>
+<li><strong>Production feedback did not reach development.</strong> Operations was the last phase. Alarms and tickets were closed there, and they never went back to development as signals about where the software is fragile. The same issues kept coming back. We got faster at closing them, not at removing them.</li>
+<li><strong>Nobody owned keeping the code evergreen.</strong> No phase owns upgrades, security patches, or complexity reduction, so nobody expected a mechanism to do them continuously. They happened only when someone had time, or when a deadline forced them.</li>
+<li><strong>All work started with a feature request.</strong> If development means “someone asks for a feature, then we build it,” work that nobody asks for gets ignored. Self-maintenance never has a requester, so it dropped out of the picture.</li>
+</ol>
+<p>All three come from one blind spot. A phase plan shows how a change moves through the lifecycle, but not where the change comes from. AI makes this worse. As writing and reviewing code gets faster, <strong>the bottleneck moves away from the code</strong>, and where it moves depends on the kind of change.</p>
+<hr>
+
+<h2 id="intent">Start from intent, not from phase</h2>
+<p>So we started again from first principles. We set the SDLC aside and asked one question about every change: <strong>what triggered it, and what is it trying to achieve?</strong> The answers fall into three streams:</p>
+<ol>
+<li><strong>Features (business intent).</strong> Someone wants the software to do something new, or to behave differently.</li>
+<li><strong>Operational feedback.</strong> Production tells us something is wrong: an alarm, a ticket, a defect. The signal itself carries the intent. We want AI to fix these automatically.</li>
+<li><strong>Self-maintenance (non-functional requirements).</strong> Nobody asks for it, but the code still has to change: upgrades, security patches, complexity reduction, dead-code removal. This keeps the code in a state where agents can keep working on it.</li>
+</ol>
+<p>These are the same three streams as in <a href="software-factories-for-brownfield.html">Software Factories for Brownfield Code at Amazon Scale</a>. That post covers how each stream works. This post covers how we used them to organize the transformation itself: the goals, the level of autonomy, and who runs the agents.</p>
+<p>Instead of slicing the lifecycle by phase, we slice it by trigger. Each stream runs end to end and has one velocity goal:</p>
+<div class="tw"><table><thead><tr><th>Stream</th><th>Trigger</th><th>Velocity goal</th></tr></thead><tbody>
+<tr><td>1) Features</td><td>Business intent</td><td>Feature description → agreed spec in &lt; 2 hours; → first experiment results in &lt; 1 week</td></tr>
+<tr><td>2) Operational feedback</td><td>Production signal</td><td>Issue raised → fix deployed to production in &lt; 2 hours</td></tr>
+<tr><td>3) Self-maintenance</td><td>Health of the code</td><td>Complexity goes down every quarter; each change lands in &lt; 2 hours</td></tr>
+</tbody></table></div>
+<p>This new view changed mindsets faster than any tool we rolled out. Engineers stopped asking “how do I use AI in code review?” They started asking “why does this kind of change take a week, and what is holding it up?”</p>
+<p><strong>The results followed.</strong> Our team has achieved a <strong>2x productivity increase</strong>. Working by phase gave us small gains in each phase. Working by stream let those gains add up from end to end.</p>
+<hr>
+
+<h2 id="autonomy">Match AI autonomy to how clear the intent is</h2>
+<p>The streams differ in one way that matters a lot for AI: how clear the intent is. The clearer the intent, the more autonomy an agent can have.</p>
+<div class="tw"><table><thead><tr><th>Stream</th><th>How clear is the intent?</th><th>AI’s role</th><th>Where it gets stuck</th><th>What we measure</th></tr></thead><tbody>
+<tr><td>Features</td><td>Unclear until humans agree on it</td><td>Speeds up the build once the spec is agreed</td><td>At the start: agreeing on a spec</td><td>Time to agreed spec, then to first experiment results</td></tr>
+<tr><td>Operational feedback</td><td>Clear: the signal says what is wrong</td><td>Fixes issues, and each fix makes the system stronger</td><td>At the end: deploying safely</td><td>Time to production deploy</td></tr>
+<tr><td>Self-maintenance</td><td>Clear: success can be checked mechanically</td><td>Works on its own, inside guardrails</td><td>It never gets prioritized, because nobody asks for it</td><td>Complexity trend</td></tr>
+</tbody></table></div>
+<p>Why the difference? It comes down to <strong>feedback</strong>. Marc Brooker calls this the feedback loop hypothesis in <a href="https://brooker.co.za/blog/2026/05/18/whats-easy-whats-hard.html">What’s Easy Now? What’s Hard Now?</a>: what an agent can do is limited by how much accurate feedback it gets. If a change can check itself with tests, evals, or regression suites, an agent can run it with a lot of autonomy. If success depends on how customers react, you need a production experiment, and a human has to make the call.</p>
+
+<h3 id="features">Stream 1: Features, where humans own the intent</h3>
+<p>For features, the delay is at the start. Once there is a clear spec, AI makes the build cheap. Getting to that spec is human work: agreeing what to build, with whom, and how we will know it worked.</p>
+<p>Our goals:</p>
+<ul>
+<li><strong>Feature description → agreed spec in under 2 hours.</strong></li>
+<li><strong>Feature description → first experiment results in under 1 week.</strong></li>
+</ul>
+<p>To keep the numbers honest, we sort features into three cases:</p>
+<ol>
+<li><strong>Straightforward.</strong> The intent and the existing context are enough. AI drives it end to end, with humans aligned.</li>
+<li><strong>Algorithm change.</strong> The same 2-hour spec goal, plus a separate formal verification step that proves the algorithm does what the spec says.</li>
+<li><strong>Needs more input.</strong> It waits on upstream data or another team’s decision. That wait is taken off the clock. We confirm the data exists when we write the spec, not halfway through the build.</li>
+</ol>
+<p>Large projects are not exempt. A big release needs too many judgment calls to go through the factory as one piece. But it is made of many small deliveries, and many of those fit. Humans decide how to split it and make the judgment calls. The factory builds the well-defined pieces. If only a few pieces fit, the project needs a better split.</p>
+
+<h3 id="ops">Stream 2: Operational feedback, where the signal is the spec</h3>
+<p>An operational issue comes with its intent attached: make the alarm stop. The fix is usually small. The hard part is getting it to production safely. A merged fix does not close the issue. Only the deploy that clears the signal does.</p>
+<p>Our goal: <strong>issue raised → fix deployed to production in under 2 hours.</strong> That does not mean skipping bake time or approvals. It means building pipelines where a small fix can pass every safety check in that time (see <a href="software-factories-for-brownfield.html#continuous-delivery">small, continuous changes</a>). Where a pipeline cannot do that, the gap becomes the next thing to improve.</p>
+<p>But do not just get faster at closing the same ticket. Each issue shows where the software is fragile. So we treat each issue as a <strong>router</strong>: fix this instance, then send the root cause to the right kind of change.</p>
+<ul>
+<li><strong>A missing alarm, retry, timeout, or permission</strong> becomes an infrastructure-as-code change, so every environment gets the fix.</li>
+<li><strong>Tangled code that keeps breaking</strong> goes to the self-maintenance stream for refactoring.</li>
+<li><strong>A brittle boundary between services</strong> gets a better interface, not a workaround on one side.</li>
+</ul>
+<p>We pair the speed goal with a check for repeat issues. The goal is better software, not just faster ticket handling.</p>
+
+<h3 id="maintenance">Stream 3: Self-maintenance, where agents do the work</h3>
+<p>The <a href="software-factories-for-brownfield.html#self-maintenance">brownfield post</a> explains why a factory that only ships features decays. What changed for us was how much autonomy to give agents here.</p>
+<p>Nobody outside the team asks for non-functional work, so it always loses to features and incidents. But its success is easy to check, so it does not need a human in the loop. An agent needs two checks that it can run on its own:</p>
+<ul>
+<li><strong>Did complexity go down?</strong> A complexity score answers this.</li>
+<li><strong>Did behavior stay the same?</strong> A regression suite answers this.</li>
+</ul>
+<p>With both in place, the agent picks a hotspot, restructures it, runs both checks, and sends the change for review. Nobody has to start it.</p>
+<p>Two rules keep this honest. We measure the outcome (complexity goes down every quarter), not the number of changes. And we report complexity added by features separately from complexity removed by refactoring. A guardrail keeps each change under 2 hours from hotspot to merge.</p>
+<p><strong>This already works at small scale.</strong> One of our agent pipelines opened two code reviews on its own. They removed catalog entries that pointed at deleted skill files. Nobody asked for them. Next, we want business events to trigger cleanup. When a line of business moves out of a system, the deprecation notice or the drop to zero traffic should start jobs that remove the dead code, configs, and tests. Humans review the removal. They should not have to remember to start it.</p>
 <hr>
 
 <h2 id="consensus">Agents will own non-functional work</h2>
-<p>We discussed this model with several senior principal engineers at Amazon and came away aligned on one conclusion: <strong>non-functional requirements will be handled fully by agents.</strong> Dependency upgrades, security patches, complexity reduction, documentation drift, dead-code removal: all of it is well defined, mechanically verifiable, and continuous. That is the profile of work agents are best at and humans are worst at prioritizing.</p>
+<p>We discussed this model with several senior principal engineers at Amazon, and we agreed on one conclusion: <strong>agents will fully handle non-functional requirements.</strong> Upgrades, security patches, complexity reduction, outdated docs, and dead code are all well defined, easy to check, and never finished. Agents are good at this kind of work. Humans are bad at making time for it.</p>
 <p>That changes the human job. Humans provide three things:</p>
 <ol>
-<li><strong>Intent:</strong> what the software should do and why.</li>
-<li><strong>Functional requirements:</strong> the agreed spec that makes intent buildable.</li>
-<li><strong>Guardrails:</strong> the regression tests, verification gates, review rules, and deployment safety checks that let the factory act on its own without breaking production.</li>
+<li><strong>Intent:</strong> what the software should do, and why.</li>
+<li><strong>Functional requirements:</strong> an agreed spec that makes the intent buildable.</li>
+<li><strong>Guardrails:</strong> regression tests, verification steps, review rules, and deployment safety checks. These let the factory act on its own without breaking production.</li>
 </ol>
-<p>Everything else is the factory’s job. The most important part of the factory to define is its <strong>self-maintenance mechanism</strong>: what runs, on what cadence, measured by what, and stopped by which guardrail.</p>
+<p>Everything else is the factory’s job. The most important part to define is the <strong>self-maintenance mechanism</strong>: what runs, how often, how it is measured, and which guardrail stops it.</p>
 <hr>
 
 <h2 id="team">Let the system run the agents</h2>
-<p>The second big shift is about who manages the agents. In the first wave of adoption, humans tracked the agents. Each engineer had their own agent, started it, watched it, checked its output, and remembered what to run next. That is AI-assisted development: the agent does tasks, and a person is still the workflow engine.</p>
-<p>A factory inverts this. <strong>The system manages the agentic workflow, not the humans.</strong> Triggers start the work: a new spec, an alarm, a complexity threshold, a schedule. The workflow routes each change to the right stream, runs the checks, and asks a human only at the points that need judgment. Humans stop babysitting agents and start reviewing outcomes.</p>
-<p>This matters because the mix of work is changing. Only one of our three streams, features, starts with a person asking for something. The other two are triggered by the system: an alarm, a ticket, a new dependency version, a complexity score, a schedule. As agents take over non-functional work, those system-triggered streams grow the fastest. <strong>Soon, the majority of code changes will be triggered by the system, not by humans.</strong> A workflow that waits for a person to start each change cannot keep up with that. The system has to manage it.</p>
-<p>That is the move from AI-assisted to <strong>AI-native</strong> development. In an AI-native team, every team member works with <strong>a single team-level agent</strong>, instead of each person running a separate agent of their own. The team agent carries the team’s context, rules, and history. When one engineer corrects it, the whole team benefits on the next run. Ten personal agents give you ten slightly different versions of the team’s practices; one team agent gives you one, and it gets better every week.</p>
-<p>Self-maintenance on a cadence only works if something actually runs it on that cadence. Over the past year most of us built real fluency with agents through local, personal skills. That was the right first step, but personal skills depend on a person remembering to run them. The next step is to bring the practice back to the team level:</p>
+<p>The second big shift is about who manages the agents.</p>
+<p>In the first wave, humans managed them. Each engineer had their own agent. They started it, watched it, checked its output, and remembered what to run next. That is <strong>AI-assisted</strong> development: the agent does tasks, but a person is still the workflow engine.</p>
+<p>A factory flips this. <strong>The system manages the workflow, not the humans.</strong> Triggers start the work: a new spec, an alarm, a complexity threshold, a schedule. The system sends each change to the right stream, runs the checks, and asks a human only when judgment is needed. Humans stop watching agents and start reviewing results.</p>
+<p>This matters because the mix of work is changing. Only one stream, features, starts with a person asking. The other two are triggered by the system: an alarm, a ticket, a new dependency version, a complexity score, a schedule. As agents take over non-functional work, these two streams grow the fastest. <strong>Soon, most code changes will be triggered by the system, not by humans.</strong> A workflow that waits for a person to start each change cannot keep up.</p>
+<p>That is the move to <strong>AI-native</strong> development. In an AI-native team, everyone works with <strong>one team-level agent</strong> instead of their own personal agent. The team agent holds the team’s context, rules, and history. When one engineer corrects it, the whole team benefits on the next run. Ten personal agents give you ten slightly different versions of the team’s practices. One team agent gives you one version, and it gets better every week.</p>
+<p>Personal skills got most of us fluent with agents over the past year. But personal skills depend on someone remembering to run them. So we moved the practice to the team level:</p>
 <ul>
-<li><strong>Team-owned scheduled jobs.</strong> A centralized scheduler runs team jobs daily or weekly instead of waiting for someone to trigger them. The chores from the brownfield post’s maintenance loop now run as team jobs, not personal ones. We started with <strong>auto-refactor</strong>, <strong>doc sync</strong>, <strong>release notes</strong>, and <strong>retrospectives</strong>.</li>
-<li><strong>Retrospectives as scheduled analysis.</strong> Much of an ops review or sprint retro is recurring analysis over data we already have. Which review rules fire and get accepted? Where is the bottleneck in time to production? <strong>At which steps did a human have to step in?</strong> That last question is the factory’s own backlog, because every human intervention names the next piece of automation.</li>
-<li><strong>Remote, team-hosted agents.</strong> Local agents stay great for exploration. Team-hosted agents apply the team’s practices the same way on every run and build up shared knowledge, so each improvement benefits everyone. That compounding is what a factory depends on.</li>
+<li><strong>Team-owned scheduled jobs.</strong> A central scheduler runs team jobs daily or weekly. We started with <strong>auto-refactor</strong>, <strong>doc sync</strong>, <strong>release notes</strong>, and <strong>retrospectives</strong>.</li>
+<li><strong>Retrospectives as scheduled analysis.</strong> Much of a retro is the same analysis of data we already have. Which review rules fire, and which get accepted? Where is the bottleneck on the way to production? <strong>Where did a human have to step in?</strong> That last question is the factory’s own backlog, because each step-in points to the next thing to automate.</li>
+<li><strong>Team-hosted agents.</strong> Local agents are still great for exploring. Team-hosted agents apply the team’s practices the same way every time, so every improvement benefits everyone.</li>
 </ul>
-<p>We also changed how we plan. If sprint planning keeps scheduling individual features and fixes, the backlog fills with traditional work and factory work gets crowded out. So most committed capacity now goes to the machine: “automate stage X,” “make Y self-verifying,” “reduce complexity in hotspot Z.” Every traditional task becomes a question: what part of the factory should have produced this automatically, and can we build that instead?</p>
+<p>We also changed how we plan. If sprint planning only schedules features and fixes, factory work gets crowded out. So most of our capacity now goes to the factory itself: “automate step X,” “make Y check itself,” “reduce complexity in hotspot Z.” For every manual task, we ask: what part of the factory should have done this, and can we build that instead?</p>
 <hr>
 
 <h2 id="quality">Is the output worth shipping?</h2>
-<p>Lead time shows how fast the factory runs. It does not show whether the output is good. A factory that opens many code reviews that never reach production looks busy and wastes review time. So we track quality next to velocity:</p>
+<p>Lead time shows how fast the factory runs, not whether its output is good. A factory that opens many code reviews that never ship looks busy and wastes reviewers’ time. So we track quality next to speed:</p>
 <div class="tw"><table><thead><tr><th>Metric</th><th>What it measures</th><th>Warning sign</th></tr></thead><tbody>
-<tr><td>Merge-to-production rate</td><td>Share of opened changes that are merged and deployed, not abandoned or reverted</td><td>Low: specs are unclear, or the agent’s self-checks miss what reviewers catch</td></tr>
-<tr><td>Change failure rate</td><td>Share of deployments that cause a rollback, revert, or operational issue</td><td>High: the gates miss real defects</td></tr>
-<tr><td>Rework per change</td><td>Revisions and blocking comments before merge</td><td>High: the agent lacks context, so humans correct it by hand</td></tr>
+<tr><td>Merge-to-production rate</td><td>Share of changes that are merged and deployed, not abandoned or reverted</td><td>Low: specs are unclear, or the agent’s own checks miss what reviewers catch</td></tr>
+<tr><td>Change failure rate</td><td>Share of deployments that cause a rollback, a revert, or an operational issue</td><td>High: the checks miss real defects</td></tr>
+<tr><td>Rework per change</td><td>Revisions and blocking comments before merge</td><td>High: the agent lacks context, so humans fix its work by hand</td></tr>
 </tbody></table></div>
-<p>We report agent-authored and human-authored changes separately, so we can see whether the factory’s output meets the same bar.</p>
+<p>We report agent-written and human-written changes separately, to check that the factory’s output meets the same bar.</p>
 <hr>
 
-<h2 id="lessons">What we learned</h2>
-<ul>
-<li><strong>Slice by intent, not by phase.</strong> Phase owners make phases faster. Stream owners make changes faster, because each stream’s goal sits on the stage that actually gates it.</li>
-<li><strong>Let the feedback loop set the autonomy.</strong> High-ambiguity work keeps humans in charge of intent. Mechanically verifiable work should run on its own.</li>
-<li><strong>Put the goal on the gate.</strong> Each stream stalls somewhere different: features at the spec, fixes at the deploy, maintenance at prioritization. Measure there.</li>
-<li><strong>Hand non-functional work to agents.</strong> Humans own intent, functional requirements, and guardrails.</li>
-<li><strong>Let the system manage the agents.</strong> Soon most code changes will be triggered by the system, not by people. Move from one agent per person, tracked by hand, to one team-level agent driven by triggers and schedules. If upkeep depends on someone remembering, it will not happen.</li>
-</ul>
-<p>The human role does not shrink in this model. It moves up: from writing each change to defining intent, agreeing specs, and designing the guardrails and self-maintenance mechanisms that let the factory run. That work is harder and more valuable, and it is the work senior engineers are best placed to lead.</p>
+<h2 id="humans">Where this leaves humans</h2>
+<p>The human role does not shrink in this model. It moves up: from writing each change to defining intent, agreeing on specs, and designing the guardrails and self-maintenance that let the factory run. That work is harder and more valuable, and senior engineers are best placed to lead it.</p>
 <hr>
 <p style="font-size:.92rem;color:var(--muted)">Further reading: Gergely Orosz, <a href="https://newsletter.pragmaticengineer.com/p/openai-software-factory">Inside OpenAI’s agentic software factory</a>; Kiro, <a href="https://kiro.dev/blog/software-factory-1000-prs/">Software factory: 1,000 PRs in a week</a>; Marc Brooker, <a href="https://brooker.co.za/blog/2026/05/18/whats-easy-whats-hard.html">What’s Easy Now? What’s Hard Now?</a></p>
 </main>

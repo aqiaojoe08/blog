@@ -73,7 +73,7 @@ tbody tr:last-child td{border-bottom:0}
 <header class="mast">
 <h1>The Cache Inversion: Software Is Becoming a Cache of Data</h1>
 <p class="sub">We used to store data to cache the results of software. More and more often, the software is now the cache: a distilled form of data too large to keep in hand. Code that models how a system behaves is still essential, but this trend changes how we build, version, and test software.</p>
-<div class="meta"><span>1,700 words</span><span>~7 min read</span><span>2026-11-12</span></div>
+<div class="meta"><span>1,600 words</span><span>~7 min read</span><span>2026-11-12</span></div>
 </header>
 <main>
 <h2 id="three-forms">Software 1.0, 2.0, and 3.0, all at once</h2>
@@ -141,18 +141,7 @@ tbody tr:last-child td{border-bottom:0}
 <li><strong>Review data changes like code changes.</strong> A change to the training data or the eval set changes behavior as surely as a code change does. It deserves the same review, and the same rollback path.</li>
 <li><strong>Keep lineage.</strong> When a behavior looks wrong, the question is “what data taught it this?” You can only answer that if you can trace from the artifact back to its sources.</li>
 </ol>
-
-<hr>
-<h2 id="lessons">What we learned</h2>
-<ul>
-<li><strong>Software is no longer just the codebase.</strong> Across 1.0, 2.0, and 3.0, more and more behavior lives in data.</li>
-<li><strong>The arrow is flipping.</strong> Data used to cache computation. More and more, models are a cached, distilled form of data too large to use directly.</li>
-<li><strong>Keep the explicit model.</strong> Code that models a system’s dynamics extrapolates, enforces hard constraints, and explains itself. Combine it with what you distill from data instead of replacing it.</li>
-<li><strong>Use the caching vocabulary.</strong> Source of truth, invalidation, TTL, and misses map directly to data, retraining, drift, and out-of-distribution inputs.</li>
-<li><strong>Define behavior with data.</strong> Eval sets and production data from end to end are the spec and the test for software you cannot read.</li>
-<li><strong>Make data a first-class citizen.</strong> Collect more of it beyond the codebase, on purpose, and treat it as an asset as important as the code.</li>
-<li><strong>Engineer the source, not only the cache.</strong> Version, review, and trace the data and the recipe, and let agents keep the cache fresh.</li>
-</ul>
+<p>Code that models how a system behaves is not going away. But more and more of what our software does comes from data, and that makes the data as much a part of the software as the code. Treat it that way: collect it on purpose, version it, review it, and keep the models built from it fresh.</p>
 <hr>
 <p style="font-size:.92rem;color:var(--muted)">Further reading: Andrej Karpathy, <a href="https://karpathy.medium.com/software-2-0-a64152b37c35">Software 2.0</a>; Andrej Karpathy, <em>Software Is Changing (Again)</em>, Y Combinator AI Startup School talk (2025).</p>
 </main>
