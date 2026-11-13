@@ -2,7 +2,7 @@
 <html lang="en"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Slice by Intent, Not by Phase: Organizing a Software Factory Around Three Change Streams</title>
+<title>Slice by Intent (10x+), Not by Phase (2x)</title>
 <style>
 :root{
   --bg:#fbfaf8; --panel:#fff; --ink:#1c1b1a; --muted:#5f5b56; --faint:#8b857e;
@@ -74,19 +74,19 @@ tbody tr:last-child td{border-bottom:0}
 </head><body><div class="wrap">
 <nav style="padding-top:1.6rem;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.85rem"><a href="./" style="border:0">&larr; All posts</a></nav>
 <header class="mast">
-<h1>Slice by Intent, Not by Phase: Organizing a Software Factory Around Three Change Streams</h1>
-<p class="sub">We used to drive AI adoption one phase of the development lifecycle at a time. It helped, but it was slow. Organizing the work by what triggered each change shifted mindsets much faster, and it helped us reach a 2x productivity increase.</p>
-<div class="meta"><span>2,400 words</span><span>~10 min read</span><span>2026-11-12</span></div>
+<h1>Slice by Intent (10x+), Not by Phase (2x)</h1>
+<p class="sub">Driving AI adoption one phase of the development lifecycle at a time got us a 2x productivity increase. Getting to 10x or 100x takes something different: thinking end to end, and slicing the work by the intent behind each change.</p>
+<div class="meta"><span>2,500 words</span><span>~10 min read</span><span>2026-11-12</span></div>
 </header>
 <main>
 <div class="tldr">
 <p class="tl-h">In short</p>
 <ul>
-<li>We used to drive AI adoption one SDLC phase at a time. Each phase got faster, but changes did not reach production much faster.</li>
-<li>Now we organize work by what triggered each change: a feature request, a production signal, or the health of the code.</li>
+<li>Driving AI adoption one SDLC phase at a time got us a 2x productivity increase. That is close to the limit of the phase approach.</li>
+<li>To reach 10x or 100x, we think end to end and organize work by what triggered each change: a feature request, a production signal, or the health of the code.</li>
 <li>Each of these three streams gets one goal, placed on the step where it usually gets stuck.</li>
 <li>Agents should fully own non-functional work. Humans own the intent, the functional requirements, and the guardrails.</li>
-<li>The system, not each engineer, runs the agents, through one team-level agent. The result so far: a 2x productivity increase.</li>
+<li>The system, not each engineer, runs the agents, through one team-level agent. Soon, most code changes will be triggered by the system, not by humans.</li>
 </ul>
 </div>
 
@@ -97,8 +97,8 @@ tbody tr:last-child td{border-bottom:0}
 <li><strong>Development:</strong> spec-driven development, AI code review, continuous delivery.</li>
 <li><strong>Knowledge base:</strong> <code>AGENTS.md</code> files, steering docs, wiki sync.</li>
 </ul>
-<p>It helped. Alarms got less noisy, ticket volume went down, and other teams adopted the regression tests we built from production traffic.</p>
-<p>But it was not efficient. Each owner made their own phase faster, and the total time barely moved. A faster code review did not help a fix that then waited two days to deploy. A better knowledge base did not help a feature stuck in three meetings about what to build.</p>
+<p>It worked. Alarms got less noisy, ticket volume went down, and other teams adopted the regression tests we built from production traffic. Overall, it got us a <strong>2x productivity increase</strong>.</p>
+<p>But 2x is close to as far as the phase approach can go. Making one phase faster only speeds up the part of the work that phase covers. If writing code takes a third of the time from request to production, making it instant saves at most a third. This is Amdahl’s law, applied to a team. The rest of the time goes to review, deployment, waiting, and the handoffs between phases, and no phase owner owns those. A faster code review did not help a fix that then waited two days to deploy. A better knowledge base did not help a feature stuck in three meetings about what to build.</p>
 <p>We also found three deeper problems:</p>
 <ol>
 <li><strong>Production feedback did not reach development.</strong> Operations was the last phase. Alarms and tickets were closed there, and they never went back to development as signals about where the software is fragile. The same issues kept coming back. We got faster at closing them, not at removing them.</li>
@@ -123,7 +123,7 @@ tbody tr:last-child td{border-bottom:0}
 <tr><td>3) Self-maintenance</td><td>Health of the code</td><td>Complexity goes down every quarter; each change lands in &lt; 2 hours</td></tr>
 </tbody></table></div>
 <p>This new view changed mindsets faster than any tool we rolled out. Engineers stopped asking “how do I use AI in code review?” They started asking “why does this kind of change take a week, and what is holding it up?”</p>
-<p><strong>The results followed.</strong> Our team has achieved a <strong>2x productivity increase</strong>. Working by phase gave us small gains in each phase. Working by stream let those gains add up from end to end.</p>
+<p><strong>From 2x to 10x and beyond.</strong> Slicing by phase got us to 2x. Slicing by intent is how we plan to go further. Each stream owns a change from its trigger all the way to production, so the waits between phases become visible, and someone owns removing them. That is the path to 10x. The path to 100x runs through the two streams that the system triggers. When agents fix production issues and maintain the code on their own, most of the work no longer waits for a human at all.</p>
 <hr>
 
 <h2 id="autonomy">Match AI autonomy to how clear the intent is</h2>
