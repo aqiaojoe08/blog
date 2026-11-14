@@ -93,17 +93,8 @@ tbody tr:last-child td{border-bottom:0}
 <nav style="padding-top:1.6rem;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.85rem"><a href="./" style="border:0">&larr; All posts</a></nav>
 <header class="mast"><h1>Faster Decisions in Complex Systems with LLMs and World Models</h1><p class="sub">An LLM proposes a small set of strategies. An optimizer fills in the details. A world model tests what happens next.</p><div class="meta"><span>~4 min read</span><span>2026-11-14</span></div></header>
 <main>
-<p>During my PhD, I worked on automatic control for robots. That experience shapes how I think about decision-making in complex systems. In robotics, we can consider several ways to accomplish a task, then use models of the robot and its environment to evaluate the resulting motions. That same approach inspired the decision process in this article.</p><p>A robot needs to move a cup past an obstacle. It could go around the
-left side, go around the right, or lift the cup over it. A business
-facing a supplier delay has a similar decision to make. It could
-transfer stock, expedite a shipment, or reduce a promotion. In both
-cases, the high-level choice changes which detailed decisions are worth
-considering.</p>
-<p>The challenge is that those detailed decisions interact. A robot’s
-approach changes the feasible joint trajectories. A promotion change
-alters demand and therefore the best transfer quantity. When a system
-has to act quickly, jointly exploring every route, quantity, timing, and
-sequence can consume the time available to act.</p>
+<p>Over the weekend, I found myself thinking about a question that goes back to my PhD work in automatic control for robots. When a robot has several ways to accomplish a task, how should it decide which ones are worth computing in detail?</p>
+<p>Imagine a robot arm carrying a cup past an obstacle. It could go left, go right, or lift the cup over it. Each choice changes the joint trajectories the arm can follow, how fast it can move, and how easily it can keep the cup upright. Exploring all those choices together can take longer than the time available to act.</p>
 <p>I propose giving the system two levels of planning. <strong>Use an
 LLM to propose a few distinct ways to respond, then optimize and
 simulate within each one.</strong> The LLM helps decide where to search.
@@ -142,24 +133,19 @@ practice.</p>
 </g>
 <text x="350" y="324" text-anchor="middle" font-size="14" fill="#42615b">If no plan qualifies, use simulation feedback to revise the shortlist.</text>
 <path d="M36 373H884" stroke="#b9d1c8"/>
-<g font-size="17" font-weight="700"><text x="36" y="408">Robotics</text><text x="476" y="408">Supply chain</text></g>
+<g font-size="17" font-weight="700"><text x="36" y="408">Robotics</text><text x="476" y="408">Closed-loop control</text></g>
 <g font-size="15" fill="#42615b">
 <text x="36" y="435">Compare left, right, or overhead paths.<tspan x="36" dy="24">Solve trajectories and simulate clearance and tilt.</tspan></text>
-<text x="476" y="435">Compare transfers, expediting, or promotion changes.<tspan x="476" dy="24">Solve quantities and simulate stockouts and cost.</tspan></text>
+<text x="476" y="435">Track the trajectory using sensor feedback.<tspan x="476" dy="24">Replan when the observed scene changes.</tspan></text>
 </g></g></svg>
-<figcaption>The decision loop in robotics and supply chain.</figcaption>
+<figcaption>From strategy selection to feedback control in robotics.</figcaption>
 </figure>
 <h2 id="define-the-decision-before-proposing-actions">1. Define the
 decision before proposing actions</h2>
 <p>Capture what the system knows at the moment of decision. Include
 current state, the triggering change, the objective, the time available,
 and the constraints that every plan must satisfy.</p>
-<p>For a robot, that means the observed scene, joint positions, the
-estimated grip, and limits on clearance, speed, and tilt. For a supplier
-delay, it means inventory, open orders, the revised arrival date, and
-business rules such as minimum availability. Keep a reference plan for
-comparison, such as a standard motion-planning policy or accepting the
-delay while keeping the promotion as scheduled.</p>
+<p>For the robot arm, capture the observed scene, joint positions, estimated grip, and limits on clearance, speed, and cup tilt. Use the existing motion planner as a baseline for measuring time and plan quality.</p>
 <h2 id="turn-candidate-strategies-into-smaller-search-problems">2. Turn
 candidate strategies into smaller search problems</h2>
 <p>Ask the LLM for a short list of strategies using actions that the
@@ -187,22 +173,10 @@ solver.</p>
 <td>Waypoints, joint trajectories, and speed within the allowed
 corridor</td>
 </tr>
-<tr class="even">
-<td>Respond to a supplier delay</td>
-<td>Keep the promotion and combine a transfer with partial
-expediting</td>
-<td>How much to transfer, how much to expedite, and when to dispatch
-each</td>
-</tr>
+<tr class="even"><td>Move a cup around an obstacle</td><td>Lift the cup over the obstacle while keeping it upright</td><td>Lift height, arm configuration, and speed within the overhead corridor</td></tr>
 </tbody>
 </table></div>
-<p>A robot can compare left, right, and overhead corridors without
-asking a single solve to explore all three geometries. A supply chain
-optimizer can compare plans with fixed promotion terms without trying
-every possible price. Within a candidate, the solver still handles
-coupled variables together. Changing the robot’s waypoint affects
-several joints at once. Expediting more inventory can reduce the
-transfer required.</p>
+<p>Each corridor gives the motion planner a smaller problem. Within a corridor, it still has to solve for coupled variables. A waypoint that improves clearance may require a different joint configuration or a slower motion to keep the cup upright.</p>
 <p>The expected speedup comes from fixing irrelevant choices and
 bounding the remaining ones. A shortlist alone saves little if every
 candidate leaves the same variables open.</p>
@@ -221,12 +195,6 @@ with plausible errors in the estimated obstacle position or grip. During
 execution, the controller uses sensor feedback to track the trajectory.
 If the scene changes materially, the system can stop safely and plan
 again from the updated state.</p>
-<p><strong>In supply chain</strong>, advance the simulation by day.
-Apply scheduled arrivals and transfers, estimate demand under each
-plan’s promotion settings, fulfill orders, and carry forward remaining
-inventory. Compare stockouts, contribution margin, and freight cost. Use
-the same underlying demand and lead-time scenarios across plans so the
-comparison reflects the actions taken.</p>
 <p>Evaluate all candidates against the same objectives and hard
 constraints. A plan that looks favorable on average can still fail an
 important constraint under the required test conditions.</p>
@@ -251,4 +219,5 @@ against observed outcomes for actions actually taken.</p>
 erase the time savings. The goal is to find a good, feasible decision
 before the opportunity to act passes. The method earns its place when it
 does that more reliably on the decisions the system actually faces.</p>
+<p>The same planning pattern can also apply to other domains, including supply chain.</p>
 </main></div></body></html>
