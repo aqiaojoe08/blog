@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Innovation Tree: From Fragmented Innovation to Collective Innovation</title>
+<style>
+:root{
+  --bg:#fbfaf8; --panel:#fff; --ink:#1c1b1a; --muted:#5f5b56; --faint:#8b857e;
+  --rule:#e6e2dc; --accent:#8a5a2b; --accent-soft:#f4ede4; --code-bg:#f6f4f1;
+}
+@media (prefers-color-scheme:dark){
+  :root{ --bg:#16171a; --panel:#1c1e22; --ink:#e8e6e3; --muted:#a7a29b; --faint:#857f78;
+         --rule:#2d3035; --accent:#d9a05b; --accent-soft:#25262a; --code-bg:#21242a; }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:17px/1.72 ui-serif,Georgia,'Iowan Old Style','Times New Roman',serif;
+  padding:0 1.25rem 6rem;}
+.wrap{max-width:46rem;margin:0 auto}
+header.mast{padding:4.5rem 0 0;border-bottom:1px solid var(--rule);margin-bottom:2.5rem}
+h1{font-size:2.3rem;line-height:1.18;letter-spacing:-.02em;margin:0 0 1rem;font-weight:600}
+header.mast p.sub{color:var(--muted);font-style:italic;margin:0 0 2.2rem;font-size:1.02rem}
+.meta{display:flex;gap:1.4rem;flex-wrap:wrap;font-family:ui-sans-serif,system-ui,sans-serif;
+  font-size:.76rem;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);
+  padding-bottom:1.4rem}
+h2{font-size:1.5rem;line-height:1.25;letter-spacing:-.01em;margin:3.4rem 0 1rem;font-weight:600;
+  padding-top:.4rem}
+h3{font-size:1.13rem;margin:2.4rem 0 .7rem;font-weight:600;
+  font-family:ui-sans-serif,system-ui,sans-serif;letter-spacing:-.005em}
+p{margin:0 0 1.15rem}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid color-mix(in oklab,var(--accent) 35%,transparent)}
+a:hover{border-bottom-color:var(--accent)}
+strong{font-weight:650}
+hr{border:0;height:1px;background:var(--rule);margin:2.8rem 0}
+ul,ol{margin:0 0 1.3rem;padding-left:1.35rem}
+li{margin:0 0 .62rem}
+li>p{margin:0 0 .6rem}
+blockquote{margin:1.5rem 0;padding:.2rem 0 .2rem 1.3rem;border-left:3px solid var(--accent);
+  color:var(--muted)}
+blockquote p{margin:0 0 .6rem}
+blockquote p:last-child{margin:0}
+code{font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,monospace;font-size:.855em;
+  background:var(--code-bg);padding:.13em .38em;border-radius:4px;
+  border:1px solid color-mix(in oklab,var(--rule) 70%,transparent)}
+pre{background:var(--code-bg);border:1px solid var(--rule);border-radius:8px;
+  padding:1rem 1.1rem;overflow-x:auto;margin:0 0 1.4rem}
+pre code{background:none;border:0;padding:0;font-size:.8rem;line-height:1.62}
+.tw{overflow-x:auto;margin:0 0 1.6rem;border:1px solid var(--rule);border-radius:8px;
+  background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-family:ui-sans-serif,system-ui,sans-serif;
+  font-size:.845rem;line-height:1.5}
+th{text-align:left;font-weight:600;background:var(--accent-soft);color:var(--ink);
+  padding:.68rem .8rem;border-bottom:1px solid var(--rule);vertical-align:bottom;
+  font-size:.78rem;letter-spacing:.02em}
+td{padding:.66rem .8rem;border-bottom:1px solid color-mix(in oklab,var(--rule) 60%,transparent);
+  vertical-align:top;color:var(--muted)}
+td:first-child{color:var(--ink)}
+tbody tr:last-child td{border-bottom:0}
+@media (max-width:640px){
+  body{font-size:16px;padding:0 1rem 4rem}
+  h1{font-size:1.85rem} h2{font-size:1.32rem}
+  header.mast{padding-top:2.5rem}
+}
+@media print{
+  body{background:#fff;color:#000;font-size:11pt}
+  .tw,pre{break-inside:avoid} h2,h3{break-after:avoid}
+}
+.fig{--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--o1:#1c5cab;--o2:#2a78d6;--o3:#5598e7;--o4:#86b6ef;
+  --grid:#e1e0d9;--axis:#c3c2b7;--lab:#898781;
+  margin:2.1rem 0 2.3rem;border:1px solid var(--rule);border-radius:8px;background:var(--panel);
+  padding:1.1rem 1.15rem .95rem}
+@media (prefers-color-scheme:dark){.fig{--s1:#3987e5;--s2:#d95926;--s3:#199e70;
+  --o1:#184f95;--o2:#256abf;--o3:#3987e5;--o4:#6da7ec;--grid:#2c2c2a;--axis:#383835}}
+.fig svg{display:block;width:100%;height:auto}
+.fig .ft{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.86rem;font-weight:600;
+  color:var(--ink);margin:0 0 .55rem;line-height:1.35}
+.fig figcaption{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.76rem;line-height:1.55;
+  color:var(--muted);margin:.8rem 0 0}
+.fig .lgd{display:flex;flex-wrap:wrap;gap:.3rem 1.1rem;font-family:ui-sans-serif,system-ui,sans-serif;
+  font-size:.76rem;color:var(--muted);margin:0 0 .75rem}
+.fig .lgd span{display:inline-flex;align-items:center;gap:.4rem}
+.fig .lgd i{width:10px;height:10px;border-radius:3px;display:inline-block;flex:0 0 auto}
+.fig text{font-family:ui-sans-serif,system-ui,sans-serif}
+.fig .t-pri{fill:var(--ink)}.fig .t-sec{fill:var(--muted)}.fig .t-mut{fill:var(--lab)}
+.fig .gr{stroke:var(--grid);stroke-width:1;fill:none}
+.fig .ax{stroke:var(--axis);stroke-width:1;fill:none}
+.fig .ln{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.fig .dsh{fill:none;stroke-width:1.5;stroke-dasharray:4 5}
+.fig .box{fill:none;stroke-width:1.5}
+</style>
+</head><body><div class="wrap">
+<nav style="padding-top:1.6rem;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.85rem"><a href="./" style="border:0">&larr; All posts</a></nav>
+<header class="mast"><h1>Innovation Tree: From Fragmented Innovation to Collective Innovation</h1><p class="sub">Trace the roots. Recognize contributions. Grow together.</p><div class="meta"><span>~5 min read</span><span>2026-11-14</span></div></header>
+<main>
+<p>Two teams build tools for the same problem. One started earlier. The other adds a better workflow and attracts more users. Soon, the conversation shifts from what customers need to who copied whom. Both teams have contributed, but there is no shared account of how the work evolved.</p>
+<p>I propose <strong>Innovation Tree</strong>: a way to make that evolution visible, so teams can discover related work, recognize contributions, and decide what to build together. The core is an <strong>Innovation Evolution Graph</strong>, with LLMs helping connect evidence across code, design documents, and project history.</p>
+<h2 id="graph">A tree people can understand, a graph underneath</h2>
+<p>A family tree is an intuitive way to show where an idea began and how it grew. Software also combines ideas from multiple sources, so the underlying model needs to be a graph. Its nodes represent ideas, products, repositories, contributors, decisions, and outcomes. Its edges describe relationships such as <em>inspired by</em>, <em>derived from</em>, <em>extended by</em>, <em>merged into</em>, and <em>replaced by</em>.</p>
+<p>Each relationship should carry supporting evidence: a design reference, a pull request, an explicit acknowledgment, or a documented decision. Record who proposed it, who reviewed it, and whether it is confirmed, disputed, or still a hypothesis. An early timestamp is evidence of timing; it does not, by itself, establish that another team borrowed the idea.</p>
+<figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 540" role="img" aria-labelledby="tree-title tree-desc">
+<title id="tree-title">Innovation Tree: branches converge into a shared service</title>
+<desc id="tree-desc">Team A's prototype is extended by Team B's quality improvement. Team C contributes an independent interface experiment. Both branches merge into a shared service, retaining credit for the foundation, improvements, and integration. Arrows show hypothetical reviewed relationships.</desc>
+<defs><marker id="tree-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4 0 8Z" fill="#46736d"/></marker></defs>
+<rect width="720" height="540" rx="12" fill="#f7f9f6"/>
+<g font-family="Arial,sans-serif" fill="#182e2b">
+<text x="30" y="40" font-size="23" font-weight="700">Innovation Evolution Graph</text>
+<text x="30" y="68" font-size="16" fill="#42615b">One product family. Multiple contributions.</text>
+<g stroke="#b9d1c8" stroke-width="1.5">
+<rect x="35" y="100" width="290" height="82" rx="10" fill="#dceee6"/>
+<rect x="35" y="250" width="290" height="82" rx="10" fill="#fff"/>
+<rect x="395" y="250" width="290" height="82" rx="10" fill="#fff"/>
+<rect x="165" y="410" width="390" height="86" rx="10" fill="#dceee6"/>
+</g>
+<g font-size="19" font-weight="700">
+<text x="53" y="132">Original prototype</text>
+<text x="53" y="282">Quality improvement</text>
+<text x="413" y="282">Interface experiment</text>
+<text x="185" y="443">Shared service</text>
+</g>
+<g font-size="16" fill="#42615b">
+<text x="53" y="159">Team A · foundation</text>
+<text x="53" y="309">Team B · fewer noisy findings</text>
+<text x="413" y="309">Team C · independent work</text>
+<text x="185" y="473">A + B + C · integration and maintenance</text>
+</g>
+<g fill="none" stroke="#46736d" stroke-width="2" marker-end="url(#tree-arrow)">
+<path d="M180 184V246"/>
+<path d="M180 334V370H285V406"/>
+<path d="M540 334V370H435V406"/>
+</g>
+<g font-size="15" fill="#42615b">
+<text x="196" y="220">extended by</text>
+<text x="197" y="356">merged into</text>
+<text x="445" y="356">merged into</text>
+<text x="360" y="524" text-anchor="middle">Evidence + contributor review accompany each relationship.</text>
+</g></g></svg><figcaption>A hypothetical evolution: one branch extends an existing prototype; another starts independently. Integration retains the history of both.</figcaption></figure>
+<h2 id="llm">Use LLMs to propose connections</h2>
+<p>Relevant work is often described in different language and scattered across repositories and planning tools. An LLM can help translate that material into comparable descriptions: the problem being solved, the intended users, the approach, and the constraints. Semantic retrieval can then surface candidate connections for review.</p>
+<p>A practical implementation would have four steps:</p>
+<ol>
+<li><strong>Collect evidence.</strong> Ingest versioned design documents, repository metadata, pull requests, and project decisions. Keep source links and access permissions attached to every record.</li>
+<li><strong>Retrieve related work.</strong> Combine semantic search with explicit citations, dependencies, and commit history. Similarity identifies a candidate relationship; it does not establish lineage.</li>
+<li><strong>Propose a typed edge.</strong> Ask the LLM to suggest a relationship, cite its evidence, explain uncertainty, and identify missing information. “Related problem” must remain distinct from “derived from.”</li>
+<li><strong>Review and maintain the graph.</strong> Let contributors confirm, correct, or dispute the proposal. Preserve the review history, and recheck relationships when the underlying evidence changes.</li>
+</ol>
+<p>Git history could supply implementation evidence, while a planning tool such as Linear could supply product intent and decisions. The graph would connect those records. Retrieval and generated explanations must respect the source permissions, including when an edge could reveal a restricted project.</p>
+<h2 id="example">Make the next conversation more useful</h2>
+<p>Consider a hypothetical code review assistant. Team A develops the first prototype. Team B builds on it to reduce noisy findings. Team C independently explores a better reviewer interface. Later, the teams combine the strongest parts into a shared service.</p>
+<p>The graph records A’s foundation, B’s quality improvement, C’s independent contribution, and the integration work. If C was inspired by A, that becomes a separate relationship supported by evidence. If there is no evidence of influence, the graph should leave that question open.</p>
+<p>Now a team starting another review tool can see what already exists, why branches diverged, and whom to contact. The useful discussion becomes concrete: Which requirement is still unmet? Should we extend a branch, run a new experiment, or bring improvements back into the shared service?</p>
+<h2 id="credit">Recognize the full chain of contribution</h2>
+<p>The graph only helps if recognition follows the work. Originators deserve credit for establishing a direction. Improvers deserve credit for better quality, reliability, usability, or cost. Maintainers and integrators deserve credit for turning several experiments into something others can depend on.</p>
+<p>Attach outcomes to contributions with their evaluation context: a quality benchmark, adoption over a stated period, operating cost, or measured time saved. Avoid collapsing these into an automatic originality score. A popular project may have better distribution, and a less visible component may provide its essential foundation. The graph should support an evidence-based discussion of contribution, not automatically determine ownership or settle disputes.</p>
+<p>Healthy experimentation still needs room. Two teams may reasonably choose different constraints or test competing approaches. Make that rationale visible, then revisit opportunities to share components or converge as evidence accumulates.</p>
+<h2 id="pilot">Start with one product family</h2>
+<p>A useful pilot would map one family of related tools, ask the contributors to validate the history, and surface that map when someone proposes new work. Measure how quickly teams find relevant projects, how often proposed relationships survive review, whether shared improvements are adopted, and how much effort the review process adds. Track attribution corrections and contributor feedback alongside reuse.</p>
+<p>The hypothesis is simple: making origins, improvements, and outcomes visible can reduce the friction around reuse and help separate experiments grow into shared capabilities. Innovation Tree succeeds when people can build on one another’s work with confidence that their contributions will remain visible.</p>
+<blockquote><p><strong>Trace the roots. Recognize contributions. Grow together.</strong></p></blockquote>
+</main></div></body></html>

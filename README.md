@@ -6,6 +6,7 @@ The `.html` files in this repo are the source for each post. GitHub shows them a
 
 ## Posts
 
+- [Innovation Tree: From Fragmented Innovation to Collective Innovation](https://aqiaojoe08.github.io/blog/innovation-tree.html) (2026-11-14)
 - [Faster Decisions in Complex Systems with LLMs and World Models](https://aqiaojoe08.github.io/blog/llm-world-model-decision-making.html) (2026-11-14)
 - [The Cache Inversion: Software Is Becoming a Cache of Data](https://aqiaojoe08.github.io/blog/software-is-a-cache-of-data.html) (2026-11-12)
 - [Slice by Intent (10x+), Not by Phase (2x)](https://aqiaojoe08.github.io/blog/slice-by-intent-not-by-phase.html) (2026-11-12)
