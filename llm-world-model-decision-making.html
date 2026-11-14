@@ -92,7 +92,8 @@ tbody tr:last-child td{border-bottom:0}
 </head><body><div class="wrap">
 <nav style="padding-top:1.6rem;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.85rem"><a href="./" style="border:0">&larr; All posts</a></nav>
 <header class="mast"><h1>Faster Decisions in Complex Systems with LLMs and World Models</h1><p class="sub">An LLM proposes a small set of strategies. An optimizer fills in the details. A world model tests what happens next.</p><div class="meta"><span>~4 min read</span><span>2026-11-14</span></div></header>
-<main><p>A robot needs to move a cup past an obstacle. It could go around the
+<main>
+<p>During my PhD, I worked on automatic control for robots. That experience shapes how I think about decision-making in complex systems. In robotics, we can consider several ways to accomplish a task, then use models of the robot and its environment to evaluate the resulting motions. That same approach inspired the decision process in this article.</p><p>A robot needs to move a cup past an obstacle. It could go around the
 left side, go around the right, or lift the cup over it. A business
 facing a supplier delay has a similar decision to make. It could
 transfer stock, expedite a shipment, or reduce a promotion. In both
