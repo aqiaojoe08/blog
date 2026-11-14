@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Faster Decisions in Complex Systems with LLMs and World Models</title>
+<style>
+:root{
+  --bg:#fbfaf8; --panel:#fff; --ink:#1c1b1a; --muted:#5f5b56; --faint:#8b857e;
+  --rule:#e6e2dc; --accent:#8a5a2b; --accent-soft:#f4ede4; --code-bg:#f6f4f1;
+}
+@media (prefers-color-scheme:dark){
+  :root{ --bg:#16171a; --panel:#1c1e22; --ink:#e8e6e3; --muted:#a7a29b; --faint:#857f78;
+         --rule:#2d3035; --accent:#d9a05b; --accent-soft:#25262a; --code-bg:#21242a; }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:17px/1.72 ui-serif,Georgia,'Iowan Old Style','Times New Roman',serif;
+  padding:0 1.25rem 6rem;}
+.wrap{max-width:46rem;margin:0 auto}
+header.mast{padding:4.5rem 0 0;border-bottom:1px solid var(--rule);margin-bottom:2.5rem}
+h1{font-size:2.3rem;line-height:1.18;letter-spacing:-.02em;margin:0 0 1rem;font-weight:600}
+header.mast p.sub{color:var(--muted);font-style:italic;margin:0 0 2.2rem;font-size:1.02rem}
+.meta{display:flex;gap:1.4rem;flex-wrap:wrap;font-family:ui-sans-serif,system-ui,sans-serif;
+  font-size:.76rem;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);
+  padding-bottom:1.4rem}
+h2{font-size:1.5rem;line-height:1.25;letter-spacing:-.01em;margin:3.4rem 0 1rem;font-weight:600;
+  padding-top:.4rem}
+h3{font-size:1.13rem;margin:2.4rem 0 .7rem;font-weight:600;
+  font-family:ui-sans-serif,system-ui,sans-serif;letter-spacing:-.005em}
+p{margin:0 0 1.15rem}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid color-mix(in oklab,var(--accent) 35%,transparent)}
+a:hover{border-bottom-color:var(--accent)}
+strong{font-weight:650}
+hr{border:0;height:1px;background:var(--rule);margin:2.8rem 0}
+ul,ol{margin:0 0 1.3rem;padding-left:1.35rem}
+li{margin:0 0 .62rem}
+li>p{margin:0 0 .6rem}
+blockquote{margin:1.5rem 0;padding:.2rem 0 .2rem 1.3rem;border-left:3px solid var(--accent);
+  color:var(--muted)}
+blockquote p{margin:0 0 .6rem}
+blockquote p:last-child{margin:0}
+code{font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,monospace;font-size:.855em;
+  background:var(--code-bg);padding:.13em .38em;border-radius:4px;
+  border:1px solid color-mix(in oklab,var(--rule) 70%,transparent)}
+pre{background:var(--code-bg);border:1px solid var(--rule);border-radius:8px;
+  padding:1rem 1.1rem;overflow-x:auto;margin:0 0 1.4rem}
+pre code{background:none;border:0;padding:0;font-size:.8rem;line-height:1.62}
+.tw{overflow-x:auto;margin:0 0 1.6rem;border:1px solid var(--rule);border-radius:8px;
+  background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-family:ui-sans-serif,system-ui,sans-serif;
+  font-size:.845rem;line-height:1.5}
+th{text-align:left;font-weight:600;background:var(--accent-soft);color:var(--ink);
+  padding:.68rem .8rem;border-bottom:1px solid var(--rule);vertical-align:bottom;
+  font-size:.78rem;letter-spacing:.02em}
+td{padding:.66rem .8rem;border-bottom:1px solid color-mix(in oklab,var(--rule) 60%,transparent);
+  vertical-align:top;color:var(--muted)}
+td:first-child{color:var(--ink)}
+tbody tr:last-child td{border-bottom:0}
+@media (max-width:640px){
+  body{font-size:16px;padding:0 1rem 4rem}
+  h1{font-size:1.85rem} h2{font-size:1.32rem}
+  header.mast{padding-top:2.5rem}
+}
+@media print{
+  body{background:#fff;color:#000;font-size:11pt}
+  .tw,pre{break-inside:avoid} h2,h3{break-after:avoid}
+}
+.fig{--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--o1:#1c5cab;--o2:#2a78d6;--o3:#5598e7;--o4:#86b6ef;
+  --grid:#e1e0d9;--axis:#c3c2b7;--lab:#898781;
+  margin:2.1rem 0 2.3rem;border:1px solid var(--rule);border-radius:8px;background:var(--panel);
+  padding:1.1rem 1.15rem .95rem}
+@media (prefers-color-scheme:dark){.fig{--s1:#3987e5;--s2:#d95926;--s3:#199e70;
+  --o1:#184f95;--o2:#256abf;--o3:#3987e5;--o4:#6da7ec;--grid:#2c2c2a;--axis:#383835}}
+.fig svg{display:block;width:100%;height:auto}
+.fig .ft{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.86rem;font-weight:600;
+  color:var(--ink);margin:0 0 .55rem;line-height:1.35}
+.fig figcaption{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.76rem;line-height:1.55;
+  color:var(--muted);margin:.8rem 0 0}
+.fig .lgd{display:flex;flex-wrap:wrap;gap:.3rem 1.1rem;font-family:ui-sans-serif,system-ui,sans-serif;
+  font-size:.76rem;color:var(--muted);margin:0 0 .75rem}
+.fig .lgd span{display:inline-flex;align-items:center;gap:.4rem}
+.fig .lgd i{width:10px;height:10px;border-radius:3px;display:inline-block;flex:0 0 auto}
+.fig text{font-family:ui-sans-serif,system-ui,sans-serif}
+.fig .t-pri{fill:var(--ink)}.fig .t-sec{fill:var(--muted)}.fig .t-mut{fill:var(--lab)}
+.fig .gr{stroke:var(--grid);stroke-width:1;fill:none}
+.fig .ax{stroke:var(--axis);stroke-width:1;fill:none}
+.fig .ln{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.fig .dsh{fill:none;stroke-width:1.5;stroke-dasharray:4 5}
+.fig .box{fill:none;stroke-width:1.5}
+</style>
+</head><body><div class="wrap">
+<nav style="padding-top:1.6rem;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.85rem"><a href="./" style="border:0">&larr; All posts</a></nav>
+<header class="mast"><h1>Faster Decisions in Complex Systems with LLMs and World Models</h1><p class="sub">An LLM proposes a small set of strategies. An optimizer fills in the details. A world model tests what happens next.</p><div class="meta"><span>~4 min read</span><span>2026-11-14</span></div></header>
+<main><p>A robot needs to move a cup past an obstacle. It could go around the
+left side, go around the right, or lift the cup over it. A business
+facing a supplier delay has a similar decision to make. It could
+transfer stock, expedite a shipment, or reduce a promotion. In both
+cases, the high-level choice changes which detailed decisions are worth
+considering.</p>
+<p>The challenge is that those detailed decisions interact. A robot’s
+approach changes the feasible joint trajectories. A promotion change
+alters demand and therefore the best transfer quantity. When a system
+has to act quickly, jointly exploring every route, quantity, timing, and
+sequence can consume the time available to act.</p>
+<p>I propose giving the system two levels of planning. <strong>Use an
+LLM to propose a few distinct ways to respond, then optimize and
+simulate within each one.</strong> The LLM helps decide where to search.
+The optimizer and world model determine what those choices would mean in
+practice.</p>
+<h2 id="define-the-decision-before-proposing-actions">1. Define the
+decision before proposing actions</h2>
+<p>Capture what the system knows at the moment of decision. Include
+current state, the triggering change, the objective, the time available,
+and the constraints that every plan must satisfy.</p>
+<p>For a robot, that means the observed scene, joint positions, the
+estimated grip, and limits on clearance, speed, and tilt. For a supplier
+delay, it means inventory, open orders, the revised arrival date, and
+business rules such as minimum availability. Keep a reference plan for
+comparison, such as a standard motion-planning policy or accepting the
+delay while keeping the promotion as scheduled.</p>
+<h2 id="turn-candidate-strategies-into-smaller-search-problems">2. Turn
+candidate strategies into smaller search problems</h2>
+<p>Ask the LLM for a short list of strategies using actions that the
+system supports. Each candidate specifies which decisions can vary,
+their allowable ranges, and which decisions stay fixed. Validate those
+fields against the action schema and policy before passing them to a
+solver.</p>
+<div class="tw"><table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Decision</th>
+<th>Candidate strategy</th>
+<th>What the solver still chooses</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Move a cup around an obstacle</td>
+<td>Pass to the left while keeping the cup upright</td>
+<td>Waypoints, joint trajectories, and speed within the allowed
+corridor</td>
+</tr>
+<tr class="even">
+<td>Respond to a supplier delay</td>
+<td>Keep the promotion and combine a transfer with partial
+expediting</td>
+<td>How much to transfer, how much to expedite, and when to dispatch
+each</td>
+</tr>
+</tbody>
+</table></div>
+<p>A robot can compare left, right, and overhead corridors without
+asking a single solve to explore all three geometries. A supply chain
+optimizer can compare plans with fixed promotion terms without trying
+every possible price. Within a candidate, the solver still handles
+coupled variables together. Changing the robot’s waypoint affects
+several joints at once. Expediting more inventory can reduce the
+transfer required.</p>
+<p>The expected speedup comes from fixing irrelevant choices and
+bounding the remaining ones. A shortlist alone saves little if every
+candidate leaves the same variables open.</p>
+<h2 id="simulate-the-consequences-of-each-executable-plan">3. Simulate
+the consequences of each executable plan</h2>
+<p>A world model takes an initial state, a sequence of actions, and
+assumptions about uncertainty. It advances the system through time and
+returns the resulting states and outcomes. The solver can use a cheap
+approximation while searching, then send its best feasible plans to a
+more detailed simulator. For small problems, the simulator can also
+score actions directly during the search.</p>
+<p><strong>In robotics</strong>, advance the simulation in short time
+steps using the commanded trajectory and a model of the robot and scene.
+Check collisions, joint limits, cup tilt, and completion time. Repeat
+with plausible errors in the estimated obstacle position or grip. During
+execution, the controller uses sensor feedback to track the trajectory.
+If the scene changes materially, the system can stop safely and plan
+again from the updated state.</p>
+<p><strong>In supply chain</strong>, advance the simulation by day.
+Apply scheduled arrivals and transfers, estimate demand under each
+plan’s promotion settings, fulfill orders, and carry forward remaining
+inventory. Compare stockouts, contribution margin, and freight cost. Use
+the same underlying demand and lead-time scenarios across plans so the
+comparison reflects the actions taken.</p>
+<p>Evaluate all candidates against the same objectives and hard
+constraints. A plan that looks favorable on average can still fail an
+important constraint under the required test conditions.</p>
+<h2 id="select-execute-and-learn-from-the-outcome">4. Select, execute,
+and learn from the outcome</h2>
+<p>Rank feasible plans against the decision policy. The agent can select
+a plan within its delegated authority. A person makes the call when the
+trade-off falls outside that authority. If no candidate passes, the
+system can use the simulator’s feedback for one more proposal round,
+fall back to an established policy, or allocate more time to search.
+Save the assumptions and results so observed outcomes can inform the
+next decision.</p>
+<h2 id="how-to-tell-whether-it-works">How to tell whether it works</h2>
+<p>Compare the proposed method with a fixed playbook and with broader
+optimization under the same end-to-end time budget. Count the time spent
+generating candidates, solving, and simulating. Measure time to the
+first feasible plan, time to the final decision, and the quality of the
+selected outcome. Where practical, use a longer search as a reference to
+estimate what the shortlist missed. Validate the simulator separately
+against observed outcomes for actions actually taken.</p>
+<p>A short list can omit the best strategy, and a costly simulator can
+erase the time savings. The goal is to find a good, feasible decision
+before the opportunity to act passes. The method earns its place when it
+does that more reliably on the decisions the system actually faces.</p>
+</main></div></body></html>
