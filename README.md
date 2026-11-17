@@ -6,6 +6,7 @@ The `.html` files in this repo are the source for each post. GitHub shows them a
 
 ## Posts
 
+- [Everything as Code, Reviewed by Agents: Ending Fragmentation in a Federated Architecture](https://aqiaojoe08.github.io/blog/everything-as-code-reviewed-by-agents.html) (2026-11-17)
 - [Stateless Apps, Central Data: What the Agentic Ecosystem Is Missing](https://aqiaojoe08.github.io/blog/stateless-apps-central-data.html) (2026-11-17)
 - [Innovation Tree: From Fragmented Innovation to Collective Innovation](https://aqiaojoe08.github.io/blog/innovation-tree.html) (2026-11-14)
 - [Faster Decisions in Complex Systems with LLMs and World Models](https://aqiaojoe08.github.io/blog/llm-world-model-decision-making.html) (2026-11-14)

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Everything as Code, Reviewed by Agents: Ending Fragmentation in a Federated Architecture</title>
+<style>
+:root{
+  --bg:#fbfaf8; --panel:#fff; --ink:#1c1b1a; --muted:#5f5b56; --faint:#8b857e;
+  --rule:#e6e2dc; --accent:#8a5a2b; --accent-soft:#f4ede4; --code-bg:#f6f4f1;
+}
+@media (prefers-color-scheme:dark){
+  :root{ --bg:#16171a; --panel:#1c1e22; --ink:#e8e6e3; --muted:#a7a29b; --faint:#857f78;
+         --rule:#2d3035; --accent:#d9a05b; --accent-soft:#25262a; --code-bg:#21242a; }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:17px/1.72 ui-serif,Georgia,'Iowan Old Style','Times New Roman',serif;
+  padding:0 1.25rem 6rem;}
+.wrap{max-width:46rem;margin:0 auto}
+header.mast{padding:4.5rem 0 0;border-bottom:1px solid var(--rule);margin-bottom:2.5rem}
+h1{font-size:2.3rem;line-height:1.18;letter-spacing:-.02em;margin:0 0 1rem;font-weight:600}
+header.mast p.sub{color:var(--muted);font-style:italic;margin:0 0 2.2rem;font-size:1.02rem}
+.meta{display:flex;gap:1.4rem;flex-wrap:wrap;font-family:ui-sans-serif,system-ui,sans-serif;
+  font-size:.76rem;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);
+  padding-bottom:1.4rem}
+h2{font-size:1.5rem;line-height:1.25;letter-spacing:-.01em;margin:3.4rem 0 1rem;font-weight:600;
+  padding-top:.4rem}
+h3{font-size:1.13rem;margin:2.4rem 0 .7rem;font-weight:600;
+  font-family:ui-sans-serif,system-ui,sans-serif;letter-spacing:-.005em}
+p{margin:0 0 1.15rem}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid color-mix(in oklab,var(--accent) 35%,transparent)}
+a:hover{border-bottom-color:var(--accent)}
+strong{font-weight:650}
+hr{border:0;height:1px;background:var(--rule);margin:2.8rem 0}
+ul,ol{margin:0 0 1.3rem;padding-left:1.35rem}
+li{margin:0 0 .62rem}
+li>p{margin:0 0 .6rem}
+blockquote{margin:1.5rem 0;padding:.2rem 0 .2rem 1.3rem;border-left:3px solid var(--accent);
+  color:var(--muted)}
+blockquote p{margin:0 0 .6rem}
+blockquote p:last-child{margin:0}
+code{font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,monospace;font-size:.855em;
+  background:var(--code-bg);padding:.13em .38em;border-radius:4px;
+  border:1px solid color-mix(in oklab,var(--rule) 70%,transparent)}
+pre{background:var(--code-bg);border:1px solid var(--rule);border-radius:8px;
+  padding:1rem 1.1rem;overflow-x:auto;margin:0 0 1.4rem}
+pre code{background:none;border:0;padding:0;font-size:.8rem;line-height:1.62}
+.tw{overflow-x:auto;margin:0 0 1.6rem;border:1px solid var(--rule);border-radius:8px;
+  background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-family:ui-sans-serif,system-ui,sans-serif;
+  font-size:.845rem;line-height:1.5}
+th{text-align:left;font-weight:600;background:var(--accent-soft);color:var(--ink);
+  padding:.68rem .8rem;border-bottom:1px solid var(--rule);vertical-align:bottom;
+  font-size:.78rem;letter-spacing:.02em}
+td{padding:.66rem .8rem;border-bottom:1px solid color-mix(in oklab,var(--rule) 60%,transparent);
+  vertical-align:top;color:var(--muted)}
+td:first-child{color:var(--ink)}
+tbody tr:last-child td{border-bottom:0}
+@media (max-width:640px){
+  body{font-size:16px;padding:0 1rem 4rem}
+  h1{font-size:1.85rem} h2{font-size:1.32rem}
+  header.mast{padding-top:2.5rem}
+}
+@media print{
+  body{background:#fff;color:#000;font-size:11pt}
+  .tw,pre{break-inside:avoid} h2,h3{break-after:avoid}
+}
+.tldr{background:var(--accent-soft);border:1px solid var(--rule);border-radius:8px;padding:1.1rem 1.3rem .4rem;margin:0 0 2.4rem;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.93rem;line-height:1.6}
+.tldr .tl-h{font-size:.74rem;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);margin:0 0 .5rem}
+.tldr ul{margin:0 0 .8rem}
+.tldr li{margin:0 0 .45rem}
+.fig{--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--o1:#1c5cab;--o2:#2a78d6;--o3:#5598e7;--o4:#86b6ef;
+  --grid:#e1e0d9;--axis:#c3c2b7;--lab:#898781;
+  margin:2.1rem 0 2.3rem;border:1px solid var(--rule);border-radius:8px;background:var(--panel);
+  padding:1.1rem 1.15rem .95rem}
+@media (prefers-color-scheme:dark){.fig{--s1:#3987e5;--s2:#d95926;--s3:#199e70;
+  --o1:#184f95;--o2:#256abf;--o3:#3987e5;--o4:#6da7ec;--grid:#2c2c2a;--axis:#383835}}
+.fig svg{display:block;width:100%;height:auto}
+.fig .ft{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.86rem;font-weight:600;
+  color:var(--ink);margin:0 0 .55rem;line-height:1.35}
+.fig figcaption{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.76rem;line-height:1.55;
+  color:var(--muted);margin:.8rem 0 0}
+.fig .lgd{display:flex;flex-wrap:wrap;gap:.3rem 1.1rem;font-family:ui-sans-serif,system-ui,sans-serif;
+  font-size:.76rem;color:var(--muted);margin:0 0 .75rem}
+.fig .lgd span{display:inline-flex;align-items:center;gap:.4rem}
+.fig .lgd i{width:10px;height:10px;border-radius:3px;display:inline-block;flex:0 0 auto}
+.fig text{font-family:ui-sans-serif,system-ui,sans-serif}
+.fig .t-pri{fill:var(--ink)}.fig .t-sec{fill:var(--muted)}.fig .t-mut{fill:var(--lab)}
+.fig .gr{stroke:var(--grid);stroke-width:1;fill:none}
+.fig .ax{stroke:var(--axis);stroke-width:1;fill:none}
+.fig .ln{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.fig .dsh{fill:none;stroke-width:1.5;stroke-dasharray:4 5}
+.fig .box{fill:none;stroke-width:1.5}
+pre{line-height:1.5}
+</style>
+</head>
+<body><div class="wrap">
+<nav style="padding-top:1.6rem;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.85rem"><a href="./" style="border:0">&larr; All posts</a></nav>
+<header class="mast">
+<h1>Everything as Code, Reviewed by Agents: Ending Fragmentation in a Federated Architecture</h1>
+<p class="sub">Federated architectures are right about ownership and wrong about discovery. Declare data, skills, agents, and code as code in the owner’s repo, let agents review every change, and keep people on the loop to write the rules.</p>
+<div class="meta"><span>1,700 words</span><span>~7 min read</span><span>2026-11-17</span></div>
+</header>
+<main>
+<div class="tldr">
+<p class="tl-h">In short</p>
+<ul>
+<li>Federation puts each team in charge of its own services and data. That is right for speed and ownership, but nobody can find what exists, and every team governs it differently.</li>
+<li>Agents make this worse and better. Skills and agents multiply faster than services ever did, but agents can also review every change, which people never could.</li>
+<li>Manage everything as code: data contracts, skills, agent specs, and code, each declared in the owner’s repo.</li>
+<li>Let agents review every change against rules that people write and own, also as code. People move from reviewing each change to defining what good looks like.</li>
+<li>Build the catalog from the repos, so discovery never goes stale. Federate the ownership, centralize the rules, automate the review.</li>
+</ul>
+</div>
+
+<h2 id="problem">The long-standing problem</h2>
+<p>Large organizations federate for good reasons. The team that runs a service knows its data best, so it should own the schema, the quality, and the access. A central team that tries to own everything becomes a bottleneck.</p>
+<p>But federation has a cost that never goes away: <strong>fragmentation</strong>. Data is spread across hundreds of services and stores. Each team describes it in its own way, if at all. So the same questions keep coming back:</p>
+<ul>
+<li><strong>What exists?</strong> Is there already a dataset with order history, or should I build one?</li>
+<li><strong>Who owns it?</strong> Is the owner still on that team? Is anyone maintaining it?</li>
+<li><strong>Can I use it?</strong> How is it classified? Is it allowed for this purpose? How long can I keep it?</li>
+<li><strong>Is it any good?</strong> Is it fresh? Does it still match what the docs say?</li>
+</ul>
+<p>The usual answers have each failed in their own way:</p>
+<div class="tw"><table><thead><tr><th>Approach</th><th>What happens</th></tr></thead><tbody>
+<tr><td>A central catalog, maintained by hand</td><td>It goes stale. Keeping it current is nobody’s main job, so it describes last year’s systems.</td></tr>
+<tr><td>A central review board</td><td>It becomes a queue. Reviews come weeks late, so teams route around them.</td></tr>
+<tr><td>Centralize the data itself</td><td>It fights ownership. The team that knows the data no longer controls it, and the central team cannot keep up.</td></tr>
+</tbody></table></div>
+<hr>
+
+<h2 id="agents">Agents raise the stakes</h2>
+<p>Agents make the problem bigger. Data is no longer the only thing to discover and govern. Every team now writes skills, prompts, and agents, and they multiply faster than services ever did. Two teams write the same skill without knowing it. An agent gets broad permissions because nobody reviewed its spec. A skill keeps running after the system it drives has changed.</p>
+<p>Agents also make the problem solvable. Governance never kept up because people did the review, and people do not scale to every change in every repo. An agent can review every change, the same way every time, in minutes. That changes what is possible, if two things are true: the assets are something an agent can read, and the rules are something an agent can apply.</p>
+<p>Both lead to the same principle.</p>
+<hr>
+
+<h2 id="as-code">Manage everything as code</h2>
+<p>Infrastructure as code showed the way. Declare the thing in a file, keep the file in Git, change it through code review, and let a pipeline apply it. The file is the source of truth, and everything else is generated from it.</p>
+<p>Apply the same principle to every asset that people and agents need to find or check:</p>
+<div class="tw"><table><thead><tr><th>Asset</th><th>Declared as</th><th>What the declaration holds</th></tr></thead><tbody>
+<tr><td>Data</td><td>A data contract next to the code that produces the data</td><td>Owner, description, schema, classification, PII fields, retention, freshness</td></tr>
+<tr><td>Skills</td><td>A skill file in the owner’s repo</td><td>What it does, the system it drives, its evals, the permissions it needs</td></tr>
+<tr><td>Agents</td><td>An agent spec</td><td>Its tools, permissions, model, instructions, and owner</td></tr>
+<tr><td>Code</td><td>The code itself</td><td>Ownership, interfaces, and the tests that define its behaviour</td></tr>
+<tr><td>Review rules</td><td>Rule files in a governance repo</td><td>What must be true, why, how severe, and examples</td></tr>
+</tbody></table></div>
+<p>A data contract can be this small:</p>
+<pre><code># datasets/order-events.yaml, in the owning team’s repo
+kind: dataset
+name: order-events
+owner: team-orders
+description: One record per change in an order’s state.
+classification: confidential
+pii_fields: [customer_id]
+retention: 400d
+schema: schemas/order-events.avsc
+freshness: 15m</code></pre>
+<p>Managing it as code gives you a lot for free. Git already provides ownership (who can merge), history (who changed what, and when), review (every change is a pull request), and rollback. And because the declaration sits next to the code that produces the data, the two change in the same review. A schema change that forgets to update the contract shows up in the diff.</p>
+<p>One rule makes it work: <strong>if it is not declared in a repo, it does not exist.</strong> The catalog does not accept entries typed into a web form.</p>
+
+<h2 id="discovery">Discovery: the catalog is an index, not a database</h2>
+<p>Once every asset is declared in a repo, the catalog stops being something people maintain. It becomes an index, rebuilt from the repos on every merge, like a search engine over code. It cannot go stale, because it has no state of its own. It is the pattern from <a href="stateless-apps-central-data.html">Stateless Apps, Central Data</a>: the catalog is a view, and the repos hold the data.</p>
+<p>This matters even more for agents than for people. Before an agent writes a new skill or builds a new dataset, it can search the catalog for one that already exists. When two teams declare things that look the same, an agent can notice and suggest merging them. And a generated catalog can show signals that a hand-written page never could: when each asset last changed, whether its owner is still on the team, and whether its tests and evals still pass.</p>
+
+<h2 id="governance">Governance: agents review, people write the rules</h2>
+<p>Every change to every asset is a code review. An agent reviews it against the organization’s rules and comments, approves, or blocks, in the owner’s repo, before the merge. The rules cover every asset type:</p>
+<ul>
+<li>A dataset that lists PII fields must set a retention period.</li>
+<li>A new dataset must not duplicate an existing one without saying why.</li>
+<li>A skill must have evals before other teams can use it.</li>
+<li>An agent spec must ask only for the permissions its tools need.</li>
+<li>Every owner must be a team that exists, not a person who has left.</li>
+</ul>
+<p>The rules are code too. Each one is a short statement in plain language, with a severity and a few examples of good and bad changes. An agent can apply a rule written this way, and a person can read it and argue with it.</p>
+<pre><code># rules/data/pii-needs-retention.yaml, in the governance repo
+id: pii-needs-retention
+applies_to: dataset
+rule: &gt;
+  A dataset that lists any PII field must set a retention
+  period, and the period must not exceed what the privacy
+  policy allows for its classification.
+severity: blocking
+mode: shadow        # shadow: comment only. enforce: block the merge.
+owner: privacy-team
+examples:
+  bad:  examples/pii-without-retention.yaml
+  good: examples/pii-with-retention.yaml</code></pre>
+
+<h3 id="on-the-loop">People on the loop, not in it</h3>
+<p>This changes the human job. People <em>in</em> the loop review each change. People <strong>on</strong> the loop do four other things:</p>
+<ol>
+<li><strong>Write the rules.</strong> The security, privacy, and platform owners who used to review changes now write down what they would have checked.</li>
+<li><strong>Handle escalations.</strong> When the agent cannot decide, it asks a person. The answer becomes a new rule or a new example, so nobody has to answer the same question twice.</li>
+<li><strong>Watch the rules.</strong> For each rule, track how often it fires, how often owners accept its findings, and how often they override them. A rule that is mostly overridden is wrong or unclear. Fix it or retire it.</li>
+<li><strong>Roll rules out safely.</strong> A new rule starts in shadow mode, where it comments but does not block. Once owners mostly accept its findings, switch it to enforce.</li>
+</ol>
+<p>From building an AI code reviewer, this is the lesson I keep relearning: the reviewer is only as good as its rules, and the rules only get better when someone owns them and measures them.</p>
+<hr>
+
+<h2 id="federated">Why this ends the fragmentation</h2>
+<p>Put together, the four pieces look like this:</p>
+<ul>
+<li><strong>Ownership stays federated.</strong> Data, skills, and agents live in their owners’ repos, next to the code. Nobody gives up control.</li>
+<li><strong>Description is uniform.</strong> Every asset uses one of a few declaration formats, so a dataset from one team reads like a dataset from any other.</li>
+<li><strong>Discovery is central, and generated.</strong> The catalog is rebuilt from the repos, so it is always current.</li>
+<li><strong>Governance is central, and automated.</strong> The rules are written once, centrally, and an agent applies them to every change, locally.</li>
+</ul>
+<figure class="fig">
+<p class="ft">Federate the ownership, centralize the rules, automate the review</p>
+<div class="lgd"><span><i style="background:var(--s1)"></i>Owned by teams</span><span><i style="background:var(--s2)"></i>Governance</span><span><i style="background:var(--s3)"></i>Discovery</span></div><svg viewBox="0 0 720 280" role="img" aria-labelledby="figI-t figI-d">
+<title id="figI-t">Federate the ownership, centralize the rules, automate the review</title><desc id="figI-d">Three team repositories on the left feed every change to a review agent that applies human-owned rules, and every merge to a generated catalog that people and agents search.</desc>
+<text class="t-mut" x="20" y="30" font-size="10" letter-spacing=".07em">FEDERATED OWNERSHIP</text>
+<text class="t-mut" x="300" y="30" font-size="10" letter-spacing=".07em">CENTRAL, AND AUTOMATED</text>
+<text class="t-mut" x="540" y="30" font-size="10" letter-spacing=".07em">HUMANS ON THE LOOP</text>
+<g><title>Team A repo: everything it owns, declared as code</title><rect x="20" y="44" width="176" height="62" rx="7" fill="var(--s1)" fill-opacity=".12" stroke="var(--s1)" stroke-width="1.5"/><text class="t-pri" x="32" y="65" font-size="12" font-weight="600">Team A repo</text><text class="t-mut" x="32" y="81" font-size="10.5">data contracts · skills</text><text class="t-mut" x="32" y="95" font-size="10.5">agent specs · code</text></g>
+<line x1="196" y1="75" x2="236" y2="75" stroke="var(--axis)" stroke-width="1.5"/>
+<g><title>Team B repo: everything it owns, declared as code</title><rect x="20" y="122" width="176" height="62" rx="7" fill="var(--s1)" fill-opacity=".12" stroke="var(--s1)" stroke-width="1.5"/><text class="t-pri" x="32" y="143" font-size="12" font-weight="600">Team B repo</text><text class="t-mut" x="32" y="159" font-size="10.5">data contracts · skills</text><text class="t-mut" x="32" y="173" font-size="10.5">agent specs · code</text></g>
+<line x1="196" y1="153" x2="236" y2="153" stroke="var(--axis)" stroke-width="1.5"/>
+<g><title>Team C repo: everything it owns, declared as code</title><rect x="20" y="200" width="176" height="62" rx="7" fill="var(--s1)" fill-opacity=".12" stroke="var(--s1)" stroke-width="1.5"/><text class="t-pri" x="32" y="221" font-size="12" font-weight="600">Team C repo</text><text class="t-mut" x="32" y="237" font-size="10.5">data contracts · skills</text><text class="t-mut" x="32" y="251" font-size="10.5">agent specs · code</text></g>
+<line x1="196" y1="231" x2="236" y2="231" stroke="var(--axis)" stroke-width="1.5"/>
+<line x1="236" y1="75" x2="236" y2="231" stroke="var(--axis)" stroke-width="1.5"/>
+<g><title>Every change to any asset is reviewed by an agent</title><rect x="300" y="50" width="196" height="62" rx="7" fill="var(--s2)" fill-opacity=".12" stroke="var(--s2)" stroke-width="1.5"/><text class="t-pri" x="312" y="71" font-size="12" font-weight="600">Review agent</text><text class="t-mut" x="312" y="87" font-size="10.5">reviews every change</text><text class="t-mut" x="312" y="101" font-size="10.5">against the rules</text></g>
+<line x1="236" y1="81" x2="290" y2="81" stroke="var(--axis)" stroke-width="1.5" stroke-linecap="round"/><polygon points="297,81 290,76.66 290,85.34" fill="var(--axis)"/>
+<text class="t-sec" x="266" y="72" font-size="10.5" text-anchor="middle">change</text>
+<g><title>Review rules: natural language plus examples, owned by people</title><rect x="540" y="50" width="162" height="62" rx="7" fill="none" stroke="var(--s2)" stroke-width="1.5"/><text class="t-pri" x="552" y="71" font-size="12" font-weight="600">Review rules</text><text class="t-mut" x="552" y="87" font-size="10.5">written and owned</text><text class="t-mut" x="552" y="101" font-size="10.5">by people, as code</text></g>
+<line x1="538" y1="72" x2="506" y2="72" stroke="var(--s2)" stroke-width="1.5" stroke-linecap="round"/><polygon points="499,72 506,67.66 506,76.34" fill="var(--s2)"/>
+<text class="t-sec" x="518" y="64" font-size="10" text-anchor="middle">rules</text>
+<path class="dsh" stroke="var(--lab)" d="M499,96 L533,96"/>
+<polygon points="540,96 532,92 532,100" fill="var(--lab)"/>
+<text class="t-sec" x="540" y="130" font-size="10.5">escalations from the agent</text>
+<text class="t-sec" x="540" y="144" font-size="10.5">become better rules</text>
+<text class="t-mut" x="300" y="130" font-size="10.5">→ comments, approves, or blocks</text>
+<text class="t-mut" x="300" y="144" font-size="10.5">the change in the owner’s repo</text>
+<g><title>Catalog: generated from the repos, never edited by hand</title><rect x="300" y="200" width="196" height="62" rx="7" fill="var(--s3)" fill-opacity=".12" stroke="var(--s3)" stroke-width="1.5"/><text class="t-pri" x="312" y="221" font-size="12" font-weight="600">Catalog</text><text class="t-mut" x="312" y="237" font-size="10.5">a generated index, rebuilt</text><text class="t-mut" x="312" y="251" font-size="10.5">on every merge</text></g>
+<line x1="236" y1="231" x2="290" y2="231" stroke="var(--axis)" stroke-width="1.5" stroke-linecap="round"/><polygon points="297,231 290,226.66 290,235.34" fill="var(--axis)"/>
+<text class="t-sec" x="266" y="222" font-size="10.5" text-anchor="middle">merge</text>
+<g><title>People and agents discover what already exists</title><rect x="540" y="200" width="162" height="62" rx="7" fill="none" stroke="var(--axis)" stroke-width="1.5"/><text class="t-pri" x="552" y="221" font-size="12" font-weight="600">People and agents</text><text class="t-mut" x="552" y="237" font-size="10.5">search it before</text><text class="t-mut" x="552" y="251" font-size="10.5">they build or reuse</text></g>
+<line x1="496" y1="231" x2="530" y2="231" stroke="var(--s3)" stroke-width="1.5" stroke-linecap="round"/><polygon points="537,231 530,226.66 530,235.34" fill="var(--s3)"/>
+<text class="t-sec" x="518" y="222" font-size="10" text-anchor="middle">find</text>
+</svg>
+<figcaption>A schematic, not measured data. Each team keeps its data contracts, skills, agent specs, and code in its own repo. Every change is reviewed by an agent against rules that people write and own, and the cases the agent cannot decide go to those people, who turn them into better rules. Every merge rebuilds a catalog generated from the repos, so discovery never goes stale.</figcaption>
+</figure>
+<p>Federate the ownership, centralize the rules, and automate the review. Each part fixes one failure from the table above. Generated discovery fixes the stale catalog. Agent review fixes the review queue. And declarations in the owner’s repo end the fight over ownership, because the data never has to move.</p>
+
+<h2 id="start">How to start</h2>
+<ol>
+<li><strong>Pick the asset that hurts most.</strong> For most organizations, that is data. Define a minimal declaration: owner, description, classification, and schema. Add fields later.</li>
+<li><strong>Generate the catalog from the repos.</strong> Do not import the old catalog. Ask owners to declare their assets, and treat anything undeclared as unknown.</li>
+<li><strong>Write five rules.</strong> Start with the checks reviewers already do by hand, and run them in shadow mode.</li>
+<li><strong>Measure, then enforce.</strong> Promote a rule when owners mostly accept its findings. Retire the ones they mostly override.</li>
+<li><strong>Extend to skills and agents.</strong> Same pattern, new declaration formats, new rules.</li>
+</ol>
+<hr>
+<p>Federation was always right about ownership. What it lacked was a way to describe and check what every team owns without a central team doing that work by hand. Declarations as code provide the description, agents provide the review, and people on the loop provide the judgment. That is how a federated organization finally knows what it has.</p>
+</main>
+</div></body></html>
