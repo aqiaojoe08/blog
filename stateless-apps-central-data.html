@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stateless Apps, Central Data: What the Agentic Ecosystem Is Missing</title>
+<style>
+:root{
+  --bg:#fbfaf8; --panel:#fff; --ink:#1c1b1a; --muted:#5f5b56; --faint:#8b857e;
+  --rule:#e6e2dc; --accent:#8a5a2b; --accent-soft:#f4ede4; --code-bg:#f6f4f1;
+}
+@media (prefers-color-scheme:dark){
+  :root{ --bg:#16171a; --panel:#1c1e22; --ink:#e8e6e3; --muted:#a7a29b; --faint:#857f78;
+         --rule:#2d3035; --accent:#d9a05b; --accent-soft:#25262a; --code-bg:#21242a; }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:17px/1.72 ui-serif,Georgia,'Iowan Old Style','Times New Roman',serif;
+  padding:0 1.25rem 6rem;}
+.wrap{max-width:46rem;margin:0 auto}
+header.mast{padding:4.5rem 0 0;border-bottom:1px solid var(--rule);margin-bottom:2.5rem}
+h1{font-size:2.3rem;line-height:1.18;letter-spacing:-.02em;margin:0 0 1rem;font-weight:600}
+header.mast p.sub{color:var(--muted);font-style:italic;margin:0 0 2.2rem;font-size:1.02rem}
+.meta{display:flex;gap:1.4rem;flex-wrap:wrap;font-family:ui-sans-serif,system-ui,sans-serif;
+  font-size:.76rem;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);
+  padding-bottom:1.4rem}
+h2{font-size:1.5rem;line-height:1.25;letter-spacing:-.01em;margin:3.4rem 0 1rem;font-weight:600;
+  padding-top:.4rem}
+h3{font-size:1.13rem;margin:2.4rem 0 .7rem;font-weight:600;
+  font-family:ui-sans-serif,system-ui,sans-serif;letter-spacing:-.005em}
+p{margin:0 0 1.15rem}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid color-mix(in oklab,var(--accent) 35%,transparent)}
+a:hover{border-bottom-color:var(--accent)}
+strong{font-weight:650}
+hr{border:0;height:1px;background:var(--rule);margin:2.8rem 0}
+ul,ol{margin:0 0 1.3rem;padding-left:1.35rem}
+li{margin:0 0 .62rem}
+li>p{margin:0 0 .6rem}
+blockquote{margin:1.5rem 0;padding:.2rem 0 .2rem 1.3rem;border-left:3px solid var(--accent);
+  color:var(--muted)}
+blockquote p{margin:0 0 .6rem}
+blockquote p:last-child{margin:0}
+code{font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,monospace;font-size:.855em;
+  background:var(--code-bg);padding:.13em .38em;border-radius:4px;
+  border:1px solid color-mix(in oklab,var(--rule) 70%,transparent)}
+pre{background:var(--code-bg);border:1px solid var(--rule);border-radius:8px;
+  padding:1rem 1.1rem;overflow-x:auto;margin:0 0 1.4rem}
+pre code{background:none;border:0;padding:0;font-size:.8rem;line-height:1.62}
+.tw{overflow-x:auto;margin:0 0 1.6rem;border:1px solid var(--rule);border-radius:8px;
+  background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-family:ui-sans-serif,system-ui,sans-serif;
+  font-size:.845rem;line-height:1.5}
+th{text-align:left;font-weight:600;background:var(--accent-soft);color:var(--ink);
+  padding:.68rem .8rem;border-bottom:1px solid var(--rule);vertical-align:bottom;
+  font-size:.78rem;letter-spacing:.02em}
+td{padding:.66rem .8rem;border-bottom:1px solid color-mix(in oklab,var(--rule) 60%,transparent);
+  vertical-align:top;color:var(--muted)}
+td:first-child{color:var(--ink)}
+tbody tr:last-child td{border-bottom:0}
+@media (max-width:640px){
+  body{font-size:16px;padding:0 1rem 4rem}
+  h1{font-size:1.85rem} h2{font-size:1.32rem}
+  header.mast{padding-top:2.5rem}
+}
+@media print{
+  body{background:#fff;color:#000;font-size:11pt}
+  .tw,pre{break-inside:avoid} h2,h3{break-after:avoid}
+}
+.tldr{background:var(--accent-soft);border:1px solid var(--rule);border-radius:8px;padding:1.1rem 1.3rem .4rem;margin:0 0 2.4rem;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.93rem;line-height:1.6}
+.tldr .tl-h{font-size:.74rem;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);margin:0 0 .5rem}
+.tldr ul{margin:0 0 .8rem}
+.tldr li{margin:0 0 .45rem}
+.fig{--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--o1:#1c5cab;--o2:#2a78d6;--o3:#5598e7;--o4:#86b6ef;
+  --grid:#e1e0d9;--axis:#c3c2b7;--lab:#898781;
+  margin:2.1rem 0 2.3rem;border:1px solid var(--rule);border-radius:8px;background:var(--panel);
+  padding:1.1rem 1.15rem .95rem}
+@media (prefers-color-scheme:dark){.fig{--s1:#3987e5;--s2:#d95926;--s3:#199e70;
+  --o1:#184f95;--o2:#256abf;--o3:#3987e5;--o4:#6da7ec;--grid:#2c2c2a;--axis:#383835}}
+.fig svg{display:block;width:100%;height:auto}
+.fig .ft{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.86rem;font-weight:600;
+  color:var(--ink);margin:0 0 .55rem;line-height:1.35}
+.fig figcaption{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.76rem;line-height:1.55;
+  color:var(--muted);margin:.8rem 0 0}
+.fig .lgd{display:flex;flex-wrap:wrap;gap:.3rem 1.1rem;font-family:ui-sans-serif,system-ui,sans-serif;
+  font-size:.76rem;color:var(--muted);margin:0 0 .75rem}
+.fig .lgd span{display:inline-flex;align-items:center;gap:.4rem}
+.fig .lgd i{width:10px;height:10px;border-radius:3px;display:inline-block;flex:0 0 auto}
+.fig text{font-family:ui-sans-serif,system-ui,sans-serif}
+.fig .t-pri{fill:var(--ink)}.fig .t-sec{fill:var(--muted)}.fig .t-mut{fill:var(--lab)}
+.fig .gr{stroke:var(--grid);stroke-width:1;fill:none}
+.fig .ax{stroke:var(--axis);stroke-width:1;fill:none}
+.fig .ln{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.fig .dsh{fill:none;stroke-width:1.5;stroke-dasharray:4 5}
+.fig .box{fill:none;stroke-width:1.5}
+</style>
+</head>
+<body><div class="wrap">
+<nav style="padding-top:1.6rem;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.85rem"><a href="./" style="border:0">&larr; All posts</a></nav>
+<header class="mast">
+<h1>Stateless Apps, Central Data: What the Agentic Ecosystem Is Missing</h1>
+<p class="sub">Apps are cheap to build now. Their state is not. Documents, agent memory, and heavy capabilities like speech-to-text should live on one shared, governed floor, and every app should be a replaceable view on top of it.</p>
+<div class="meta"><span>1,800 words</span><span>~7 min read</span><span>2026-11-17</span></div>
+</header>
+<main>
+<div class="tldr">
+<p class="tl-h">In short</p>
+<ul>
+<li>With agents, building an app takes days. Storing its data safely still takes weeks, so most new apps skip that part.</li>
+<li>Every app has two halves: a stateless experience (UI, agent, prompts) that is cheap to replace, and stateful data that is expensive to lose.</li>
+<li>The agentic ecosystem rebuilds the stateful half in every app. Documents are one symptom. Fragmented agent memory, and a 0.5 GB speech-to-text download for each app, are two more.</li>
+<li>The fix is one shared floor: central documents, central memory, and shared capabilities, governed and paid for once.</li>
+<li>On top of it, apps become views. Anyone can build a better one, and retiring one loses nothing.</li>
+</ul>
+</div>
+
+<h2 id="two-halves">Apps are cheap now. State is not.</h2>
+<p>Every application has two halves, and they carry different risks:</p>
+<ul>
+<li><strong>The experience is stateless.</strong> UI, HTML pages, client scripts, agents, and prompts. It is cheap to build and cheap to throw away. If one breaks or is abandoned, a new one can replace it.</li>
+<li><strong>The data is stateful.</strong> Documents, diagrams, reviews, records, and whatever users type in. It is expensive to recreate, often sensitive, and valuable long after the app that made it is gone.</li>
+</ul>
+<p>Agents made the first half almost free. A team can now build a new editor, viewer, or dashboard in days. But each new app still has to decide where its data lives, and the quickest answer is “in a database in our own cloud account.” So that is what most apps do.</p>
+<p>Some apps already get this right. A static viewer that reads files straight from the company’s Git server, as the signed-in reader, has no storage of its own. Its data inherits Git’s permissions, history, code review, and ownership. If the viewer disappears, nothing is lost.</p>
+<hr>
+
+<h2 id="documents">Symptom 1: documents locked inside each app</h2>
+<p>Document apps are where this hurts most: tools whose main data is what people write, such as docs, diagrams, threat models, and reviews. When each one keeps its documents in its own store, two things go wrong.</p>
+<p><strong>Use comes before review.</strong> Nobody outside the team knows what data the app holds, how it is classified, who can read it, or whether it is encrypted and retained correctly. A useful app spreads across teams in weeks. The security and privacy review, if it happens at all, comes later. By then, other teams’ data is already in it. And because every app rebuilds access control, every app makes its own mistakes.</p>
+<p><strong>The data dies with the app.</strong> Teams reorganize, and owners move on. The data is tied to the app’s account, schema, and UI. Users can read it one item at a time while the app still runs, but there is often no way to export it in bulk. Most large organizations have lived through this: a tool that many teams used for diagrams or threat models is retired, and its users find out that export works one item at a time.</p>
+<p>Editors show the same problem from the other side. When a popular document editor is retired, several successors appear, each with its own storage. Users pick one, migrate their documents, and migrate again if that one is retired too. The documents are the same every time. Only the editor changes.</p>
+
+<h2 id="memory">Symptom 2: fragmented memory</h2>
+<p>Agents have the same problem with memory. Each agent tool keeps its own: one in the IDE, one in the command line, one in the chat app, one per person, and one per machine. Each one learns the same facts about the team’s systems on its own, and none of them can see what the others learned. When you switch tools, the memory stays behind. When the tool is retired, the memory goes with it.</p>
+<p>In <a href="agent-memory-is-a-team-document.html">Agent Memory Is a Team Document</a>, I argued that the knowledge worth keeping belongs in documents the whole team can read. This is the storage half of that argument. Memory is data, so it needs the same floor as documents: one central store, owned by the team, that every agent reads and writes as the signed-in user. A tool can cache what it needs. The canonical memory lives outside it.</p>
+
+<h2 id="capabilities">Symptom 3: every app ships its own heavy capabilities</h2>
+<p>The third symptom is about capabilities, not data. Many agent apps now offer voice input, and each one asks you to download its own speech-to-text model: about 0.5 GB each, in our experience. Install five of these apps and you have 2.5 GB of what is mostly the same model, five update cycles, and five copies of a component that somebody has to patch.</p>
+<p>That is the same mistake one layer down. A capability that every app needs should be installed once and shared, the way an operating system provides fonts, a keyboard, or a camera. Apps call it through a stable local API. They do not each bring their own.</p>
+
+<h2 id="diagnosis">One diagnosis</h2>
+<p>Documents, memory, and capabilities look like three different problems. They are one: <strong>every app rebuilds the parts it should share.</strong> Data, memory, and heavy dependencies are expensive, long-lived, and need governance. The UI and the agent are cheap and short-lived. We keep bundling the two together, so the expensive part inherits the short life of the cheap part.</p>
+<figure class="fig">
+<p class="ft">One diagnosis, three symptoms</p>
+<div class="lgd"><span><i style="background:var(--s1)"></i>Documents and data</span><span><i style="background:var(--s2)"></i>Agent memory</span><span><i style="background:var(--s3)"></i>Heavy capabilities</span></div><svg viewBox="0 0 720 305" role="img" aria-labelledby="figH-t figH-d">
+<title id="figH-t">One diagnosis, three symptoms</title><desc id="figH-d">Left: three apps, each stacked on its own documents store, its own memory, and its own speech model. Right: the same three apps as thin views with arrows down to one shared floor of central documents, central memory, and shared capabilities.</desc>
+<text class="t-pri" x="20" y="34" font-size="12.5" font-weight="600">Today: every app brings its own state</text>
+<text class="t-mut" x="20" y="50" font-size="10.5">built fast, reviewed late, lost when the app is retired</text>
+<rect x="20" y="84" width="100" height="36" rx="6" fill="none" stroke="var(--axis)" stroke-width="1.4"/><text class="t-pri" x="30" y="99" font-size="11.5" font-weight="600">App A</text><text class="t-mut" x="30" y="113" font-size="10">UI and agent</text>
+<g><title>App A: Documents, its own store</title><rect x="20" y="128" width="100" height="36" rx="6" fill="var(--s1)" fill-opacity=".12" stroke="var(--s1)" stroke-width="1.4"/><text class="t-pri" x="30" y="143" font-size="11.5" font-weight="600">Documents</text><text class="t-mut" x="30" y="157" font-size="10">its own store</text></g>
+<g><title>App A: Memory, its own memory</title><rect x="20" y="170" width="100" height="36" rx="6" fill="var(--s2)" fill-opacity=".12" stroke="var(--s2)" stroke-width="1.4"/><text class="t-pri" x="30" y="185" font-size="11.5" font-weight="600">Memory</text><text class="t-mut" x="30" y="199" font-size="10">its own memory</text></g>
+<g><title>App A: Speech model, 0.5 GB download</title><rect x="20" y="212" width="100" height="36" rx="6" fill="var(--s3)" fill-opacity=".12" stroke="var(--s3)" stroke-width="1.4"/><text class="t-pri" x="30" y="227" font-size="11.5" font-weight="600">Speech model</text><text class="t-mut" x="30" y="241" font-size="10">0.5 GB download</text></g>
+<rect x="130" y="84" width="100" height="36" rx="6" fill="none" stroke="var(--axis)" stroke-width="1.4"/><text class="t-pri" x="140" y="99" font-size="11.5" font-weight="600">App B</text><text class="t-mut" x="140" y="113" font-size="10">UI and agent</text>
+<g><title>App B: Documents, its own store</title><rect x="130" y="128" width="100" height="36" rx="6" fill="var(--s1)" fill-opacity=".12" stroke="var(--s1)" stroke-width="1.4"/><text class="t-pri" x="140" y="143" font-size="11.5" font-weight="600">Documents</text><text class="t-mut" x="140" y="157" font-size="10">its own store</text></g>
+<g><title>App B: Memory, its own memory</title><rect x="130" y="170" width="100" height="36" rx="6" fill="var(--s2)" fill-opacity=".12" stroke="var(--s2)" stroke-width="1.4"/><text class="t-pri" x="140" y="185" font-size="11.5" font-weight="600">Memory</text><text class="t-mut" x="140" y="199" font-size="10">its own memory</text></g>
+<g><title>App B: Speech model, 0.5 GB download</title><rect x="130" y="212" width="100" height="36" rx="6" fill="var(--s3)" fill-opacity=".12" stroke="var(--s3)" stroke-width="1.4"/><text class="t-pri" x="140" y="227" font-size="11.5" font-weight="600">Speech model</text><text class="t-mut" x="140" y="241" font-size="10">0.5 GB download</text></g>
+<rect x="240" y="84" width="100" height="36" rx="6" fill="none" stroke="var(--axis)" stroke-width="1.4"/><text class="t-pri" x="250" y="99" font-size="11.5" font-weight="600">App C</text><text class="t-mut" x="250" y="113" font-size="10">UI and agent</text>
+<g><title>App C: Documents, its own store</title><rect x="240" y="128" width="100" height="36" rx="6" fill="var(--s1)" fill-opacity=".12" stroke="var(--s1)" stroke-width="1.4"/><text class="t-pri" x="250" y="143" font-size="11.5" font-weight="600">Documents</text><text class="t-mut" x="250" y="157" font-size="10">its own store</text></g>
+<g><title>App C: Memory, its own memory</title><rect x="240" y="170" width="100" height="36" rx="6" fill="var(--s2)" fill-opacity=".12" stroke="var(--s2)" stroke-width="1.4"/><text class="t-pri" x="250" y="185" font-size="11.5" font-weight="600">Memory</text><text class="t-mut" x="250" y="199" font-size="10">its own memory</text></g>
+<g><title>App C: Speech model, 0.5 GB download</title><rect x="240" y="212" width="100" height="36" rx="6" fill="var(--s3)" fill-opacity=".12" stroke="var(--s3)" stroke-width="1.4"/><text class="t-pri" x="250" y="227" font-size="11.5" font-weight="600">Speech model</text><text class="t-mut" x="250" y="241" font-size="10">0.5 GB download</text></g>
+<text class="t-sec" x="20" y="276" font-size="11">3 stores to review · 3 memories that never meet</text>
+<text class="t-sec" x="20" y="292" font-size="11">1.5 GB of the same model, patched 3 times</text>
+<line class="gr" x1="356" y1="24" x2="356" y2="296"/>
+<text class="t-pri" x="384" y="34" font-size="12.5" font-weight="600">Proposed: stateless apps, one shared floor</text>
+<text class="t-mut" x="384" y="50" font-size="10.5">apps are views; the floor outlives every one of them</text>
+<rect x="384" y="84" width="100" height="36" rx="6" fill="none" stroke="var(--axis)" stroke-width="1.4"/><text class="t-pri" x="394" y="99" font-size="11.5" font-weight="600">App A</text><text class="t-mut" x="394" y="113" font-size="10">UI and agent</text>
+<line x1="434" y1="122" x2="434" y2="120" stroke="var(--axis)" stroke-width="1.4" stroke-linecap="round"/><polygon points="434,125 430.9,120 437.1,120" fill="var(--axis)"/>
+<rect x="494" y="84" width="100" height="36" rx="6" fill="none" stroke="var(--axis)" stroke-width="1.4"/><text class="t-pri" x="504" y="99" font-size="11.5" font-weight="600">App B</text><text class="t-mut" x="504" y="113" font-size="10">UI and agent</text>
+<line x1="544" y1="122" x2="544" y2="120" stroke="var(--axis)" stroke-width="1.4" stroke-linecap="round"/><polygon points="544,125 540.9,120 547.1,120" fill="var(--axis)"/>
+<rect x="604" y="84" width="100" height="36" rx="6" fill="none" stroke="var(--axis)" stroke-width="1.4"/><text class="t-pri" x="614" y="99" font-size="11.5" font-weight="600">App C</text><text class="t-mut" x="614" y="113" font-size="10">UI and agent</text>
+<line x1="654" y1="122" x2="654" y2="120" stroke="var(--axis)" stroke-width="1.4" stroke-linecap="round"/><polygon points="654,125 650.9,120 657.1,120" fill="var(--axis)"/>
+<g><title>Central documents: governed, open format, org-owned</title><rect x="384" y="128" width="320" height="36" rx="6" fill="var(--s1)" fill-opacity=".12" stroke="var(--s1)" stroke-width="1.4"/><text class="t-pri" x="394" y="143" font-size="11.5" font-weight="600">Central documents</text><text class="t-mut" x="394" y="157" font-size="10">governed, open format, org-owned</text></g>
+<g><title>Central memory: one store every agent reads</title><rect x="384" y="170" width="320" height="36" rx="6" fill="var(--s2)" fill-opacity=".12" stroke="var(--s2)" stroke-width="1.4"/><text class="t-pri" x="394" y="185" font-size="11.5" font-weight="600">Central memory</text><text class="t-mut" x="394" y="199" font-size="10">one store every agent reads</text></g>
+<g><title>Shared capabilities: speech-to-text installed once</title><rect x="384" y="212" width="320" height="36" rx="6" fill="var(--s3)" fill-opacity=".12" stroke="var(--s3)" stroke-width="1.4"/><text class="t-pri" x="394" y="227" font-size="11.5" font-weight="600">Shared capabilities</text><text class="t-mut" x="394" y="241" font-size="10">speech-to-text installed once</text></g>
+<text class="t-sec" x="384" y="276" font-size="11">1 store, reviewed once · 1 memory every agent shares</text>
+<text class="t-sec" x="384" y="292" font-size="11">0.5 GB, installed and patched once</text>
+</svg>
+<figcaption>A schematic, not measured data. Today each app keeps its own documents and its own memory, and ships its own copy of heavy capabilities such as a speech-to-text model, about 0.5 GB each in our experience. In the proposal, apps keep only the experience: the UI and the agent. Documents, memory, and capabilities live in one shared floor that is governed, reviewed, and paid for once.</figcaption>
+</figure>
+<hr>
+
+<h2 id="proposal">The proposal: one contract, open experiences</h2>
+<p>The fix has two parts.</p>
+<p><strong>1. Put state behind one contract, not one database.</strong> Every document, memory, and dataset has a canonical copy in an open format, in a governed store. The store owns access control, classification, encryption, audit, retention, and export, so each app does not have to. Ownership belongs to an org, not to the app or the person who built it, so it survives a reorg.</p>
+<p>Editors can still keep their own working state next to the canonical copy, such as a CRDT log for live co-editing or a table of locks. The contract only asks that the canonical copy is saved in an open format and kept current, so it outlives the editor.</p>
+<p><strong>2. Leave the experience layer open.</strong> Anyone can build a UI, a dashboard, or an agent on top of the shared floor, with no storage design and no storage review. Apps become views over the data, and they can be replaced when better ones appear. Two editors can still differ in how they edit. One may show live cursors and the other may not. Those features may not carry across, but the document always does.</p>
+<p>This also makes reviews much smaller. To review a stateless app, you check what it displays and which permissions it asks for. That is a fraction of the work of reviewing a full stack.</p>
+
+<h3 id="floor">What the shared floor must provide</h3>
+<div class="tw"><table><thead><tr><th>Capability</th><th>Requirement</th></tr></thead><tbody>
+<tr><td>Identity and access</td><td>Every read and write is made as the signed-in user and checked against existing groups and permissions. No shared service credentials to the data.</td></tr>
+<tr><td>Classification</td><td>Each dataset is classified when it is created, and the classification decides which controls apply.</td></tr>
+<tr><td>Protection</td><td>Encryption at rest and in transit, access logs, and retention and deletion that follow policy.</td></tr>
+<tr><td>Ownership</td><td>Each dataset has an owning org, so a reorg gives it a new owner instead of orphaning it.</td></tr>
+<tr><td>Portability</td><td>Bulk export and import in an open format. Retiring an app includes a migration path for its data.</td></tr>
+<tr><td>Inventory</td><td>One searchable list of which apps use which data, for reviewers and for owners.</td></tr>
+<tr><td>Shared capabilities</td><td>Heavy components such as speech-to-text are installed once, versioned, and called through a stable API.</td></tr>
+<tr><td>Builder experience</td><td>A simple client API and templates, so using the floor is faster than setting up your own account.</td></tr>
+</tbody></table></div>
+
+<h3 id="cors">Let browser apps read the source directly</h3>
+<p>One small change unlocks many stateless apps. Many internal Git servers send no CORS headers, so a browser app on another internal origin cannot read a file, even with the user’s own session. The workarounds are a browser extension or a backend proxy. A proxy has to hold read access of its own, which bypasses each user’s permissions.</p>
+<p>The fix is narrow. On read-only raw-file endpoints, send CORS headers for an explicit allowlist of internal origins, with credentials allowed. Every read is still made as the signed-in user and checked against that user’s permissions, so no new access is granted. Writes stay out of scope and keep going through code review.</p>
+<hr>
+
+<h2 id="builders">What changes for builders</h2>
+<div class="tw"><table><thead><tr><th></th><th>Today</th><th>With a shared floor</th></tr></thead><tbody>
+<tr><td>Start a new app</td><td>Create an account; design storage, access control, and backups; then build the UI</td><td>Ask for a dataset on the floor, then build the UI</td></tr>
+<tr><td>Security review</td><td>Full-stack review, often after people already use the app</td><td>Storage controls are approved once, so the review covers only the app, before launch</td></tr>
+<tr><td>Add voice input</td><td>Ship and update your own 0.5 GB speech model</td><td>Call the shared speech-to-text capability</td></tr>
+<tr><td>Give an agent memory</td><td>Build a memory store inside the tool</td><td>Read and write the team’s central memory</td></tr>
+<tr><td>Team reorg</td><td>The app and its data are orphaned</td><td>The data moves to the new owning org, and the app can be rebuilt or replaced</td></tr>
+<tr><td>Retire an app</td><td>The data is lost or stranded</td><td>The data stays; users open it in another app or export it</td></tr>
+</tbody></table></div>
+
+<h2 id="rollout">How to get there</h2>
+<ol>
+<li><strong>Inventory.</strong> Find the apps that keep their own documents, memory, or heavy capabilities, and rank them by data sensitivity and number of users.</li>
+<li><strong>Pave the path.</strong> Choose or build the shared store, publish its client API and app templates, and get its controls approved once.</li>
+<li><strong>New apps first.</strong> Require new apps to use the floor, with an exception process for workloads it cannot serve, such as very high throughput or very large objects.</li>
+<li><strong>Migrate by risk.</strong> Move the highest-risk apps first. Starting now, make bulk export a required step in every app retirement.</li>
+</ol>
+<p>Some questions are still open. Which canonical format fits each type of document: Markdown or HTML for docs, <code>.drawio</code> for diagrams, a structured format for threat models? How often should an editor with live co-editing write its canonical copy: on every save, every few seconds, or when a session ends? And how are the store and the shared capabilities funded? None of these is a reason to wait. Each app that launches on its own storage makes the migration bigger.</p>
+<hr>
+<p>Agents will keep making apps cheaper to build. That is good news, but only if the part that matters does not also get cheaper to lose. Put documents, memory, and heavy capabilities on one shared floor, and let the apps on top compete on the experience. Then retiring an app is a non-event, a new app can launch with most of its review already done, and you download the speech model once.</p>
+</main>
+</div></body></html>
