@@ -88,6 +88,7 @@ tbody tr:last-child td{border-bottom:0}
 .fig .ln{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .fig .dsh{fill:none;stroke-width:1.5;stroke-dasharray:4 5}
 .fig .box{fill:none;stroke-width:1.5}
+.fig{--crit:#d03b3b}
 </style>
 </head><body><div class="wrap">
 <nav style="padding-top:1.6rem;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.85rem"><a href="./" style="border:0">&larr; All posts</a></nav>
@@ -104,6 +105,361 @@ tbody tr:last-child td{border-bottom:0}
 <li><strong>Prove it.</strong> Describe the system, or a model of it, in mathematics, state the property you care about, and show the property holds for <em>every</em> input. Type systems, model checkers, SMT solvers, and proof assistants are all this. The result is logical: no input violates the property, within the limits of the model.</li>
 </ol>
 <p>Most teams do only the first and talk about it as if it were the second. This post is about getting both right: where the best samples come from, and when it is worth paying for a proof.</p>
+<figure class="fig">
+<p class="ft">What each kind of verification covers</p>
+<div class="lgd"><span><i style="background:var(--s1)"></i>Sampled input: a test or a production request</span><span><i style="background:var(--s3)"></i>Proven: every input in the model</span><span><i style="background:var(--crit)"></i>Bug, marked ✕</span></div><svg viewBox="0 0 720 310" role="img" aria-labelledby="figJ-t figJ-d">
+<title id="figJ-t">What each kind of verification covers</title><desc id="figJ-d">Three panels of the same input space. Left: dots for sampled inputs cluster where traffic lives and miss a bug in a rare corner. Middle: a proven core region contains the bug and finds it, while the rest of the space is unchecked. Right: both together, so the core is proven and the rest is sampled.</desc>
+<text class="t-pri" x="14" y="28" font-size="12.5" font-weight="600">Sample the behavior</text>
+<text class="t-mut" x="14" y="44" font-size="10.5">tests, canaries, production traffic</text>
+<g><title>Sample the behavior: Correct where the traffic is. Blind where it is not.</title>
+<rect x="14" y="88" width="214" height="168" rx="8" fill="none" stroke="var(--axis)" stroke-width="1.2"/>
+<rect x="150" y="106" width="66" height="76" rx="6" fill="none" stroke="var(--lab)" stroke-width="1" stroke-dasharray="3 3"/>
+<text class="t-mut" x="157" y="174" font-size="10">core logic</text>
+<circle cx="82.79" cy="199.34" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="83.86" cy="174.55" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="58.52" cy="177.6" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="132.03" cy="196.72" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="129.33" cy="191.47" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="106.21" cy="189.56" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="32.02" cy="209.66" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="110.23" cy="198.96" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="31.11" cy="131.68" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="59.97" cy="169.95" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="103" cy="182.62" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="110.76" cy="164.73" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="103.11" cy="195.82" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="68.2" cy="235.53" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="112.04" cy="219.91" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="69.67" cy="161.81" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="79.61" cy="180.81" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="114.75" cy="191.45" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="75.9" cy="155.29" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="73.26" cy="220.63" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="62.91" cy="191.34" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="107.35" cy="139.31" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="93.75" cy="223.19" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="88.18" cy="159.48" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="109.91" cy="182.13" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="39.27" cy="208.84" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="116.1" cy="212.38" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="143.86" cy="194.87" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="96.29" cy="145.02" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="114.16" cy="165.65" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="75.7" cy="146.06" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="57.17" cy="168.07" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="138.4" cy="123.05" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="39.52" cy="191.18" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="143.96" cy="201.35" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="104.87" cy="161.91" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="51.69" cy="213.32" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="131.66" cy="188.72" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="100.85" cy="197.03" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="149.38" cy="202.57" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="110.67" cy="200.43" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="35.54" cy="222.45" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="126.38" cy="199.89" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="122.32" cy="129.66" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="85.38" cy="214.59" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="44.8" cy="232.3" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="111.87" cy="179.5" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="103.7" cy="203.49" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="96.33" cy="218.37" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="68.18" cy="171.56" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="129.5" cy="184.8" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="60.3" cy="212.39" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="144.76" cy="170.66" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="42.32" cy="179.96" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="86.64" cy="175.06" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="142.57" cy="153.19" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="137.38" cy="145.95" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="63.67" cy="202.95" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="132.63" cy="209.77" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="104.43" cy="188.27" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="97.49" cy="201.26" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="85.66" cy="192.32" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="112.62" cy="184.03" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="119.5" cy="200.98" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="164.38" cy="193.75" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="76.61" cy="172.82" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="91.53" cy="211.71" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="79.88" cy="195.57" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="158.14" cy="107.06" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="51.54" cy="191.32" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="106.34" cy="191.16" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="76.48" cy="203.65" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="102.16" cy="168.34" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="179.48" cy="194.65" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="72.05" cy="181.02" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="83.88" cy="182.12" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="128.31" cy="148.94" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="89.6" cy="212.61" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="122.82" cy="228.73" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="30.75" cy="173.4" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="79.73" cy="202.7" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="131.3" cy="103.52" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="131.19" cy="140.57" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="116.59" cy="139.24" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="98.33" cy="219.84" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="86.62" cy="189.73" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="120.7" cy="188.24" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="88.81" cy="230" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="129.74" cy="175.19" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="124.93" cy="176.03" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="96.77" cy="205.15" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="100" cy="203.16" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="37.02" cy="138.71" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="114.14" cy="155.11" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="55.04" cy="139.9" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="137.59" cy="206.4" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="145.03" cy="155.87" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="92.04" cy="149.79" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="119.58" cy="231.68" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="59.95" cy="230.81" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="127.57" cy="178.66" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="88.53" cy="165.92" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="106.39" cy="196.3" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="145.93" cy="153.4" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="132.9" cy="228.62" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="144.28" cy="178.58" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="65.21" cy="214.56" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="96.15" cy="187.73" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="143.27" cy="176.1" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="25.26" cy="208.56" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="103.41" cy="165.66" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="91.65" cy="208.98" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="94.84" cy="223.8" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="89.79" cy="215.21" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="145.69" cy="232.3" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="67.81" cy="210.4" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="24.46" cy="151.5" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="47.65" cy="183.62" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="85.08" cy="183.14" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="70.71" cy="191.01" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="156.49" cy="185.33" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="111.12" cy="214.02" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="84.87" cy="146.21" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="72.01" cy="216.21" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="32.74" cy="166.06" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="128.27" cy="207.78" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="92.27" cy="208.16" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="97.98" cy="148.63" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="35.7" cy="164.83" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="125.22" cy="167.03" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="59.52" cy="160.87" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="36.86" cy="180.48" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="49.53" cy="194.92" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="68.9" cy="125.74" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="118.09" cy="175.73" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="102.48" cy="170.24" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="120.08" cy="206.43" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="115.98" cy="193.8" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="140.01" cy="203.8" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="108.24" cy="121.48" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="124.28" cy="223.28" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="81.31" cy="169.91" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="161.85" cy="131.26" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="58.61" cy="204.69" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="159.91" cy="180.39" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="112.2" cy="211.08" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="59.39" cy="181.33" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="102.54" cy="208.76" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="90.76" cy="178.14" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="55.42" cy="173.23" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="28" cy="102" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="214" cy="244" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="30" cy="240" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="134" cy="238" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="118" cy="106" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="204" cy="208" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="190" cy="128" r="9" fill="var(--panel)" stroke="#d03b3b" stroke-width="1.5"/><path d="M186,124 l8,8 M194,124 l-8,8" stroke="#d03b3b" stroke-width="2" stroke-linecap="round"/>
+</g>
+<text class="t-sec" x="228" y="67" font-size="10.5" text-anchor="end">bug: never sampled,</text>
+<text class="t-sec" x="228" y="80" font-size="10.5" text-anchor="end">but an attacker finds it</text>
+<path class="dsh" stroke="var(--lab)" d="M190,84 L190,117"/>
+<text class="t-pri" x="14" y="278" font-size="11" font-weight="600">Correct where the traffic is.</text>
+<text class="t-pri" x="14" y="293" font-size="11" font-weight="400">Blind where it is not.</text>
+<text class="t-pri" x="253" y="28" font-size="12.5" font-weight="600">Prove it</text>
+<text class="t-mut" x="253" y="44" font-size="10.5">a property, for every input in the model</text>
+<g><title>Prove it: Certain inside the model. Silent outside it.</title>
+<rect x="253" y="88" width="214" height="168" rx="8" fill="none" stroke="var(--axis)" stroke-width="1.2"/>
+<rect x="389" y="106" width="66" height="76" rx="6" fill="var(--s3)" fill-opacity=".22" stroke="var(--s3)" stroke-width="1.5"/>
+<text class="t-pri" x="396" y="174" font-size="10" font-weight="600">proven</text>
+<text class="t-mut" x="267" y="210" font-size="10.5" font-style="italic">outside the model:</text>
+<text class="t-mut" x="267" y="225" font-size="10.5" font-style="italic">I/O, configuration, the</text>
+<text class="t-mut" x="267" y="240" font-size="10.5" font-style="italic">environment. Unchecked.</text>
+<circle cx="429" cy="128" r="9" fill="var(--panel)" stroke="#d03b3b" stroke-width="1.5"/><path d="M425,124 l8,8 M433,124 l-8,8" stroke="#d03b3b" stroke-width="2" stroke-linecap="round"/>
+</g>
+<text class="t-sec" x="467" y="80" font-size="10.5" text-anchor="end">counterexample found</text>
+<path class="dsh" stroke="var(--lab)" d="M429,84 L429,117"/>
+<text class="t-pri" x="253" y="278" font-size="11" font-weight="600">Certain inside the model.</text>
+<text class="t-pri" x="253" y="293" font-size="11" font-weight="400">Silent outside it.</text>
+<text class="t-pri" x="492" y="28" font-size="12.5" font-weight="600">Use both</text>
+<text class="t-mut" x="492" y="44" font-size="10.5">proof for the core, samples for the rest</text>
+<g><title>Use both: The core cannot fail. Everything else is checked as it runs.</title>
+<rect x="492" y="88" width="214" height="168" rx="8" fill="none" stroke="var(--axis)" stroke-width="1.2"/>
+<rect x="628" y="106" width="66" height="76" rx="6" fill="var(--s3)" fill-opacity=".22" stroke="var(--s3)" stroke-width="1.5"/>
+<text class="t-pri" x="635" y="174" font-size="10" font-weight="600">proven</text>
+<circle cx="560.79" cy="199.34" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="561.86" cy="174.55" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="536.52" cy="177.6" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="610.03" cy="196.72" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="607.33" cy="191.47" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="584.21" cy="189.56" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="510.02" cy="209.66" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="588.23" cy="198.96" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="509.11" cy="131.68" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="537.97" cy="169.95" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="581" cy="182.62" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="588.76" cy="164.73" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="581.11" cy="195.82" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="546.2" cy="235.53" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="590.04" cy="219.91" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="547.67" cy="161.81" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="557.61" cy="180.81" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="592.75" cy="191.45" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="553.9" cy="155.29" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="551.26" cy="220.63" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="540.91" cy="191.34" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="585.35" cy="139.31" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="571.75" cy="223.19" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="566.18" cy="159.48" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="587.91" cy="182.13" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="517.27" cy="208.84" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="594.1" cy="212.38" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="621.86" cy="194.87" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="574.29" cy="145.02" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="592.16" cy="165.65" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="553.7" cy="146.06" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="535.17" cy="168.07" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="616.4" cy="123.05" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="517.52" cy="191.18" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="621.96" cy="201.35" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="582.87" cy="161.91" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="529.69" cy="213.32" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="609.66" cy="188.72" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="578.85" cy="197.03" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="627.38" cy="202.57" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="588.67" cy="200.43" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="513.54" cy="222.45" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="604.38" cy="199.89" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="600.32" cy="129.66" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="563.38" cy="214.59" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="522.8" cy="232.3" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="589.87" cy="179.5" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="581.7" cy="203.49" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="574.33" cy="218.37" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="546.18" cy="171.56" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="607.5" cy="184.8" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="538.3" cy="212.39" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="622.76" cy="170.66" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="520.32" cy="179.96" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="564.64" cy="175.06" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="620.57" cy="153.19" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="615.38" cy="145.95" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="541.67" cy="202.95" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="610.63" cy="209.77" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="582.43" cy="188.27" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="575.49" cy="201.26" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="563.66" cy="192.32" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="590.62" cy="184.03" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="597.5" cy="200.98" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="642.38" cy="193.75" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="554.61" cy="172.82" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="569.53" cy="211.71" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="557.88" cy="195.57" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="529.54" cy="191.32" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="584.34" cy="191.16" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="554.48" cy="203.65" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="580.16" cy="168.34" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="657.48" cy="194.65" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="550.05" cy="181.02" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="561.88" cy="182.12" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="606.31" cy="148.94" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="567.6" cy="212.61" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="600.82" cy="228.73" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="508.75" cy="173.4" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="557.73" cy="202.7" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="609.3" cy="103.52" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="609.19" cy="140.57" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="594.59" cy="139.24" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="576.33" cy="219.84" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="564.62" cy="189.73" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="598.7" cy="188.24" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="566.81" cy="230" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="607.74" cy="175.19" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="602.93" cy="176.03" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="574.77" cy="205.15" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="578" cy="203.16" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="515.02" cy="138.71" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="592.14" cy="155.11" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="533.04" cy="139.9" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="615.59" cy="206.4" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="623.03" cy="155.87" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="570.04" cy="149.79" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="597.58" cy="231.68" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="537.95" cy="230.81" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="605.57" cy="178.66" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="566.53" cy="165.92" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="584.39" cy="196.3" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="623.93" cy="153.4" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="610.9" cy="228.62" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="622.28" cy="178.58" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="543.21" cy="214.56" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="574.15" cy="187.73" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="621.27" cy="176.1" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="503.26" cy="208.56" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="581.41" cy="165.66" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="569.65" cy="208.98" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="572.84" cy="223.8" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="567.79" cy="215.21" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="623.69" cy="232.3" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="545.81" cy="210.4" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="502.46" cy="151.5" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="525.65" cy="183.62" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="563.08" cy="183.14" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="548.71" cy="191.01" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="589.12" cy="214.02" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="562.87" cy="146.21" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="550.01" cy="216.21" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="510.74" cy="166.06" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="606.27" cy="207.78" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="570.27" cy="208.16" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="575.98" cy="148.63" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="513.7" cy="164.83" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="603.22" cy="167.03" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="537.52" cy="160.87" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="514.86" cy="180.48" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="527.53" cy="194.92" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="546.9" cy="125.74" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="596.09" cy="175.73" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="580.48" cy="170.24" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="598.08" cy="206.43" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="593.98" cy="193.8" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="618.01" cy="203.8" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="586.24" cy="121.48" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="602.28" cy="223.28" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="559.31" cy="169.91" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="536.61" cy="204.69" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="590.2" cy="211.08" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="537.39" cy="181.33" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="580.54" cy="208.76" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="568.76" cy="178.14" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="533.42" cy="173.23" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="506" cy="102" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="692" cy="244" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="508" cy="240" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="612" cy="238" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="596" cy="106" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="682" cy="208" r="2.6" fill="var(--s1)" stroke="var(--panel)" stroke-width="1"/>
+<circle cx="668" cy="128" r="9" fill="var(--panel)" stroke="#d03b3b" stroke-width="1.5"/><path d="M664,124 l8,8 M672,124 l-8,8" stroke="#d03b3b" stroke-width="2" stroke-linecap="round"/>
+</g>
+<text class="t-sec" x="706" y="80" font-size="10.5" text-anchor="end">caught by the proof</text>
+<path class="dsh" stroke="var(--lab)" d="M668,84 L668,117"/>
+<text class="t-pri" x="492" y="278" font-size="11" font-weight="600">The core cannot fail.</text>
+<text class="t-pri" x="492" y="293" font-size="11" font-weight="400">Everything else is checked as it runs.</text>
+</svg>
+<figcaption>A schematic, not measured data. Each box is the space of all possible inputs. Tests and production traffic sample the region where real traffic lives, so a bug in a rare corner can pass every test, and an attacker who searches for it will find it. A proof covers every input inside its model, so it finds the counterexample, but it says nothing about what the model leaves out. Together, the proof covers the small core that must never fail, and production samples cover everything around it.</figcaption>
+</figure>
 <hr>
 
 <h2 id="sampling">Testing is sampling, not exhaustion</h2>
@@ -150,58 +506,6 @@ tbody tr:last-child td{border-bottom:0}
 
 <h2 id="proof">When 99.99% is not enough: prove it</h2>
 <p>In security, aerospace, industrial control, medical devices, and cryptography, “we will add the bug as a test after it happens” is not an acceptable plan. The first failure is the catastrophe. An authorization check that is right on 99.99% of requests is a vulnerability, because an attacker does not sample from your traffic distribution. They search for the 0.01%.</p>
-<figure class="fig">
-<p class="ft">What a rate of nines costs you per day</p>
-<div class="lgd"><span><i style="background:var(--s2)"></i>99.99% correct</span><span><i style="background:var(--s1)"></i>99.9999% correct</span></div><svg viewBox="0 0 720 300" role="img" aria-labelledby="figD-t figD-d">
-<title id="figD-t">What a rate of nines costs you per day</title><desc id="figD-d">Two log-log lines showing wrong results a day rising with traffic, one for 99.99 percent correct and one for 99.9999 percent, both crossing the one-per-day reference line.</desc>
-<line class="gr" x1="68" y1="248" x2="548" y2="248"/>
-<text class="t-mut" x="60" y="251.5" font-size="11" text-anchor="end">0.01</text>
-<line class="gr" x1="68" y1="211.67" x2="548" y2="211.67"/>
-<text class="t-mut" x="60" y="215.17" font-size="11" text-anchor="end">0.1</text>
-<line class="gr" x1="68" y1="175.33" x2="548" y2="175.33"/>
-<text class="t-mut" x="60" y="178.83" font-size="11" text-anchor="end">1</text>
-<line class="gr" x1="68" y1="139" x2="548" y2="139"/>
-<text class="t-mut" x="60" y="142.5" font-size="11" text-anchor="end">10</text>
-<line class="gr" x1="68" y1="102.67" x2="548" y2="102.67"/>
-<text class="t-mut" x="60" y="106.17" font-size="11" text-anchor="end">100</text>
-<line class="gr" x1="68" y1="66.33" x2="548" y2="66.33"/>
-<text class="t-mut" x="60" y="69.83" font-size="11" text-anchor="end">1,000</text>
-<line class="gr" x1="68" y1="30" x2="548" y2="30"/>
-<text class="t-mut" x="60" y="33.5" font-size="11" text-anchor="end">10,000</text>
-<line class="ax" x1="68" y1="248" x2="548" y2="248"/>
-<line class="ax" x1="68" y1="248" x2="68" y2="253"/>
-<text class="t-mut" x="68" y="267" font-size="11" text-anchor="middle">10k</text>
-<line class="ax" x1="188" y1="248" x2="188" y2="253"/>
-<text class="t-mut" x="188" y="267" font-size="11" text-anchor="middle">100k</text>
-<line class="ax" x1="308" y1="248" x2="308" y2="253"/>
-<text class="t-mut" x="308" y="267" font-size="11" text-anchor="middle">1M</text>
-<line class="ax" x1="428" y1="248" x2="428" y2="253"/>
-<text class="t-mut" x="428" y="267" font-size="11" text-anchor="middle">10M</text>
-<line class="ax" x1="548" y1="248" x2="548" y2="253"/>
-<text class="t-mut" x="548" y="267" font-size="11" text-anchor="middle">100M</text>
-<text class="t-sec" x="308" y="286" font-size="11.5" text-anchor="middle">Requests a day</text>
-<text class="t-sec" x="16" y="139" font-size="11.5" text-anchor="middle" transform="rotate(-90 16 139)">Wrong results a day</text>
-<line class="dsh" x1="68" y1="175.33" x2="668" y2="175.33" stroke="var(--lab)"/>
-<text class="t-sec" x="556" y="168.33" font-size="11" font-style="italic">one a day</text>
-<path class="ln" d="M68,175.33 L188,139 L308,102.67 L428,66.33 L548,30" stroke="var(--s2)"/>
-<g><title>99.99% correct at 10k requests a day: 1 wrong a day</title><circle cx="68" cy="175.33" r="4.5" fill="var(--s2)" stroke="var(--panel)" stroke-width="2"/></g>
-<g><title>99.99% correct at 100k requests a day: 10 wrong a day</title><circle cx="188" cy="139" r="4.5" fill="var(--s2)" stroke="var(--panel)" stroke-width="2"/></g>
-<g><title>99.99% correct at 1M requests a day: 100 wrong a day</title><circle cx="308" cy="102.67" r="4.5" fill="var(--s2)" stroke="var(--panel)" stroke-width="2"/></g>
-<g><title>99.99% correct at 10M requests a day: 1000 wrong a day</title><circle cx="428" cy="66.33" r="4.5" fill="var(--s2)" stroke="var(--panel)" stroke-width="2"/></g>
-<g><title>99.99% correct at 100M requests a day: 10000 wrong a day</title><circle cx="548" cy="30" r="4.5" fill="var(--s2)" stroke="var(--panel)" stroke-width="2"/></g>
-<text class="t-pri" x="560" y="34" font-size="12" font-weight="600">99.99% correct</text>
-<path class="ln" d="M68,248 L188,211.67 L308,175.33 L428,139 L548,102.67" stroke="var(--s1)"/>
-<g><title>99.9999% correct at 10k requests a day: 0.01 wrong a day</title><circle cx="68" cy="248" r="4.5" fill="var(--s1)" stroke="var(--panel)" stroke-width="2"/></g>
-<g><title>99.9999% correct at 100k requests a day: 0.1 wrong a day</title><circle cx="188" cy="211.67" r="4.5" fill="var(--s1)" stroke="var(--panel)" stroke-width="2"/></g>
-<g><title>99.9999% correct at 1M requests a day: 1 wrong a day</title><circle cx="308" cy="175.33" r="4.5" fill="var(--s1)" stroke="var(--panel)" stroke-width="2"/></g>
-<g><title>99.9999% correct at 10M requests a day: 10 wrong a day</title><circle cx="428" cy="139" r="4.5" fill="var(--s1)" stroke="var(--panel)" stroke-width="2"/></g>
-<g><title>99.9999% correct at 100M requests a day: 100 wrong a day</title><circle cx="548" cy="102.67" r="4.5" fill="var(--s1)" stroke="var(--panel)" stroke-width="2"/></g>
-<text class="t-pri" x="560" y="106.67" font-size="12" font-weight="600">99.9999% correct</text>
-<text class="t-sec" x="365.25" y="53.89" font-size="11.5" font-style="italic" text-anchor="middle">an attacker searches here</text>
-<path class="dsh" stroke="var(--lab)" d="M365.25,57.96 L428,64.83"/>
-</svg>
-<figcaption>Plain arithmetic: wrong results a day = requests a day × the error rate, on log scales. 99.99% correct means one wrong result in 10,000. At a million requests a day that is 100 a day. Adding two nines moves the line down, not to zero, which is why a property that must never fail needs a proof rather than more samples.</figcaption>
-</figure>
 <p>No amount of sampling closes that gap. For these properties you need the second kind of verification: state the property precisely and prove it holds for all inputs. This is what formal methods do. A proof assistant such as Lean or Coq checks a proof step by step. A model checker such as TLA+ explores every reachable state of a design. An SMT solver such as Z3 either proves a property for all inputs or produces a concrete counterexample.</p>
 
 <h3 id="barrier">The barrier just dropped</h3>
