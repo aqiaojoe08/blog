@@ -95,7 +95,7 @@ tbody tr:last-child td{border-bottom:0}
 <header class="mast">
 <h1>Two Ways to Verify Software: Sample the Behavior, or Prove It</h1>
 <p class="sub">Tests are behavior samples, and the best samples come from production. When 99.99% is not enough, you need a proof, and proofs just got much cheaper.</p>
-<div class="meta"><span>2,100 words</span><span>~8 min read</span><span>2026-11-04</span></div>
+<div class="meta"><span>2,300 words</span><span>~9 min read</span><span>2026-11-04</span></div>
 </header>
 <main>
 <h2 id="two-ways">Two ways, not one</h2>
@@ -502,6 +502,14 @@ tbody tr:last-child td{border-bottom:0}
 <li><strong>Weakness:</strong> reactive. Someone pays for the bug before it becomes a sample.</li>
 </ul>
 <p>The two work well together. Blind capture gives you the shape of normal behavior and catches regressions early. Feedback gives you the sharp edges. Over time the suite becomes a record of how the system is really used and how it really fails, not of what someone predicted before launch. This is also where agents help most: turning an incident into a minimal reproducing test, and deduplicating a million captured requests into a few hundred that cover distinct behavior, are both jobs an agent does well.</p>
+<h3 id="cold-start">Before launch: predict the scenarios</h3>
+<p>Both methods need production, and a new system has none. That is the cold-start problem. The answer is not to fall back on whatever tests someone happened to imagine. It is to <strong>predict the behavior scenarios</strong> the system will see, and use them as the first sample. The guess becomes deliberate.</p>
+<ul>
+<li><strong>Borrow a distribution.</strong> If the new system replaces an existing one, or sits next to one, that system’s traffic is the best predictor of the new one’s. Replay it, translated to the new interface.</li>
+<li><strong>Derive scenarios from the spec and the domain.</strong> List the actors, the states, and the transitions the spec allows, and weight each one by how often you expect it. Agents are good at this. Given a spec, they can propose hundreds of concrete scenarios, including the awkward ones.</li>
+<li><strong>Simulate the workload.</strong> When behavior depends on load or on other systems, a small simulation of the expected workload shows which scenarios matter before any real user arrives.</li>
+</ul>
+<p>Treat the prediction as a starting point, not a fact. Once the system is deployed, compare the predicted scenarios with what production actually sends. Where the two differ, the prediction was wrong, and that is the first place to sample from production.</p>
 <p>Done well, this gets you a system that is statistically correct: 99.9%, 99.99%, maybe more, on the traffic it actually sees. For most software, that is the right target. But both methods share one limit. They learn from what already happened. Some failures are not allowed to happen even once.</p>
 <hr>
 
