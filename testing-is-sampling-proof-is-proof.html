@@ -95,7 +95,7 @@ tbody tr:last-child td{border-bottom:0}
 <header class="mast">
 <h1>Two Ways to Verify Software: Sample the Behavior, or Prove It</h1>
 <p class="sub">Tests are behavior samples, and the best samples come from production. When 99.99% is not enough, you need a proof, and proofs just got much cheaper.</p>
-<div class="meta"><span>2,300 words</span><span>~9 min read</span><span>2026-11-04</span></div>
+<div class="meta"><span>2,100 words</span><span>~8 min read</span><span>2026-11-04</span></div>
 </header>
 <main>
 <h2 id="two-ways">Two ways, not one</h2>
@@ -479,7 +479,6 @@ tbody tr:last-child td{border-bottom:0}
 <p>This matters more now that agents can generate hundreds of tests in minutes. If an agent keeps sampling the same region of the behavior space, because that is where its training signal is dense, coverage of low-risk behavior goes up while high-risk behavior stays unsampled. The metric improves and the confidence is misplaced. 100% line coverage means every line ran once. It says nothing about the combinations.</p>
 <p>One way to make each sample worth more is to check a property on it, not only an expected output. Marc Brooker makes the case in <a href="https://brooker.co.za/blog/2023/07/28/ds-testing.html">Invariants: A Better Debugger?</a>: assert what must be true after every step, and use deterministic simulation testing to check invariants across the whole system at once. Each run is still a sample, but each one now checks a property, which is a step toward proof.</p>
 <p>Data-driven and ML systems make this sharper. Their behavior space is defined by a data distribution, and the test set is a sample of last year’s distribution. Production drifts, and many of these systems shape the data they later learn from. A passing eval is evidence about the old distribution, not the live one.</p>
-<p>Count those samples honestly, too. In <a href="https://brooker.co.za/blog/2026/01/21/pass-k.html">Pass@k is Mostly Bunk</a>, Brooker points out that pass@k, which counts a task as passed if any one of <em>k</em> attempts succeeds, is exponentially forgiving. People who use an agent are not. What they experience is closer to pass^k, where every attempt has to work.</p>
 <p>The third bullet above is the important one. It leads to the first meta-point.</p>
 <hr>
 
@@ -518,7 +517,7 @@ tbody tr:last-child td{border-bottom:0}
 <li><strong>Tooling is closer to everyday code.</strong> Teams are now proving properties of agent harnesses in Lean (see <a href="https://kiro.dev/blog/harness-properties-in-lean/">Kiro’s post on harness properties in Lean</a>), and SMT solvers are a library call away from most languages.</li>
 </ul>
 <p>This changes formal verification from a special project into a tool you reach for when sampling is not enough. It also makes AI-driven development safer at scale: if a property is proven, it does not matter whether a person or an agent wrote the code that satisfies it.</p>
-<p>Brooker has argued for years that this is simply good engineering. In <a href="https://brooker.co.za/blog/2024/04/17/formal.html">Formal Methods: Just Good Engineering Practice?</a> his answer is yes, in part because a precise design avoids expensive rework. And in <a href="https://brooker.co.za/blog/2026/04/30/be-right.html">It’s time to be right</a>, he argues that the opportunity for agentic AI will be limited more by defect rate than by capability. His list of remedies reads like this section: correct-by-construction languages, spec-driven development, property-based testing, and Lean-based reasoning about code.</p>
+<p>Brooker has argued for years that this is simply good engineering. In <a href="https://brooker.co.za/blog/2024/04/17/formal.html">Formal Methods: Just Good Engineering Practice?</a> his answer is yes, in part because a precise design avoids expensive rework.</p>
 
 <h3 id="models">You do not need to be in aerospace to use it</h3>
 <p>Most business systems do not need 100% correctness everywhere. But many contain a small mathematical core where an assumption, if wrong, silently breaks everything above it. There, formal methods can be a good complement to sampling, and sometimes the <em>cheaper</em> option, provided the problem can be abstracted into a clean mathematical model.</p>
@@ -534,8 +533,7 @@ tbody tr:last-child td{border-bottom:0}
 <tr><td>Right for</td><td>Most business logic, UIs, integrations, ML systems</td><td>Security boundaries, safety-critical control, core algorithms and their assumptions</td></tr>
 <tr><td>Agent’s role</td><td>Turn incidents into tests, deduplicate captured traffic</td><td>Draft specs and proofs that a checker verifies</td></tr>
 </tbody></table></div>
-<p>The two are not rivals. A proof covers only what the model captures, and models leave things out: I/O, configuration, the environment. Brooker’s <a href="https://brooker.co.za/blog/2022/06/02/formal.html">Formal Methods Only Solve Half My Problems</a> makes the same point from the other side: model checking answers safety and liveness, but not latency, cost, or behavior under overload. For those, he reaches for simulation, which is sampling the model instead of the system (see <a href="https://brooker.co.za/blog/2022/04/11/simulation.html">Simple Simulations for System Builders</a>). Sampling from production checks the whole system as it really runs, with the gaps described above. A mature system uses proofs for the small core that must never fail, and production-driven sampling for everything around it.</p>
-<p>Both point the same way. In <a href="https://brooker.co.za/blog/2026/11/16/understanding.html">What does it mean to understand what we built?</a>, Brooker argues that understanding should move from reading code to knowing the properties of the system as built: precise ones, like “a SELECT never shows results from uncommitted transactions,” and fuzzy ones, like “makes the user’s life easier.” Proofs pin down the precise properties. Samples from production check the fuzzy ones.</p>
+<p>The two are not rivals. A proof covers only what the model captures, and models leave things out: I/O, configuration, the environment. Sampling from production checks the whole system as it really runs, with the gaps described above. A mature system uses proofs for the small core that must never fail, and production-driven sampling for everything around it.</p>
 <blockquote><p>Tests are samples, so take them from where the real distribution lives: production. Proofs are guarantees, so spend them where one failure is too many. Both just got cheaper.</p></blockquote>
 <hr>
 <h3 id="references">References</h3>
@@ -543,7 +541,6 @@ tbody tr:last-child td{border-bottom:0}
 <li><a href="https://kiro.dev/blog/harness-properties-in-lean/">Proving harness properties in Lean</a> — Kiro blog</li>
 <li><a href="https://github.com/Z3Prover/z3">Z3</a> — SMT solver from Microsoft Research</li>
 <li>“Testing Is Sampling, Not Exhaustion” — my earlier note, 2026</li>
-<li><a href="https://brooker.co.za/blog/">Marc Brooker’s blog</a> — the posts cited above, and many more on formal methods, simulation, and testing</li>
 </ul>
 </main>
 </div></body></html>
