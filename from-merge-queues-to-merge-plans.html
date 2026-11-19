@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>From Merge Queues to Merge Plans: What OpenAI’s and Anthropic’s Git Rewrites Leave Unsolved</title>
+<style>
+:root{
+  --bg:#fbfaf8; --panel:#fff; --ink:#1c1b1a; --muted:#5f5b56; --faint:#8b857e;
+  --rule:#e6e2dc; --accent:#8a5a2b; --accent-soft:#f4ede4; --code-bg:#f6f4f1;
+}
+@media (prefers-color-scheme:dark){
+  :root{ --bg:#16171a; --panel:#1c1e22; --ink:#e8e6e3; --muted:#a7a29b; --faint:#857f78;
+         --rule:#2d3035; --accent:#d9a05b; --accent-soft:#25262a; --code-bg:#21242a; }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:17px/1.72 ui-serif,Georgia,'Iowan Old Style','Times New Roman',serif;
+  padding:0 1.25rem 6rem;}
+.wrap{max-width:46rem;margin:0 auto}
+header.mast{padding:4.5rem 0 0;border-bottom:1px solid var(--rule);margin-bottom:2.5rem}
+h1{font-size:2.3rem;line-height:1.18;letter-spacing:-.02em;margin:0 0 1rem;font-weight:600}
+header.mast p.sub{color:var(--muted);font-style:italic;margin:0 0 2.2rem;font-size:1.02rem}
+.meta{display:flex;gap:1.4rem;flex-wrap:wrap;font-family:ui-sans-serif,system-ui,sans-serif;
+  font-size:.76rem;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);
+  padding-bottom:1.4rem}
+h2{font-size:1.5rem;line-height:1.25;letter-spacing:-.01em;margin:3.4rem 0 1rem;font-weight:600;
+  padding-top:.4rem}
+h3{font-size:1.13rem;margin:2.4rem 0 .7rem;font-weight:600;
+  font-family:ui-sans-serif,system-ui,sans-serif;letter-spacing:-.005em}
+p{margin:0 0 1.15rem}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid color-mix(in oklab,var(--accent) 35%,transparent)}
+a:hover{border-bottom-color:var(--accent)}
+strong{font-weight:650}
+hr{border:0;height:1px;background:var(--rule);margin:2.8rem 0}
+ul,ol{margin:0 0 1.3rem;padding-left:1.35rem}
+li{margin:0 0 .62rem}
+li>p{margin:0 0 .6rem}
+blockquote{margin:1.5rem 0;padding:.2rem 0 .2rem 1.3rem;border-left:3px solid var(--accent);
+  color:var(--muted)}
+blockquote p{margin:0 0 .6rem}
+blockquote p:last-child{margin:0}
+code{font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,monospace;font-size:.855em;
+  background:var(--code-bg);padding:.13em .38em;border-radius:4px;
+  border:1px solid color-mix(in oklab,var(--rule) 70%,transparent)}
+pre{background:var(--code-bg);border:1px solid var(--rule);border-radius:8px;
+  padding:1rem 1.1rem;overflow-x:auto;margin:0 0 1.4rem}
+pre code{background:none;border:0;padding:0;font-size:.8rem;line-height:1.62}
+.tw{overflow-x:auto;margin:0 0 1.6rem;border:1px solid var(--rule);border-radius:8px;
+  background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-family:ui-sans-serif,system-ui,sans-serif;
+  font-size:.845rem;line-height:1.5}
+th{text-align:left;font-weight:600;background:var(--accent-soft);color:var(--ink);
+  padding:.68rem .8rem;border-bottom:1px solid var(--rule);vertical-align:bottom;
+  font-size:.78rem;letter-spacing:.02em}
+td{padding:.66rem .8rem;border-bottom:1px solid color-mix(in oklab,var(--rule) 60%,transparent);
+  vertical-align:top;color:var(--muted)}
+td:first-child{color:var(--ink)}
+tbody tr:last-child td{border-bottom:0}
+@media (max-width:640px){
+  body{font-size:16px;padding:0 1rem 4rem}
+  h1{font-size:1.85rem} h2{font-size:1.32rem}
+  header.mast{padding-top:2.5rem}
+}
+@media print{
+  body{background:#fff;color:#000;font-size:11pt}
+  .tw,pre{break-inside:avoid} h2,h3{break-after:avoid}
+}
+.tldr{background:var(--accent-soft);border:1px solid var(--rule);border-radius:8px;padding:1.1rem 1.3rem .4rem;margin:0 0 2.4rem;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.93rem;line-height:1.6}
+.tldr .tl-h{font-size:.74rem;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);margin:0 0 .5rem}
+.tldr ul{margin:0 0 .8rem}
+.tldr li{margin:0 0 .45rem}
+.fig{--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--o1:#1c5cab;--o2:#2a78d6;--o3:#5598e7;--o4:#86b6ef;
+  --grid:#e1e0d9;--axis:#c3c2b7;--lab:#898781;
+  margin:2.1rem 0 2.3rem;border:1px solid var(--rule);border-radius:8px;background:var(--panel);
+  padding:1.1rem 1.15rem .95rem}
+@media (prefers-color-scheme:dark){.fig{--s1:#3987e5;--s2:#d95926;--s3:#199e70;
+  --o1:#184f95;--o2:#256abf;--o3:#3987e5;--o4:#6da7ec;--grid:#2c2c2a;--axis:#383835}}
+.fig svg{display:block;width:100%;height:auto}
+.fig .ft{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.86rem;font-weight:600;
+  color:var(--ink);margin:0 0 .55rem;line-height:1.35}
+.fig figcaption{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.76rem;line-height:1.55;
+  color:var(--muted);margin:.8rem 0 0}
+.fig .lgd{display:flex;flex-wrap:wrap;gap:.3rem 1.1rem;font-family:ui-sans-serif,system-ui,sans-serif;
+  font-size:.76rem;color:var(--muted);margin:0 0 .75rem}
+.fig .lgd span{display:inline-flex;align-items:center;gap:.4rem}
+.fig .lgd i{width:10px;height:10px;border-radius:3px;display:inline-block;flex:0 0 auto}
+.fig text{font-family:ui-sans-serif,system-ui,sans-serif}
+.fig .t-pri{fill:var(--ink)}.fig .t-sec{fill:var(--muted)}.fig .t-mut{fill:var(--lab)}
+.fig .gr{stroke:var(--grid);stroke-width:1;fill:none}
+.fig .ax{stroke:var(--axis);stroke-width:1;fill:none}
+.fig .ln{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.fig .dsh{fill:none;stroke-width:1.5;stroke-dasharray:4 5}
+.fig .box{fill:none;stroke-width:1.5}
+pre{line-height:1.5}
+</style>
+</head>
+<body><div class="wrap">
+<nav style="padding-top:1.6rem;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.85rem"><a href="./" style="border:0">&larr; All posts</a></nav>
+<header class="mast">
+<h1>From Merge Queues to Merge Plans: What OpenAI’s and Anthropic’s Git Rewrites Leave Unsolved</h1>
+<p class="sub">Agents pushed both labs past what their source control could handle, and both rebuilt it within months. They fixed the bytes: pushes, fetches, and checkouts. Neither fixed the race of many writers on one trunk. Agents can fix that in a way people never could, by planning the writes instead of racing them.</p>
+<div class="meta"><span>2,700 words</span><span>~12 min read</span><span>2026-11-19</span></div>
+</header>
+<main>
+<div class="tldr">
+<p class="tl-h">In short</p>
+<ul>
+<li>Within three weeks of each other, Anthropic and OpenAI described how they rebuilt source control for agents. Anthropic’s merges went from about 2,500 a day to more than 30,000 in four months, and it replaced git with Scion. OpenAI’s trunk commits reached 14.8 times their Q1 2024 rate, and it built Pando, a new server behind the Git protocol.</li>
+<li>Both fixed the bytes: pushes, fetches, and checkouts. Neither fixed coordination: many writers, one trunk. Pando still orders pushes to the same branch, and Anthropic gave up the merge-queue lock and lets Claude repair conflicts after they land.</li>
+<li>Velocity and documentation as code will keep pushing the load up. New servers, source control as an API, and cheap repair absorb much of it, but none of them removes the race for the trunk.</li>
+<li>The disruptive move is a planner that sees every write request before any code exists, predicts what each will touch, and schedules parallel waves and stacked chains. Conflicts are avoided instead of discovered at push time.</li>
+</ul>
+</div>
+
+<h2 id="wall">Two labs hit the same wall</h2>
+<p>On 13 October, Anthropic published <a href="https://www.anthropic.com/research/redesigning-source-control">Redesigning source control at Anthropic</a>. It merged about 2,500 code changes a day in May 2026, and more than 30,000 a day in September. The history of its main branch is almost 100 GB, and CI alone runs on the order of 25 million checkouts a day. A team of seven built a new version control system, Scion, and moved the monorepo off git in five months.</p>
+<p>On 2 November, OpenAI published <a href="https://openai.com/index/scaling-git-at-openai/">Scaling Git at OpenAI</a>. Its monorepo landed 14.8 times as many commits on the main branch in Q3 2026 as in Q1 2024, and OpenAI expects about 25 times in Q4. From around the end of 2025, its systems struggled: slow fetches and pushes, failed merges, and reliability at times below 90%. In ten weeks, OpenAI built Pando, a new backend that keeps the Git protocol and client.</p>
+<figure class="fig">
+<p class="ft">Commits landed on OpenAI’s monorepo trunk, as a multiple of Q1 2024</p>
+<svg viewBox="0 0 720 280" role="img" aria-labelledby="figK-t figK-d">
+<title id="figK-t">Commits landed on OpenAI’s monorepo trunk, as a multiple of Q1 2024</title><desc id="figK-d">Bar chart of twelve quarters from Q1 2024 to Q4 2026. Commits landed grow slowly to 3.6 times the Q1 2024 rate by Q4 2025, then jump to 5.3, 7.8, and 14.8 times in the first three quarters of 2026. An outlined bar shows OpenAI's estimate of 25.4 times for Q4 2026.</desc>
+<line class="gr" x1="52" y1="197.85" x2="704" y2="197.85"/>
+<text class="t-mut" x="48" y="201.35" font-size="10.5" text-anchor="end">5×</text>
+<line class="gr" x1="52" y1="159.7" x2="704" y2="159.7"/>
+<text class="t-mut" x="48" y="163.2" font-size="10.5" text-anchor="end">10×</text>
+<line class="gr" x1="52" y1="121.56" x2="704" y2="121.56"/>
+<text class="t-mut" x="48" y="125.06" font-size="10.5" text-anchor="end">15×</text>
+<line class="gr" x1="52" y1="83.41" x2="704" y2="83.41"/>
+<text class="t-mut" x="48" y="86.91" font-size="10.5" text-anchor="end">20×</text>
+<line class="gr" x1="52" y1="45.26" x2="704" y2="45.26"/>
+<text class="t-mut" x="48" y="48.76" font-size="10.5" text-anchor="end">25×</text>
+<g><title>Q1 2024: 1.0× the Q1 2024 rate</title><path d="M68.92,236 V232.19 a3.81,3.81 0 0 1 3.81,-3.81 H97.1 a3.81,3.81 0 0 1 3.81,3.81 V236 z" fill="var(--s1)"/></g>
+<text class="t-sec" x="84.92" y="221.37" font-size="11" font-weight="600" text-anchor="middle">1×</text>
+<text class="t-mut" x="84.92" y="252" font-size="10.5" text-anchor="middle">Q1</text>
+<g><title>Q2 2024: 1.4× the Q1 2024 rate</title><path d="M122.75,236 V229.7 a4,4 0 0 1 4,-4 H150.75 a4,4 0 0 1 4,4 V236 z" fill="var(--s1)"/></g>
+<text class="t-mut" x="138.75" y="252" font-size="10.5" text-anchor="middle">Q2</text>
+<g><title>Q3 2024: 1.7× the Q1 2024 rate</title><path d="M176.58,236 V226.8 a4,4 0 0 1 4,-4 H204.58 a4,4 0 0 1 4,4 V236 z" fill="var(--s1)"/></g>
+<text class="t-mut" x="192.58" y="252" font-size="10.5" text-anchor="middle">Q3</text>
+<g><title>Q4 2024: 2.0× the Q1 2024 rate</title><path d="M230.42,236 V224.89 a4,4 0 0 1 4,-4 H258.42 a4,4 0 0 1 4,4 V236 z" fill="var(--s1)"/></g>
+<text class="t-mut" x="246.42" y="252" font-size="10.5" text-anchor="middle">Q4</text>
+<g><title>Q1 2025: 2.4× the Q1 2024 rate</title><path d="M284.25,236 V221.54 a4,4 0 0 1 4,-4 H312.25 a4,4 0 0 1 4,4 V236 z" fill="var(--s1)"/></g>
+<text class="t-mut" x="300.25" y="252" font-size="10.5" text-anchor="middle">Q1</text>
+<g><title>Q2 2025: 2.9× the Q1 2024 rate</title><path d="M338.08,236 V217.57 a4,4 0 0 1 4,-4 H366.08 a4,4 0 0 1 4,4 V236 z" fill="var(--s1)"/></g>
+<text class="t-mut" x="354.08" y="252" font-size="10.5" text-anchor="middle">Q2</text>
+<g><title>Q3 2025: 3.5× the Q1 2024 rate</title><path d="M391.92,236 V213.53 a4,4 0 0 1 4,-4 H419.92 a4,4 0 0 1 4,4 V236 z" fill="var(--s1)"/></g>
+<text class="t-mut" x="407.92" y="252" font-size="10.5" text-anchor="middle">Q3</text>
+<g><title>Q4 2025: 3.6× the Q1 2024 rate</title><path d="M445.75,236 V212.23 a4,4 0 0 1 4,-4 H473.75 a4,4 0 0 1 4,4 V236 z" fill="var(--s1)"/></g>
+<text class="t-sec" x="461.75" y="201.23" font-size="11" font-weight="600" text-anchor="middle">3.6×</text>
+<text class="t-mut" x="461.75" y="252" font-size="10.5" text-anchor="middle">Q4</text>
+<g><title>Q1 2026: 5.3× the Q1 2024 rate</title><path d="M499.58,236 V199.41 a4,4 0 0 1 4,-4 H527.58 a4,4 0 0 1 4,4 V236 z" fill="var(--s1)"/></g>
+<text class="t-mut" x="515.58" y="252" font-size="10.5" text-anchor="middle">Q1</text>
+<g><title>Q2 2026: 7.8× the Q1 2024 rate</title><path d="M553.42,236 V180.26 a4,4 0 0 1 4,-4 H581.42 a4,4 0 0 1 4,4 V236 z" fill="var(--s1)"/></g>
+<text class="t-sec" x="569.42" y="169.26" font-size="11" font-weight="600" text-anchor="middle">7.8×</text>
+<text class="t-mut" x="569.42" y="252" font-size="10.5" text-anchor="middle">Q2</text>
+<g><title>Q3 2026: 14.8× the Q1 2024 rate</title><path d="M607.25,236 V127.23 a4,4 0 0 1 4,-4 H635.25 a4,4 0 0 1 4,4 V236 z" fill="var(--s1)"/></g>
+<text class="t-sec" x="623.25" y="116.23" font-size="11" font-weight="600" text-anchor="middle">14.8×</text>
+<text class="t-mut" x="623.25" y="252" font-size="10.5" text-anchor="middle">Q3</text>
+<g><title>Q4 2026 (OpenAI base-case estimate): 25.4× the Q1 2024 rate</title><rect x="661.83" y="42.8" width="30.5" height="193.2" rx="4" fill="none" stroke="var(--s1)" stroke-width="1.5" stroke-dasharray="4 4"/></g>
+<text class="t-sec" x="677.08" y="35.05" font-size="11" font-weight="600" text-anchor="middle">25.4× est.</text>
+<text class="t-mut" x="677.08" y="252" font-size="10.5" text-anchor="middle">Q4 est.</text>
+<text class="t-sec" x="165.67" y="269" font-size="11" font-weight="600" text-anchor="middle">2024</text>
+<text class="t-sec" x="381" y="269" font-size="11" font-weight="600" text-anchor="middle">2025</text>
+<line class="ax" x1="273.33" y1="240" x2="273.33" y2="272"/>
+<text class="t-sec" x="596.33" y="269" font-size="11" font-weight="600" text-anchor="middle">2026</text>
+<line class="ax" x1="488.67" y1="240" x2="488.67" y2="272"/>
+<line class="ax" x1="52" y1="236" x2="704" y2="236"/>
+<text class="t-sec" x="597.25" y="127.23" font-size="11" font-style="italic" text-anchor="end">about 4× from Q4 2025 to Q3 2026</text>
+</svg>
+<figcaption>Data from OpenAI’s “Scaling Git at OpenAI” (2 November 2026), which reports growth in commits landed on the main branch relative to Q1 2024; here each quarter is shown as a multiple of Q1 2024. The outlined Q4 2026 bar is OpenAI’s base-case estimate. Anthropic reports the same curve in a different unit: about 2,500 changes merged per day in May 2026, and more than 30,000 per day in September.</figcaption>
+</figure>
+<p>Both name the same cause. Anthropic: “coding is no longer the bottleneck … The bottleneck, now, is all of the developer infrastructure built for human scale: source control, builds, and CI.” OpenAI: “One engineer now has several changes ready for CI at once, and each push can set several jobs fetching the same commit.”</p>
+<p>The labs are first, not alone. GitHub’s <a href="https://github.blog/news-insights/octoverse/octoverse-commits-pushes-reach-new-highs-in-2026-as-developers-build-with-agents/">Octoverse 2026</a> counts 3.5 million merged pull requests a day, more than three times the rate of two years ago, and more than 40% of pull requests now start with an agent. Anthropic expects this class of problems to become more common over the next six to twelve months. Small teams already feel a small version of it: a few people and their agents in one codebase get a steady stream of merge conflicts and slow rebases.</p>
+
+<h2 id="bytes">What they fixed: the bytes</h2>
+<p>The two take opposite routes. OpenAI kept Git’s protocol and client and replaced the server. Anthropic replaced git, and moved most of the work to the server.</p>
+<div class="tw"><table><thead><tr><th></th><th>OpenAI: Pando</th><th>Anthropic: Scion</th></tr></thead><tbody>
+<tr><td>Approach</td><td>A new server behind the unchanged Git protocol and client</td><td>A new system. The server commits, merges, rebases, and answers history and blame. The client is thin.</td></tr>
+<tr><td>Writes</td><td>Each branch is coordinated on its own, so pushes to different branches never wait on each other</td><td>Changesets in a write-ahead log, created on the server, with no packfiles and no locks</td></tr>
+<tr><td>Reads</td><td>Reuses stored packfiles across clients, from regional caches with hit rates over 99%</td><td>Fetches only the trees and blobs a client needs, with sparse and virtual checkouts</td></tr>
+<tr><td>Result</td><td>Median push latency down about 80%, and nearly a petabyte served a day</td><td>Infrastructure 200 times smaller than the old git mirrors, and checkouts in seconds instead of minutes</td></tr>
+<tr><td>Built in</td><td>Ten weeks: one engineer’s design, implemented by teams of agents</td><td>Five months: a team of seven, working with Claude</td></tr>
+</tbody></table></div>
+<p>Neither solved coordination. Pando is explicit: “Clients only conflict when pushing to the same ref simultaneously.” That beats designs that put every push in one global order, but in trunk-based development, every change ends on the same ref. Anthropic says it directly:</p>
+<blockquote><p>“A proper merge queue, for example, doesn’t make much sense at agent scale. What does CI even mean when hundreds or even thousands of changes can merge while tests are running? We haven’t been able to effectively replicate the industry standard of a global repository lock on the merge queue, so instead, we’ve invested in post-merge and pre-deploy automated testing. This does mean that concurrent changes can conflict, but Claude can typically fix these conflicts faster than humans can even identify them.”</p></blockquote>
+<hr>
+
+<h2 id="trunk">What they left open: many writers, one trunk</h2>
+<p>Some arithmetic shows why the lock breaks. Say the tests take 20 minutes. A queue that lands one change at a time lands 72 a day. To land 30,000 a day, each test run must carry about 420 changes. If 1% of changes would fail on their own, a batch of 420 passes with a probability of 0.99<sup>420</sup>, about 1.5%. Nearly every batch fails, and must be split to find the culprit. Batching, speculative builds, and culprit finding stretch the queue, and Uber’s <a href="https://doi.org/10.1145/3302424.3303970">SubmitQueue</a> keeps a monorepo’s main branch green at thousands of commits a day. But they still treat the trunk as one resource that every change must win.</p>
+<p>There are four ways to share one resource among many writers, and databases have a name for each:</p>
+<div class="tw"><table><thead><tr><th>Strategy</th><th>How writers share the trunk</th><th>Database analogue</th><th>Cost at agent scale</th></tr></thead><tbody>
+<tr><td>Serialize</td><td>A merge queue with one global lock lands one change, or one batch, at a time, after its tests pass</td><td>Serial execution under a global lock</td><td>Throughput is capped by test time, and large batches almost always fail</td></tr>
+<tr><td>Detect</td><td>Everyone pushes. A compare-and-swap on the branch rejects the late writer, who rebases and retries. Pando makes this fast across branches.</td><td>Optimistic concurrency control</td><td>Retries grow with contention, and every change contends for the trunk and its hot files</td></tr>
+<tr><td>Repair</td><td>Merge without a lock, test after merge and before deploy, and let an agent fix what breaks. Anthropic’s choice.</td><td>Eventual consistency with compensating fixes</td><td>The trunk is sometimes broken, so detection and fixes must be fast</td></tr>
+<tr><td>Plan</td><td>Collect the intents before any code exists, predict what each will touch, and schedule them so that no two changes in flight overlap</td><td>Deterministic ordering, as in Calvin</td><td>Needs footprint predictions. A wrong one falls back to detect or repair.</td></tr>
+</tbody></table></div>
+<p>People live with serialize and detect, because a person’s intent is private until they push. Repair became practical once an agent could fix a conflict in a minute. Plan becomes practical only when the writers are agents. I come back to it after the trend factors.</p>
+<hr>
+
+<h2 id="up">What keeps pushing the load up</h2>
+<p><strong>Velocity.</strong> Agents raise both the number of changes and the number in flight at once. OpenAI’s trunk commits grew about four times in the three quarters to Q3 2026, and Anthropic’s merges grew twelve times in four months. Anthropic expects no slowdown: “the latent demand for merging code is practically infinite, and every bottleneck we remove immediately leads to a further increase in the amount of code we produce.” Smaller changes, which every agent workflow encourages, make review easier and merges more frequent.</p>
+<p><strong>Documentation as code.</strong> I have argued for more of it on this blog: <a href="agent-memory-is-a-team-document.html">agent memory as a team document</a> in the repo, and <a href="everything-as-code-reviewed-by-agents.html">data contracts, skills, agent specs, and review rules as code</a>. Each of those adds Git load, in three ways:</p>
+<ul>
+<li><strong>Wider changes.</strong> A change updates the code, the spec, and the docs together. On GitHub, 87% of agent-started pull requests change more than one file, against 79% of the rest.</li>
+<li><strong>Hot files.</strong> A root <code>AGENTS.md</code>, a shared spec index, a changelog, a lockfile: files that unrelated changes all touch. A hot file turns independent work into conflicting work.</li>
+<li><strong>More readers.</strong> Every agent session reads the context files before it writes anything. GitHub found that new repositories with an agent configuration file logged eight times as many commits as new repositories without one. That is a correlation, not a cause, but it points the same way.</li>
+</ul>
+<p><strong>Readers multiply faster than writers.</strong> Each change starts CI jobs, agent sandboxes, and eval runs, and each wants a checkout. Anthropic’s 25 million checkouts a day come to roughly 800 for every merged change. Fetched naively, Anthropic estimates, that would be more than 600 PB of git traffic a day.</p>
+
+<h2 id="absorb">What absorbs it</h2>
+<ul>
+<li><strong>New servers behind the same client.</strong> Pando shows that the Git protocol is not the limit: coordinate each branch on its own, serve the same packs to many readers, and cache near the clients. OpenAI sends its Git client fixes upstream, and Anthropic suggests server-side APIs that forges could standardize.</li>
+<li><strong>Source control as an API.</strong> When the server answers diff, blame, merge-base, and history, most jobs need no clone at all. The rest check out sparsely and pay only for what they read.</li>
+<li><strong>Fewer branches.</strong> Scion discourages refs other than the main and release branches. Agent work becomes short-lived changes on the server, not branches that live for weeks.</li>
+<li><strong>Cheap repair.</strong> A conflict that an agent resolves in a minute is not the problem it was for a person who lost an afternoon to a rebase. Anthropic runs its monorepo on this.</li>
+<li><strong>Hot files designed away.</strong> The <a href="https://agents.md/">AGENTS.md</a> guidance already recommends a nested file per package in a large monorepo, so no single file is edited by every change. The same works elsewhere: a changelog fragment per change, and indexes generated on merge instead of edited by hand. A generated file has one writer, the build.</li>
+</ul>
+<p>Weighing the two sides, here is what I expect over the next 12 to 24 months:</p>
+<div class="tw"><table><thead><tr><th>Trend</th><th>Prediction</th><th>What to watch</th></tr></thead><tbody>
+<tr><td>Git’s interface and its server</td><td>The client and protocol survive. The server underneath stops being a Git repository on a disk.</td><td>Forges ship Pando- or Scion-style backends, with server-side merge, diff, and blame APIs</td></tr>
+<tr><td>Checkouts</td><td>Most CI and agent jobs stop cloning. They ask the server, or check out only what they read.</td><td>Checkouts per merged change fall, even as merges rise</td></tr>
+<tr><td>The merge queue</td><td>The single global lock disappears from busy repositories. Testing after merge stays as the safety net.</td><td>Teams stop reporting queue wait time, and report conflicts and reverts per merged change instead</td></tr>
+<tr><td>Documentation as code</td><td>More knowledge moves into repositories, laid out so that it does not conflict</td><td>Linters that flag hot files, and a context file per directory instead of one per repo</td></tr>
+<tr><td>Coordination</td><td>Planning becomes a platform feature. Agents declare intents and footprints, and the platform schedules them.</td><td>A write-intent API next to the pull request API, and stacks created before the code is written</td></tr>
+</tbody></table></div>
+<hr>
+
+<h2 id="plan">The disruptive option: plan the writes</h2>
+<p>Today, writers work in parallel and find each other at push time. For people, that is the only practical choice. A person’s intent stays in their head until they push, and people pick their own tasks.</p>
+<p>Agents change both facts. An agent’s intent is written down before it writes any code: the task, the spec, the plan. And agents take assignments. So one orchestrator, a merge planner, can see every pending write request for a repository, and decide who writes what, in which order.</p>
+<figure class="fig">
+<p class="ft">A merge planner schedules the writes before any code exists</p>
+<div class="lgd"><span><i style="background:var(--s1)"></i>Both touch billing/refund.py</span><span><i style="background:var(--s2)"></i>Both touch AGENTS.md</span><span><i style="border:1.5px solid var(--axis);background:none"></i>No overlap</span></div><svg viewBox="0 0 720 326" role="img" aria-labelledby="figL-t figL-d">
+<title id="figL-t">A merge planner schedules the writes before any code exists</title><desc id="figL-d">Left: six pending intents with the files each is predicted to touch. Two pairs overlap, one on billing/refund.py and one on AGENTS.md. Right: the plan. Four intents run in parallel, and each overlapping intent is stacked on its partner and merges after it, so no two changes in flight touch the same file. A dashed arrow returns any change whose diff leaves its footprint to the planner.</desc>
+<text class="t-mut" x="14" y="24" font-size="10" letter-spacing=".07em">PENDING INTENTS, WITH PREDICTED FOOTPRINTS</text>
+<text class="t-mut" x="360" y="24" font-size="10" letter-spacing=".07em">THE MERGE PLAN</text>
+<g><title>Add a refund reason: predicted to touch billing/refund.py · api/refund.smithy</title><rect x="14" y="36" width="262" height="40" rx="7" fill="var(--s1)" fill-opacity=".12" stroke="var(--s1)" stroke-width="1.5"/><text class="t-pri" x="25" y="53" font-size="12" font-weight="600">Add a refund reason</text><text class="t-mut" x="25" y="68" font-size="10.5">billing/refund.py · api/refund.smithy</text></g>
+<g><title>Fix refund rounding: predicted to touch billing/refund.py</title><rect x="14" y="83" width="262" height="40" rx="7" fill="var(--s1)" fill-opacity=".12" stroke="var(--s1)" stroke-width="1.5"/><text class="t-pri" x="25" y="100" font-size="12" font-weight="600">Fix refund rounding</text><text class="t-mut" x="25" y="115" font-size="10.5">billing/refund.py</text></g>
+<g><title>Rename a config key: predicted to touch config/app.yaml · AGENTS.md</title><rect x="14" y="130" width="262" height="40" rx="7" fill="var(--s2)" fill-opacity=".12" stroke="var(--s2)" stroke-width="1.5"/><text class="t-pri" x="25" y="147" font-size="12" font-weight="600">Rename a config key</text><text class="t-mut" x="25" y="162" font-size="10.5">config/app.yaml · AGENTS.md</text></g>
+<g><title>Update the onboarding doc: predicted to touch docs/onboarding.md · AGENTS.md</title><rect x="14" y="177" width="262" height="40" rx="7" fill="var(--s2)" fill-opacity=".12" stroke="var(--s2)" stroke-width="1.5"/><text class="t-pri" x="25" y="194" font-size="12" font-weight="600">Update the onboarding doc</text><text class="t-mut" x="25" y="209" font-size="10.5">docs/onboarding.md · AGENTS.md</text></g>
+<g><title>Bump the HTTP client: predicted to touch the lockfile</title><rect x="14" y="224" width="262" height="40" rx="7" fill="none" stroke="var(--axis)" stroke-width="1.5"/><text class="t-pri" x="25" y="241" font-size="12" font-weight="600">Bump the HTTP client</text><text class="t-mut" x="25" y="256" font-size="10.5">the lockfile</text></g>
+<g><title>Add a latency alarm: predicted to touch infra/alarms.ts</title><rect x="14" y="271" width="262" height="40" rx="7" fill="none" stroke="var(--axis)" stroke-width="1.5"/><text class="t-pri" x="25" y="288" font-size="12" font-weight="600">Add a latency alarm</text><text class="t-mut" x="25" y="303" font-size="10.5">infra/alarms.ts</text></g>
+<path d="M278,56 h8 V103 h-8" fill="none" stroke="var(--s1)" stroke-width="1.5"/>
+<text class="t-sec" x="292" y="83.5" font-size="10.5">overlap</text>
+<path d="M278,150 h8 V197 h-8" fill="none" stroke="var(--s2)" stroke-width="1.5"/>
+<text class="t-sec" x="292" y="177.5" font-size="10.5">overlap</text>
+<text class="t-sec" x="360" y="44" font-size="10.5" font-weight="600">run in parallel</text>
+<text class="t-sec" x="548" y="44" font-size="10.5" font-weight="600">stacked, merges after</text>
+<g><title>Add a refund reason: starts now</title><rect x="360" y="54" width="150" height="34" rx="7" fill="var(--s1)" fill-opacity=".12" stroke="var(--s1)" stroke-width="1.5"/><text class="t-pri" x="370" y="75.0" font-size="11.5" font-weight="600">Add a refund reason</text></g>
+<line x1="513" y1="71" x2="539" y2="71" stroke="var(--s1)" stroke-width="1.5" stroke-linecap="round"/><polygon points="545,71 539,67.28 539,74.72" fill="var(--s1)"/>
+<text class="t-mut" x="529" y="65" font-size="9.5" text-anchor="middle">built on</text>
+<g><title>Fix refund rounding: starts from the result of Add a refund reason, and merges after it</title><rect x="548" y="54" width="158" height="34" rx="7" fill="var(--s1)" fill-opacity=".12" stroke="var(--s1)" stroke-width="1.5"/><text class="t-pri" x="558" y="75.0" font-size="11.5" font-weight="600">Fix refund rounding</text></g>
+<g><title>Rename a config key: starts now</title><rect x="360" y="98" width="150" height="34" rx="7" fill="var(--s2)" fill-opacity=".12" stroke="var(--s2)" stroke-width="1.5"/><text class="t-pri" x="370" y="119.0" font-size="11.5" font-weight="600">Rename a config key</text></g>
+<line x1="513" y1="115" x2="539" y2="115" stroke="var(--s2)" stroke-width="1.5" stroke-linecap="round"/><polygon points="545,115 539,111.28 539,118.72" fill="var(--s2)"/>
+<text class="t-mut" x="529" y="109" font-size="9.5" text-anchor="middle">built on</text>
+<g><title>Update onboarding doc: starts from the result of Rename a config key, and merges after it</title><rect x="548" y="98" width="158" height="34" rx="7" fill="var(--s2)" fill-opacity=".12" stroke="var(--s2)" stroke-width="1.5"/><text class="t-pri" x="558" y="119.0" font-size="11.5" font-weight="600">Update onboarding doc</text></g>
+<g><title>Bump the HTTP client: starts now</title><rect x="360" y="142" width="150" height="34" rx="7" fill="none" stroke="var(--axis)" stroke-width="1.5"/><text class="t-pri" x="370" y="163.0" font-size="11.5" font-weight="600">Bump the HTTP client</text></g>
+<g><title>Add a latency alarm: starts now</title><rect x="360" y="186" width="150" height="34" rx="7" fill="none" stroke="var(--axis)" stroke-width="1.5"/><text class="t-pri" x="370" y="207.0" font-size="11.5" font-weight="600">Add a latency alarm</text></g>
+<text class="t-pri" x="360" y="252" font-size="11.5" font-weight="600">No two changes in flight touch the same file.</text>
+<text class="t-mut" x="360" y="268" font-size="10.5">Each stack merges in order. The rest merge in any order.</text>
+<path class="dsh" stroke="var(--lab)" d="M352,291 L292,291"/>
+<polygon points="285,291 293,287 293,295" fill="var(--lab)"/>
+<text class="t-sec" x="360" y="289" font-size="10.5">a diff that leaves its footprint goes</text>
+<text class="t-sec" x="360" y="303" font-size="10.5">back to the planner</text>
+</svg>
+<figcaption>A schematic, not measured data. The planner sees every pending write request and predicts which files each one will touch. Intents that share a file never run side by side: the second starts from the first one’s result and merges after it, as a stack. Everything else runs in parallel. If an agent’s diff touches a file outside its predicted footprint, the change goes back to the planner instead of racing to the trunk.</figcaption>
+</figure>
+<p>A merge planner does four things:</p>
+<ul>
+<li><strong>Predict each footprint.</strong> For each intent, predict the files, symbols, and build targets it will touch, from the spec, the code index, and similar past changes. Ask the agent for a short plan before it codes, and treat the plan as a declaration. Precise specs make the prediction better, one more reason to give specs <a href="the-missing-layer-between-prose-and-code.html">structure</a>.</li>
+<li><strong>Find the overlaps.</strong> Two intents overlap if their footprints share a file. To catch conflicts that a text merge misses, they also overlap if they share build targets downstream.</li>
+<li><strong>Schedule waves and stacks.</strong> Run the intents that do not overlap in parallel. Stack an overlapping intent on its predecessor, so it starts from the predecessor’s result and merges after it. The merge chain is decided up front, not discovered at push time. Fold near-duplicates into one change, give each hot file one writer, and give a waiting agent other work.</li>
+<li><strong>Hold each change to its declaration.</strong> A diff that touches a file outside its footprint goes back to the planner. Detect and repair stay behind the planner as the safety net.</li>
+</ul>
+<p>Databases already work this way. <a href="https://doi.org/10.1145/2213836.2213838">Calvin</a> (SIGMOD 2012) agrees on the order of transactions before it executes any of them, so conflicting transactions run in the agreed order instead of aborting and retrying. Each transaction must declare its read and write sets in advance. When one cannot, Calvin first runs a cheap, read-only reconnaissance query to discover them, and checks at execution time that they still hold. For an agent, the planning pass is the reconnaissance, and the footprint check is the validation.</p>
+<p>Researchers proposed the same for people. <a href="https://doi.org/10.1145/2025113.2025139">Crystal</a> (FSE 2011) merged developers’ work in the background to warn them of conflicts early, and <a href="https://doi.org/10.1109/ICSE.2013.6606619">Cassandra</a> (ICSE 2013) scheduled developers’ tasks to minimize conflicts. Neither changed how teams work, because people choose their own tasks and do not publish their intent before they code. Agents do both by default.</p>
+<p>The pieces exist: merge queues, agents that plan before they code, and stacked pull requests, which GitHub launched in preview on 30 July 2026 and more than 264,000 developers had used by September. What is missing is the piece that decides the stacks before anyone writes the code.</p>
+
+<h3 id="limits">Where planning breaks</h3>
+<ul>
+<li><strong>Wrong predictions.</strong> A footprint is a guess. Measure how often diffs stay inside their footprints, and keep detect and repair behind the planner for the times they do not.</li>
+<li><strong>The planner as a new global lock.</strong> One planner for a whole monorepo would become the bottleneck the merge queue was. Partition planners by ownership boundary, the same move Pando made when it coordinated each branch on its own.</li>
+<li><strong>Waiting in a stack.</strong> A stacked change waits for its predecessor. Urgent fixes need a fast lane.</li>
+<li><strong>Conflicts no footprint shows.</strong> Two changes can touch different files and still break each other. Build-graph footprints catch more of them, and testing after merge catches the rest.</li>
+</ul>
+<p>The planner earns its place if conflicts per merged change fall faster than the time spent waiting in stacks grows.</p>
+<hr>
+<p>Git was designed for people who work offline and reconcile later, so its concurrency is optimistic: everyone writes, and conflicts surface at merge. OpenAI and Anthropic have shown that the storage side of source control can scale to agents, by rebuilding the server. Coordination is next. Agents are always online, their intents are written down, and they accept a schedule. The next source control system will be a faster server, and also a scheduler that decides who writes what, and in which order, before the code exists.</p>
+
+<h3 id="references">References</h3>
+<ul><li><a href="https://www.anthropic.com/research/redesigning-source-control">Redesigning source control at Anthropic</a> — Anthropic, 13 October 2026</li><li><a href="https://openai.com/index/scaling-git-at-openai/">Scaling Git at OpenAI</a> — Aaron Friel, Taylor Blau, and Ted Nyman, OpenAI, 2 November 2026</li><li><a href="https://github.blog/news-insights/octoverse/octoverse-commits-pushes-reach-new-highs-in-2026-as-developers-build-with-agents/">Octoverse: Commits, pushes, reach new highs in 2026 as developers build with agents</a> — GitHub, 28 October 2026</li><li><a href="https://agents.md/">AGENTS.md</a> — an open format for guiding coding agents</li><li><a href="https://doi.org/10.1145/2213836.2213838">Thomson et al. — Calvin: Fast Distributed Transactions for Partitioned Database Systems</a>, SIGMOD 2012</li><li><a href="https://doi.org/10.1145/2025113.2025139">Brun, Holmes, Ernst, and Notkin — Proactive Detection of Collaboration Conflicts</a>, ESEC/FSE 2011</li><li><a href="https://doi.org/10.1109/ICSE.2013.6606619">Kasi and Sarma — Cassandra: Proactive Conflict Minimization through Optimized Task Scheduling</a>, ICSE 2013</li><li><a href="https://doi.org/10.1145/3302424.3303970">Ananthanarayanan et al. — SubmitQueue</a>, EuroSys 2019</li></ul>
+</main>
+</div></body></html>

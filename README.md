@@ -6,6 +6,7 @@ The `.html` files in this repo are the source for each post. GitHub shows them a
 
 ## Posts
 
+- [From Merge Queues to Merge Plans: What OpenAI’s and Anthropic’s Git Rewrites Leave Unsolved](https://aqiaojoe08.github.io/blog/from-merge-queues-to-merge-plans.html) (2026-11-19)
 - [Everything as Code, Reviewed by Agents: Ending Fragmentation in a Federated Architecture](https://aqiaojoe08.github.io/blog/everything-as-code-reviewed-by-agents.html) (2026-11-17)
 - [Stateless Apps, Central Data: What the Agentic Ecosystem Is Missing](https://aqiaojoe08.github.io/blog/stateless-apps-central-data.html) (2026-11-17)
 - [Innovation Tree: From Fragmented Innovation to Collective Innovation](https://aqiaojoe08.github.io/blog/innovation-tree.html) (2026-11-14)
