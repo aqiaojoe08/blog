@@ -100,7 +100,7 @@ pre{line-height:1.5}
 <header class="mast">
 <h1>From Merge Queues to Merge Plans: What OpenAI’s and Anthropic’s Git Rewrites Leave Unsolved</h1>
 <p class="sub">Agents pushed both labs past what their source control could handle, and both rebuilt it within months. They fixed the bytes: pushes, fetches, and checkouts. Neither fixed the race of many writers on one trunk. Agents can fix that in a way people never could, by planning the writes instead of racing them.</p>
-<div class="meta"><span>2,700 words</span><span>~12 min read</span><span>2026-11-19</span></div>
+<div class="meta"><span>3,100 words</span><span>~14 min read</span><span>2026-11-19</span></div>
 </header>
 <main>
 <div class="tldr">
@@ -110,6 +110,7 @@ pre{line-height:1.5}
 <li>Both fixed the bytes: pushes, fetches, and checkouts. Neither fixed coordination: many writers, one trunk. Pando still orders pushes to the same branch, and Anthropic gave up the merge-queue lock and lets Claude repair conflicts after they land.</li>
 <li>Velocity and documentation as code will keep pushing the load up. New servers, source control as an API, and cheap repair absorb much of it, but none of them removes the race for the trunk.</li>
 <li>The disruptive move is a planner that sees every write request before any code exists, predicts what each will touch, and schedules parallel waves and stacked chains. Conflicts are avoided instead of discovered at push time.</li>
+<li>When a conflict still happens, rebase the spec, not the code: turn the diff back into a precise spec, rebase, and regenerate the code. The spec is the asset worth keeping. Have people contribute specs, one concern each, and they rarely conflict.</li>
 </ul>
 </div>
 
@@ -167,10 +168,10 @@ pre{line-height:1.5}
 <line class="ax" x1="52" y1="236" x2="704" y2="236"/>
 <text class="t-sec" x="597.25" y="127.23" font-size="11" font-style="italic" text-anchor="end">about 4× from Q4 2025 to Q3 2026</text>
 </svg>
-<figcaption>Data from OpenAI’s “Scaling Git at OpenAI” (2 November 2026), which reports growth in commits landed on the main branch relative to Q1 2024; here each quarter is shown as a multiple of Q1 2024. The outlined Q4 2026 bar is OpenAI’s base-case estimate. Anthropic reports the same curve in a different unit: about 2,500 changes merged per day in May 2026, and more than 30,000 per day in September.</figcaption>
+<figcaption>Data from OpenAI’s “Scaling Git at OpenAI” (2 November 2026), which reports growth in commits landed on the main branch relative to Q1 2024; here each quarter is shown as a multiple of Q1 2024. The outlined Q4 2026 bar is OpenAI’s base-case estimate.</figcaption>
 </figure>
 <p>Both name the same cause. Anthropic: “coding is no longer the bottleneck … The bottleneck, now, is all of the developer infrastructure built for human scale: source control, builds, and CI.” OpenAI: “One engineer now has several changes ready for CI at once, and each push can set several jobs fetching the same commit.”</p>
-<p>The labs are first, not alone. GitHub’s <a href="https://github.blog/news-insights/octoverse/octoverse-commits-pushes-reach-new-highs-in-2026-as-developers-build-with-agents/">Octoverse 2026</a> counts 3.5 million merged pull requests a day, more than three times the rate of two years ago, and more than 40% of pull requests now start with an agent. Anthropic expects this class of problems to become more common over the next six to twelve months. Small teams already feel a small version of it: a few people and their agents in one codebase get a steady stream of merge conflicts and slow rebases.</p>
+<p>The labs hit it first. GitHub’s <a href="https://github.blog/news-insights/octoverse/octoverse-commits-pushes-reach-new-highs-in-2026-as-developers-build-with-agents/">Octoverse 2026</a> counts 3.5 million merged pull requests a day, more than three times the rate of two years ago, and more than 40% of pull requests now start with an agent. Anthropic expects this class of problems to become more common over the next six to twelve months. Small teams already feel a small version of it: a few people and their agents in one codebase get a steady stream of merge conflicts and slow rebases.</p>
 
 <h2 id="bytes">What they fixed: the bytes</h2>
 <p>The two take opposite routes. OpenAI kept Git’s protocol and client and replaced the server. Anthropic replaced git, and moved most of the work to the server.</p>
@@ -198,21 +199,21 @@ pre{line-height:1.5}
 <hr>
 
 <h2 id="up">What keeps pushing the load up</h2>
-<p><strong>Velocity.</strong> Agents raise both the number of changes and the number in flight at once. OpenAI’s trunk commits grew about four times in the three quarters to Q3 2026, and Anthropic’s merges grew twelve times in four months. Anthropic expects no slowdown: “the latent demand for merging code is practically infinite, and every bottleneck we remove immediately leads to a further increase in the amount of code we produce.” Smaller changes, which every agent workflow encourages, make review easier and merges more frequent.</p>
+<p><strong>Velocity.</strong> Agents raise both the number of changes and the number in flight at once, and Anthropic expects no slowdown: “the latent demand for merging code is practically infinite, and every bottleneck we remove immediately leads to a further increase in the amount of code we produce.” Smaller changes, which every agent workflow encourages, make review easier and merges more frequent.</p>
 <p><strong>Documentation as code.</strong> I have argued for more of it on this blog: <a href="agent-memory-is-a-team-document.html">agent memory as a team document</a> in the repo, and <a href="everything-as-code-reviewed-by-agents.html">data contracts, skills, agent specs, and review rules as code</a>. Each of those adds Git load, in three ways:</p>
 <ul>
 <li><strong>Wider changes.</strong> A change updates the code, the spec, and the docs together. On GitHub, 87% of agent-started pull requests change more than one file, against 79% of the rest.</li>
 <li><strong>Hot files.</strong> A root <code>AGENTS.md</code>, a shared spec index, a changelog, a lockfile: files that unrelated changes all touch. A hot file turns independent work into conflicting work.</li>
 <li><strong>More readers.</strong> Every agent session reads the context files before it writes anything. GitHub found that new repositories with an agent configuration file logged eight times as many commits as new repositories without one. That is a correlation, not a cause, but it points the same way.</li>
 </ul>
-<p><strong>Readers multiply faster than writers.</strong> Each change starts CI jobs, agent sandboxes, and eval runs, and each wants a checkout. Anthropic’s 25 million checkouts a day come to roughly 800 for every merged change. Fetched naively, Anthropic estimates, that would be more than 600 PB of git traffic a day.</p>
+<p><strong>Readers multiply faster than writers.</strong> Each change starts CI jobs, agent sandboxes, and eval runs, and each wants a checkout. Anthropic’s CI alone runs about 25 million checkouts a day, roughly 800 for every merged change, before counting developer environments, agent sandboxes, and research jobs. Fetched naively, Anthropic estimates, that would be more than 600 PB of git traffic a day.</p>
 
 <h2 id="absorb">What absorbs it</h2>
 <ul>
 <li><strong>New servers behind the same client.</strong> Pando shows that the Git protocol is not the limit: coordinate each branch on its own, serve the same packs to many readers, and cache near the clients. OpenAI sends its Git client fixes upstream, and Anthropic suggests server-side APIs that forges could standardize.</li>
 <li><strong>Source control as an API.</strong> When the server answers diff, blame, merge-base, and history, most jobs need no clone at all. The rest check out sparsely and pay only for what they read.</li>
 <li><strong>Fewer branches.</strong> Scion discourages refs other than the main and release branches. Agent work becomes short-lived changes on the server, not branches that live for weeks.</li>
-<li><strong>Cheap repair.</strong> A conflict that an agent resolves in a minute is not the problem it was for a person who lost an afternoon to a rebase. Anthropic runs its monorepo on this.</li>
+<li><strong>Cheap repair.</strong> A conflict that an agent resolves in a minute is not the problem it was for a person who lost an afternoon to a rebase. Anthropic relies on it.</li>
 <li><strong>Hot files designed away.</strong> The <a href="https://agents.md/">AGENTS.md</a> guidance already recommends a nested file per package in a large monorepo, so no single file is edited by every change. The same works elsewhere: a changelog fragment per change, and indexes generated on merge instead of edited by hand. A generated file has one writer, the build.</li>
 </ul>
 <p>Weighing the two sides, here is what I expect over the next 12 to 24 months:</p>
@@ -267,7 +268,7 @@ pre{line-height:1.5}
 </figure>
 <p>A merge planner does four things:</p>
 <ul>
-<li><strong>Predict each footprint.</strong> For each intent, predict the files, symbols, and build targets it will touch, from the spec, the code index, and similar past changes. Ask the agent for a short plan before it codes, and treat the plan as a declaration. Precise specs make the prediction better, one more reason to give specs <a href="the-missing-layer-between-prose-and-code.html">structure</a>.</li>
+<li><strong>Predict each footprint.</strong> For each intent, predict the files, symbols, and build targets it will touch, from the spec, the code index, and similar past changes. Ask the agent for a short plan before it codes, and treat the plan as a declaration. Precise specs make the prediction better.</li>
 <li><strong>Find the overlaps.</strong> Two intents overlap if their footprints share a file. To catch conflicts that a text merge misses, they also overlap if they share build targets downstream.</li>
 <li><strong>Schedule waves and stacks.</strong> Run the intents that do not overlap in parallel. Stack an overlapping intent on its predecessor, so it starts from the predecessor’s result and merges after it. The merge chain is decided up front, not discovered at push time. Fold near-duplicates into one change, give each hot file one writer, and give a waiting agent other work.</li>
 <li><strong>Hold each change to its declaration.</strong> A diff that touches a file outside its footprint goes back to the planner. Detect and repair stay behind the planner as the safety net.</li>
@@ -283,9 +284,17 @@ pre{line-height:1.5}
 <li><strong>Waiting in a stack.</strong> A stacked change waits for its predecessor. Urgent fixes need a fast lane.</li>
 <li><strong>Conflicts no footprint shows.</strong> Two changes can touch different files and still break each other. Build-graph footprints catch more of them, and testing after merge catches the rest.</li>
 </ul>
-<p>The planner earns its place if conflicts per merged change fall faster than the time spent waiting in stacks grows.</p>
+<p>The planner earns its place if the time it saves on rebases and repairs is more than the time changes spend waiting in stacks.</p>
+
+<h2 id="rebase-the-spec">Rebase the spec, not the code</h2>
+<p>Planning will not prevent every conflict. In practice, when I find that my code has a major conflict with the existing codebase, I no longer resolve it line by line. I reverse the diff into a specification of what my change does, rebase onto the new trunk, translate the specification back into code, and push again.</p>
+<p><strong>Conflicting diff → Specification of the change → Rebase → Regenerated code → Push</strong></p>
+<p>The old diff was written against a codebase that no longer exists, but the intent behind it still applies. So I keep the intent and throw away the diff. An agent regenerates the code faster than I could untangle the conflict, and the new code is written for the trunk as it is now, not patched onto it. It is repair, done one level up: on the spec instead of the code.</p>
+<p>That shows which artifact is worth more. The code can be regenerated; the specification cannot. And the specification has to be precise, because a vague one regenerates into different behaviour each time. That is why specs need <a href="the-missing-layer-between-prose-and-code.html">structure</a>.</p>
+<p>So make people contribute specifications, not only code. Code changes collide whenever they touch the same lines, even when their intents are independent: two features that each add a field to the same type, or an entry to the same config file. A specification can cover one concern, such as one behaviour, one rule, or one interface, in its own file. Specs written that way are orthogonal to each other, so they rarely conflict, even when the code generated from them shares files: that code is regenerated on the latest trunk.</p>
+<p>When two specs do conflict, it is a real disagreement about intent, and worth a person’s attention, instead of an accident of where two diffs landed. Orthogonal specs make the planner’s job easier too, because the work they describe rarely overlaps.</p>
 <hr>
-<p>Git was designed for people who work offline and reconcile later, so its concurrency is optimistic: everyone writes, and conflicts surface at merge. OpenAI and Anthropic have shown that the storage side of source control can scale to agents, by rebuilding the server. Coordination is next. Agents are always online, their intents are written down, and they accept a schedule. The next source control system will be a faster server, and also a scheduler that decides who writes what, and in which order, before the code exists.</p>
+<p>Git was designed for people who work offline and reconcile later, so its concurrency is optimistic: everyone writes, and conflicts surface at merge. OpenAI and Anthropic have shown that the storage side of source control can scale to agents, by rebuilding the server. Coordination is next. Agents are always online, their intents are written down, and they accept a schedule. The next source control system will be a faster server, and also a scheduler that decides who writes what, and in which order, before the code exists. What it guards most carefully will be the specs, because the code can be regenerated from them.</p>
 
 <h3 id="references">References</h3>
 <ul><li><a href="https://www.anthropic.com/research/redesigning-source-control">Redesigning source control at Anthropic</a> — Anthropic, 13 October 2026</li><li><a href="https://openai.com/index/scaling-git-at-openai/">Scaling Git at OpenAI</a> — Aaron Friel, Taylor Blau, and Ted Nyman, OpenAI, 2 November 2026</li><li><a href="https://github.blog/news-insights/octoverse/octoverse-commits-pushes-reach-new-highs-in-2026-as-developers-build-with-agents/">Octoverse: Commits, pushes, reach new highs in 2026 as developers build with agents</a> — GitHub, 28 October 2026</li><li><a href="https://agents.md/">AGENTS.md</a> — an open format for guiding coding agents</li><li><a href="https://doi.org/10.1145/2213836.2213838">Thomson et al. — Calvin: Fast Distributed Transactions for Partitioned Database Systems</a>, SIGMOD 2012</li><li><a href="https://doi.org/10.1145/2025113.2025139">Brun, Holmes, Ernst, and Notkin — Proactive Detection of Collaboration Conflicts</a>, ESEC/FSE 2011</li><li><a href="https://doi.org/10.1109/ICSE.2013.6606619">Kasi and Sarma — Cassandra: Proactive Conflict Minimization through Optimized Task Scheduling</a>, ICSE 2013</li><li><a href="https://doi.org/10.1145/3302424.3303970">Ananthanarayanan et al. — SubmitQueue</a>, EuroSys 2019</li></ul>
