@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Easing the Human on the Loop When You Cannot Be Close to the Details</title>
+<style>
+:root{
+  --bg:#fbfaf8; --panel:#fff; --ink:#1c1b1a; --muted:#5f5b56; --faint:#8b857e;
+  --rule:#e6e2dc; --accent:#8a5a2b; --accent-soft:#f4ede4; --code-bg:#f6f4f1;
+}
+@media (prefers-color-scheme:dark){
+  :root{ --bg:#16171a; --panel:#1c1e22; --ink:#e8e6e3; --muted:#a7a29b; --faint:#857f78;
+         --rule:#2d3035; --accent:#d9a05b; --accent-soft:#25262a; --code-bg:#21242a; }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:17px/1.72 ui-serif,Georgia,'Iowan Old Style','Times New Roman',serif;
+  padding:0 1.25rem 6rem;}
+.wrap{max-width:46rem;margin:0 auto}
+header.mast{padding:4.5rem 0 0;border-bottom:1px solid var(--rule);margin-bottom:2.5rem}
+h1{font-size:2.3rem;line-height:1.18;letter-spacing:-.02em;margin:0 0 1rem;font-weight:600}
+header.mast p.sub{color:var(--muted);font-style:italic;margin:0 0 2.2rem;font-size:1.02rem}
+.meta{display:flex;gap:1.4rem;flex-wrap:wrap;font-family:ui-sans-serif,system-ui,sans-serif;
+  font-size:.76rem;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);
+  padding-bottom:1.4rem}
+h2{font-size:1.5rem;line-height:1.25;letter-spacing:-.01em;margin:3.4rem 0 1rem;font-weight:600;
+  padding-top:.4rem}
+h3{font-size:1.13rem;margin:2.4rem 0 .7rem;font-weight:600;
+  font-family:ui-sans-serif,system-ui,sans-serif;letter-spacing:-.005em}
+p{margin:0 0 1.15rem}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid color-mix(in oklab,var(--accent) 35%,transparent)}
+a:hover{border-bottom-color:var(--accent)}
+strong{font-weight:650}
+hr{border:0;height:1px;background:var(--rule);margin:2.8rem 0}
+ul,ol{margin:0 0 1.3rem;padding-left:1.35rem}
+li{margin:0 0 .62rem}
+li>p{margin:0 0 .6rem}
+blockquote{margin:1.5rem 0;padding:.2rem 0 .2rem 1.3rem;border-left:3px solid var(--accent);
+  color:var(--muted)}
+blockquote p{margin:0 0 .6rem}
+blockquote p:last-child{margin:0}
+code{font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,monospace;font-size:.855em;
+  background:var(--code-bg);padding:.13em .38em;border-radius:4px;
+  border:1px solid color-mix(in oklab,var(--rule) 70%,transparent)}
+pre{background:var(--code-bg);border:1px solid var(--rule);border-radius:8px;
+  padding:1rem 1.1rem;overflow-x:auto;margin:0 0 1.4rem}
+pre code{background:none;border:0;padding:0;font-size:.8rem;line-height:1.62}
+.tw{overflow-x:auto;margin:0 0 1.6rem;border:1px solid var(--rule);border-radius:8px;
+  background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-family:ui-sans-serif,system-ui,sans-serif;
+  font-size:.845rem;line-height:1.5}
+th{text-align:left;font-weight:600;background:var(--accent-soft);color:var(--ink);
+  padding:.68rem .8rem;border-bottom:1px solid var(--rule);vertical-align:bottom;
+  font-size:.78rem;letter-spacing:.02em}
+td{padding:.66rem .8rem;border-bottom:1px solid color-mix(in oklab,var(--rule) 60%,transparent);
+  vertical-align:top;color:var(--muted)}
+td:first-child{color:var(--ink)}
+tbody tr:last-child td{border-bottom:0}
+@media (max-width:640px){
+  body{font-size:16px;padding:0 1rem 4rem}
+  h1{font-size:1.85rem} h2{font-size:1.32rem}
+  header.mast{padding-top:2.5rem}
+}
+@media print{
+  body{background:#fff;color:#000;font-size:11pt}
+  .tw,pre{break-inside:avoid} h2,h3{break-after:avoid}
+}
+.tldr{background:var(--accent-soft);border:1px solid var(--rule);border-radius:8px;padding:1.1rem 1.3rem .4rem;margin:0 0 2.4rem;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.93rem;line-height:1.6}
+.tldr .tl-h{font-size:.74rem;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);margin:0 0 .5rem}
+.tldr ul{margin:0 0 .8rem}
+.tldr li{margin:0 0 .45rem}
+.fig{--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--o1:#1c5cab;--o2:#2a78d6;--o3:#5598e7;--o4:#86b6ef;
+  --grid:#e1e0d9;--axis:#c3c2b7;--lab:#898781;
+  margin:2.1rem 0 2.3rem;border:1px solid var(--rule);border-radius:8px;background:var(--panel);
+  padding:1.1rem 1.15rem .95rem}
+@media (prefers-color-scheme:dark){.fig{--s1:#3987e5;--s2:#d95926;--s3:#199e70;
+  --o1:#184f95;--o2:#256abf;--o3:#3987e5;--o4:#6da7ec;--grid:#2c2c2a;--axis:#383835}}
+.fig svg{display:block;width:100%;height:auto}
+.fig .ft{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.86rem;font-weight:600;
+  color:var(--ink);margin:0 0 .55rem;line-height:1.35}
+.fig figcaption{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.76rem;line-height:1.55;
+  color:var(--muted);margin:.8rem 0 0}
+.fig .lgd{display:flex;flex-wrap:wrap;gap:.3rem 1.1rem;font-family:ui-sans-serif,system-ui,sans-serif;
+  font-size:.76rem;color:var(--muted);margin:0 0 .75rem}
+.fig .lgd span{display:inline-flex;align-items:center;gap:.4rem}
+.fig .lgd i{width:10px;height:10px;border-radius:3px;display:inline-block;flex:0 0 auto}
+.fig text{font-family:ui-sans-serif,system-ui,sans-serif}
+.fig .t-pri{fill:var(--ink)}.fig .t-sec{fill:var(--muted)}.fig .t-mut{fill:var(--lab)}
+.fig .gr{stroke:var(--grid);stroke-width:1;fill:none}
+.fig .ax{stroke:var(--axis);stroke-width:1;fill:none}
+.fig .ln{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.fig .dsh{fill:none;stroke-width:1.5;stroke-dasharray:4 5}
+.fig .box{fill:none;stroke-width:1.5}
+pre{line-height:1.5}
+</style>
+<style>.fig{--chg:#c2449a}@media (prefers-color-scheme:dark){.fig{--chg:#d05aa8}}</style>
+</head>
+<body><div class="wrap">
+<nav style="padding-top:1.6rem;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.85rem"><a href="./" style="border:0">&larr; All posts</a></nav>
+<header class="mast">
+<h1>Easing the Human on the Loop When You Cannot Be Close to the Details</h1>
+<p class="sub">Agents now write code faster than anyone can read it. My own commits went from 25 in 2024 to more than 3,000 in 2026. I cannot stay close to the details, not because I do not want to, but because review does not scale to that speed. For systems with a high change blast radius, a person must still be on the loop. This is how I review the changes my agent makes.</p>
+<div class="meta"><span>1,200 words</span><span>~6 min read</span><span>2026-11-22</span></div>
+</header>
+<main>
+<div class="tldr">
+<p class="tl-h">In short</p>
+<ul>
+<li>My commits went from 25 in 2024 to 3,033 in 2026. Nobody chooses to drift away from the details; review just cannot scale to the speed of generation.</li>
+<li>For systems with a high change blast radius, I stay on the loop: AutoSDE reviews apply the agreed rules, a blind-spot reviewer checks my considerations, and a change visualizer shows the change at the spec level.</li>
+</ul>
+</div>
+
+<h2 id="cannot">You cannot stay close to the details</h2>
+<p>Code generation has sped up far more than reading has. My own commit history shows it: from 25 commits in all of 2024 to 897 in March 2026 alone. Anthropic sees the same at scale; its engineers “now examine the intent of the change as opposed to reading every line of code” (<a href="https://www.anthropic.com/research/redesigning-source-control">Anthropic</a>). Nobody chose to drift away from the details. Review cannot scale to the speed of generation.</p>
+<figure class="fig">
+<p class="ft">My commits per month, January 2025 to November 2026</p>
+<svg viewBox="0 0 720 282" role="img" aria-labelledby="figC-t figC-d">
+<title id="figC-t">My commits per month, January 2025 to November 2026</title><desc id="figC-d">Monthly bar chart of my commits. January 2025: 0; February 2025: 4; March 2025: 1; April 2025: 0; May 2025: 0; June 2025: 2; July 2025: 37; August 2025: 0; September 2025: 9; October 2025: 82; November 2025: 166; December 2025: 31; January 2026: 7; February 2026: 833; March 2026: 897; April 2026: 172; May 2026: 590; June 2026: 99; July 2026: 82; August 2026: 47; September 2026: 120; October 2026: 20; November 2026: 166. Totals: 332 in 2025 and 3033 in 2026 through November 22.</desc>
+<line class="gr" x1="50" y1="193" x2="706" y2="193"/>
+<text class="t-mut" x="42" y="196.5" font-size="10" text-anchor="end">250</text>
+<line class="gr" x1="50" y1="146" x2="706" y2="146"/>
+<text class="t-mut" x="42" y="149.5" font-size="10" text-anchor="end">500</text>
+<line class="gr" x1="50" y1="99" x2="706" y2="99"/>
+<text class="t-mut" x="42" y="102.5" font-size="10" text-anchor="end">750</text>
+<line class="gr" x1="50" y1="52" x2="706" y2="52"/>
+<text class="t-mut" x="42" y="55.5" font-size="10" text-anchor="end">1,000</text>
+<text class="t-mut" x="42" y="243" font-size="10" text-anchor="end">0</text>
+<path class="ax" d="M54,36 V31 H388.26 V36"/>
+<text class="t-sec" x="221.13" y="24" font-size="11" text-anchor="middle">2025 · 332 commits</text>
+<path class="ax" d="M396.26,36 V31 H702 V36"/>
+<text class="t-sec" x="549.13" y="24" font-size="11" text-anchor="middle">2026 · 3,033 commits, through November 22</text>
+<g><title>January 2025: 0 commits</title><rect x="50" y="40" width="28.52" height="200" fill="transparent"/></g>
+<text class="t-mut" x="64.26" y="256" font-size="10" text-anchor="middle">J</text>
+<text class="t-sec" x="60.26" y="273" font-size="10.5">2025</text>
+<g><title>February 2025: 4 commits</title><rect x="78.52" y="40" width="28.52" height="200" fill="transparent"/><path d="M83.78,240 V239.25 a0.75,0.75 0 0 1 0.75,-0.75 H101.03 a0.75,0.75 0 0 1 0.75,0.75 V240 z" fill="var(--s1)"/></g>
+<text class="t-mut" x="92.78" y="256" font-size="10" text-anchor="middle">F</text>
+<g><title>March 2025: 1 commit</title><rect x="107.04" y="40" width="28.52" height="200" fill="transparent"/><path d="M112.3,240 V239.25 a0.75,0.75 0 0 1 0.75,-0.75 H129.55 a0.75,0.75 0 0 1 0.75,0.75 V240 z" fill="var(--s1)"/></g>
+<text class="t-mut" x="121.3" y="256" font-size="10" text-anchor="middle">M</text>
+<g><title>April 2025: 0 commits</title><rect x="135.57" y="40" width="28.52" height="200" fill="transparent"/></g>
+<text class="t-mut" x="149.83" y="256" font-size="10" text-anchor="middle">A</text>
+<g><title>May 2025: 0 commits</title><rect x="164.09" y="40" width="28.52" height="200" fill="transparent"/></g>
+<text class="t-mut" x="178.35" y="256" font-size="10" text-anchor="middle">M</text>
+<g><title>June 2025: 2 commits</title><rect x="192.61" y="40" width="28.52" height="200" fill="transparent"/><path d="M197.87,240 V239.25 a0.75,0.75 0 0 1 0.75,-0.75 H215.12 a0.75,0.75 0 0 1 0.75,0.75 V240 z" fill="var(--s1)"/></g>
+<text class="t-mut" x="206.87" y="256" font-size="10" text-anchor="middle">J</text>
+<g><title>July 2025: 37 commits</title><rect x="221.13" y="40" width="28.52" height="200" fill="transparent"/><path d="M226.39,240 V236.52 a3.48,3.48 0 0 1 3.48,-3.48 H240.91 a3.48,3.48 0 0 1 3.48,3.48 V240 z" fill="var(--s1)"/></g>
+<text class="t-mut" x="235.39" y="256" font-size="10" text-anchor="middle">J</text>
+<g><title>August 2025: 0 commits</title><rect x="249.65" y="40" width="28.52" height="200" fill="transparent"/></g>
+<text class="t-mut" x="263.91" y="256" font-size="10" text-anchor="middle">A</text>
+<g><title>September 2025: 9 commits</title><rect x="278.17" y="40" width="28.52" height="200" fill="transparent"/><path d="M283.43,240 V239.15 a0.85,0.85 0 0 1 0.85,-0.85 H300.59 a0.85,0.85 0 0 1 0.85,0.85 V240 z" fill="var(--s1)"/></g>
+<text class="t-mut" x="292.43" y="256" font-size="10" text-anchor="middle">S</text>
+<g><title>October 2025: 82 commits</title><rect x="306.7" y="40" width="28.52" height="200" fill="transparent"/><path d="M311.96,240 V228.58 a4,4 0 0 1 4,-4 H325.96 a4,4 0 0 1 4,4 V240 z" fill="var(--s1)"/></g>
+<text class="t-mut" x="320.96" y="256" font-size="10" text-anchor="middle">O</text>
+<g><title>November 2025: 166 commits</title><rect x="335.22" y="40" width="28.52" height="200" fill="transparent"/><path d="M340.48,240 V212.79 a4,4 0 0 1 4,-4 H354.48 a4,4 0 0 1 4,4 V240 z" fill="var(--s1)"/><text class="t-sec" x="349.48" y="202.79" font-size="10" text-anchor="middle">166</text></g>
+<text class="t-mut" x="349.48" y="256" font-size="10" text-anchor="middle">N</text>
+<g><title>December 2025: 31 commits</title><rect x="363.74" y="40" width="28.52" height="200" fill="transparent"/><path d="M369,240 V237.09 a2.91,2.91 0 0 1 2.91,-2.91 H384.09 a2.91,2.91 0 0 1 2.91,2.91 V240 z" fill="var(--s1)"/></g>
+<text class="t-mut" x="378" y="256" font-size="10" text-anchor="middle">D</text>
+<g><title>January 2026: 7 commits</title><rect x="392.26" y="40" width="28.52" height="200" fill="transparent"/><path d="M397.52,240 V239.25 a0.75,0.75 0 0 1 0.75,-0.75 H414.77 a0.75,0.75 0 0 1 0.75,0.75 V240 z" fill="var(--s1)"/></g>
+<text class="t-mut" x="406.52" y="256" font-size="10" text-anchor="middle">J</text>
+<text class="t-sec" x="402.52" y="273" font-size="10.5">2026</text>
+<g><title>February 2026: 833 commits</title><rect x="420.78" y="40" width="28.52" height="200" fill="transparent"/><path d="M426.04,240 V87.4 a4,4 0 0 1 4,-4 H440.04 a4,4 0 0 1 4,4 V240 z" fill="var(--s1)"/><text class="t-sec" x="435.04" y="77.4" font-size="10" text-anchor="middle">833</text></g>
+<text class="t-mut" x="435.04" y="256" font-size="10" text-anchor="middle">F</text>
+<g><title>March 2026: 897 commits</title><rect x="449.3" y="40" width="28.52" height="200" fill="transparent"/><path d="M454.57,240 V75.36 a4,4 0 0 1 4,-4 H468.57 a4,4 0 0 1 4,4 V240 z" fill="var(--s1)"/><text class="t-sec" x="463.57" y="65.36" font-size="10" text-anchor="middle">897</text></g>
+<text class="t-mut" x="463.57" y="256" font-size="10" text-anchor="middle">M</text>
+<g><title>April 2026: 172 commits</title><rect x="477.83" y="40" width="28.52" height="200" fill="transparent"/><path d="M483.09,240 V211.66 a4,4 0 0 1 4,-4 H497.09 a4,4 0 0 1 4,4 V240 z" fill="var(--s1)"/></g>
+<text class="t-mut" x="492.09" y="256" font-size="10" text-anchor="middle">A</text>
+<g><title>May 2026: 590 commits</title><rect x="506.35" y="40" width="28.52" height="200" fill="transparent"/><path d="M511.61,240 V133.08 a4,4 0 0 1 4,-4 H525.61 a4,4 0 0 1 4,4 V240 z" fill="var(--s1)"/><text class="t-sec" x="520.61" y="123.08" font-size="10" text-anchor="middle">590</text></g>
+<text class="t-mut" x="520.61" y="256" font-size="10" text-anchor="middle">M</text>
+<g><title>June 2026: 99 commits</title><rect x="534.87" y="40" width="28.52" height="200" fill="transparent"/><path d="M540.13,240 V225.39 a4,4 0 0 1 4,-4 H554.13 a4,4 0 0 1 4,4 V240 z" fill="var(--s1)"/></g>
+<text class="t-mut" x="549.13" y="256" font-size="10" text-anchor="middle">J</text>
+<g><title>July 2026: 82 commits</title><rect x="563.39" y="40" width="28.52" height="200" fill="transparent"/><path d="M568.65,240 V228.58 a4,4 0 0 1 4,-4 H582.65 a4,4 0 0 1 4,4 V240 z" fill="var(--s1)"/></g>
+<text class="t-mut" x="577.65" y="256" font-size="10" text-anchor="middle">J</text>
+<g><title>August 2026: 47 commits</title><rect x="591.91" y="40" width="28.52" height="200" fill="transparent"/><path d="M597.17,240 V235.16 a4,4 0 0 1 4,-4 H611.17 a4,4 0 0 1 4,4 V240 z" fill="var(--s1)"/></g>
+<text class="t-mut" x="606.17" y="256" font-size="10" text-anchor="middle">A</text>
+<g><title>September 2026: 120 commits</title><rect x="620.43" y="40" width="28.52" height="200" fill="transparent"/><path d="M625.7,240 V221.44 a4,4 0 0 1 4,-4 H639.7 a4,4 0 0 1 4,4 V240 z" fill="var(--s1)"/></g>
+<text class="t-mut" x="634.7" y="256" font-size="10" text-anchor="middle">S</text>
+<g><title>October 2026: 20 commits</title><rect x="648.96" y="40" width="28.52" height="200" fill="transparent"/><path d="M654.22,240 V238.12 a1.88,1.88 0 0 1 1.88,-1.88 H670.34 a1.88,1.88 0 0 1 1.88,1.88 V240 z" fill="var(--s1)"/></g>
+<text class="t-mut" x="663.22" y="256" font-size="10" text-anchor="middle">O</text>
+<g><title>November 2026: 166 commits, through the 22nd</title><rect x="677.48" y="40" width="28.52" height="200" fill="transparent"/><path d="M682.74,240 V212.79 a4,4 0 0 1 4,-4 H696.74 a4,4 0 0 1 4,4 V240 z" fill="var(--s1)"/><text class="t-sec" x="691.74" y="202.79" font-size="10" text-anchor="middle">166</text></g>
+<text class="t-mut" x="691.74" y="256" font-size="10" text-anchor="middle">N</text>
+<line class="ax" x1="50" y1="240" x2="706" y2="240"/>
+</svg>
+<figcaption>Commits I authored on the main branch of every repository on my laptop; a rebased commit counts once. November 2026 runs through the 22nd.</figcaption>
+<details style="font-family:ui-sans-serif,system-ui,sans-serif;font-size:.76rem;margin:.7rem 0 0"><summary style="cursor:pointer;color:var(--muted)">Data table</summary><div class="tw" style="margin:.5rem 0 0"><table><thead><tr><th>Year</th><th>Jan</th><th>Feb</th><th>Mar</th><th>Apr</th><th>May</th><th>Jun</th><th>Jul</th><th>Aug</th><th>Sep</th><th>Oct</th><th>Nov</th><th>Dec</th><th>Total</th></tr></thead><tbody><tr><td>2025</td><td>0</td><td>4</td><td>1</td><td>0</td><td>0</td><td>2</td><td>37</td><td>0</td><td>9</td><td>82</td><td>166</td><td>31</td><td>332</td></tr><tr><td>2026</td><td>7</td><td>833</td><td>897</td><td>172</td><td>590</td><td>99</td><td>82</td><td>47</td><td>120</td><td>20</td><td>166</td><td>–</td><td>3,033</td></tr></tbody></table></div></details>
+</figure>
+<p>A new language widens the gap. In September, my agent ported a numerical component from Java to Rust, a language I am not familiar with: almost 21,000 lines of Rust in one change. Read line by line, it leaves two bad options: approve what I do not understand, or block on what I cannot judge. The questions that matter need no Rust: does the port give the same numbers as the Java code, where does it differ on purpose, and what happens on a path it does not support?</p>
+<p>Some systems can absorb a bad change. Those with a high change blast radius, such as payments, identity, or shared infrastructure, cannot, so a person must stay on the loop. In the loop, a person approves every line, which no longer scales. On the loop, the agent writes and fixes the code, and the person supplies the context, judges the results, and steps in when something is wrong. An agent alone is not enough: Django asks contributors not to request automated AI reviews, which “often generate noise that distracts maintainers” (<a href="https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/submitting-patches/">Django</a>).</p>
+
+<h2 id="how-i-review">How I review changes from my agent</h2>
+<p>The agent knows Rust better than I do. What it lacks is what the code does not say. So I split the work by level:</p>
+<div class="tw"><table><thead><tr><th>Level</th><th>Who owns it</th><th>My part</th></tr></thead><tbody>
+<tr><td>Details: syntax, idioms, ownership</td><td>The agent, the compiler, the linters</td><td>Delegate. Ask the agent when curious.</td></tr>
+<tr><td>Rules: predefined, team-agreed, or agent-learned</td><td>AutoSDE reviews, on every change</td><td>Agree on a rule once, and stop repeating it</td></tr>
+<tr><td>Context: design decisions, past failures, customer needs</td><td>People</td><td>Name it as considerations, or link the doc that holds it</td></tr>
+<tr><td>Boundaries and intent: what users see, what crosses components, whether the change is right</td><td>People, given the right view</td><td>Judge, and decide together</td></tr>
+</tbody></table></div>
+<p>I take part at two points: going in, with context, and coming out, with judgment. For the port, I judged its contract, not its Rust: the contract maps every type, states the rules for numerical fidelity, and lists each deliberate divergence. Nothing calls the new code yet, so its blast radius is still zero. I scale my part to the blast radius: an internal script may need only the rules, while a change to a shared system gets considerations, views, and a person who decides.</p>
+
+<h2 id="going-in">Going in: rules, then blind spots</h2>
+<p>Context that holds for every change belongs in rules. AutoSDE reviews apply them to each change: predefined rules, rules the team agrees on, and rules an agent learns from the review comments people make most often. Nobody has to repeat them.</p>
+<p>Context for one change goes to the blind-spot reviewer instead. I name considerations in plain language, such as “Retries MUST use the shared backoff policy.” It checks every changed file against each one and drafts comments. Its principles:</p>
+<ul>
+<li><strong>Look where the rules cannot.</strong> It runs after AutoSDE reviews, and looks for what needs context, such as backward compatibility.</li>
+<li><strong>Let people name the blind spots</strong> as free text, a checklist, or a link to a design doc. A link stays in sync with the doc.</li>
+<li><strong>Flag only gaps it can point to,</strong> at a file and a line. A merely possible concern is dropped. Google holds its code review checks to under 10% effective false positives (<a href="https://doi.org/10.1145/3188720">Sadowski et al.</a>).</li>
+<li><strong>Take severity from the source’s words.</strong> MUST makes a gap blocking, and SHOULD or MAY makes it a suggestion, as in <a href="https://www.rfc-editor.org/rfc/rfc2119">RFC 2119</a>.</li>
+<li><strong>Ask, then suggest, and name the consideration,</strong> so a reader who does not know the language still knows what is at stake.</li>
+<li><strong>Stay quiet:</strong> one comment per root cause, a cap on the count, and nothing on clean files.</li>
+<li><strong>Draft, never publish.</strong> A person edits the drafts and publishes them under their own name.</li>
+</ul>
+<p>On an illustrative payment change, a draft reads:</p>
+<blockquote><p><strong>Blocking · Retry policy.</strong> The design doc says retries MUST use the shared backoff. The new retry in <code>charge.rs</code> calls the card network again right away. What happens when it is overloaded? Suggestion: wrap the call in the shared backoff helper.</p></blockquote>
+<p>I can judge that comment without reading Rust.</p>
+
+<h2 id="coming-out">Coming out: the change visualizer</h2>
+<p>The change visualizer lifts the diff to the level where I judge it: one self-contained page whose views read like a <a href="the-missing-layer-between-prose-and-code.html">structured spec</a> of the change. Its principles:</p>
+<ul>
+<li><strong>Explain the change at its boundaries:</strong> what users see, and what crosses between components.</li>
+<li><strong>Draw only what the diff supports.</strong> Take the why and the testing from the commit messages, and never invent behavior.</li>
+<li><strong>Draw a view only when it carries meaning:</strong> a before-and-after of what users see, a pair of sequence diagrams, and a file chart that is always there. Say why a view is missing.</li>
+<li><strong>Lead with the most telling view,</strong> and end with two to four points to check.</li>
+<li><strong>Stay read-only and self-contained,</strong> with secrets redacted.</li>
+</ul>
+<figure class="fig">
+<p class="ft">What the change visualizer draws, for a change in Rust</p>
+<div class="lgd"><span><i style="background:var(--s1)"></i>Added</span><span><i style="background:var(--s2)"></i>Removed (dashed arrows)</span><span><i style="background:var(--chg)"></i>Changed</span><span><i style="background:var(--lab)"></i>Unchanged</span></div><svg viewBox="0 0 720 676" role="img" aria-labelledby="figN-t figN-d">
+<title id="figN-t">What the change visualizer draws, for a change in Rust</title><desc id="figN-d">A page with four parts. A header gives the change, why it was made, and how it was tested, taken from the commit. What the user sees: before, the page shows Payment failed. Retrying; after, it shows Processing payment, marked as changed. What crosses components: two sequence diagrams between the checkout page, the payment service and the card network. Before, the page sends the charge again after a 502 and the second authorization has no key; both calls are marked removed. After, the first authorization carries a key, the payment service retries with the same key, and the card network approves; the retry and the approval are marked added. Lines changed per file: seven files, most of them Rust, with 219 lines added and 67 removed, led by a new test file with 88 added lines. Reviewer checklist: three points about backoff, the idempotency key, and older payment services.</desc>
+<text class="t-pri" x="14" y="18" font-size="12.5" font-weight="600">Example change, mostly in Rust: retry card charges in the payment service, not on the page</text>
+<text class="t-sec" x="14" y="37" font-size="10.5">Why, from the commit: a charge retried by the page had no idempotency key, so a slow first attempt could charge the card twice.</text>
+<text class="t-sec" x="14" y="53" font-size="10.5">Tested, from the commit: a fault-injection test times out the first authorize call.</text>
+<text class="t-mut" x="14" y="80" font-size="10" letter-spacing=".07em">WHAT THE USER SEES</text>
+<rect x="14" y="90" width="338" height="76" rx="8" fill="var(--panel)" stroke="var(--axis)" stroke-width="1.5"/>
+<text class="t-mut" x="26" y="106" font-size="9.5" letter-spacing=".07em">BEFORE</text>
+<text class="t-sec" x="26" y="128" font-size="11">Order total</text>
+<text class="t-pri" x="340" y="128" font-size="11" text-anchor="end" font-weight="600">$42.00</text>
+<rect x="26" y="138" width="96" height="20" rx="5" fill="none" stroke="var(--axis)" stroke-width="1.5"/>
+<text class="t-pri" x="74" y="152" font-size="10.5" text-anchor="middle">Pay $42.00</text>
+<g><title>Before: after a timeout the page shows “Payment failed. Retrying…” and charges again</title><rect x="132" y="138" width="176" height="20" rx="4" fill="none" stroke="var(--chg)" stroke-width="1.75" stroke-dasharray="4 3"/><text class="t-pri" x="142" y="152" font-size="10.5">Payment failed. Retrying…</text></g>
+<rect x="368" y="90" width="338" height="76" rx="8" fill="var(--panel)" stroke="var(--axis)" stroke-width="1.5"/>
+<text class="t-mut" x="380" y="106" font-size="9.5" letter-spacing=".07em">AFTER</text>
+<text class="t-sec" x="380" y="128" font-size="11">Order total</text>
+<text class="t-pri" x="694" y="128" font-size="11" text-anchor="end" font-weight="600">$42.00</text>
+<rect x="380" y="138" width="96" height="20" rx="5" fill="none" stroke="var(--axis)" stroke-width="1.5"/>
+<text class="t-pri" x="428" y="152" font-size="10.5" text-anchor="middle">Pay $42.00</text>
+<g><title>After: the page shows “Processing payment…” until the final result</title><rect x="486" y="138" width="176" height="20" rx="4" fill="none" stroke="var(--chg)" stroke-width="1.75" stroke-dasharray="4 3"/><text class="t-pri" x="496" y="152" font-size="10.5">Processing payment…</text></g>
+<rect x="530" y="98" width="9" height="9" rx="2" fill="var(--chg)"/>
+<text class="t-sec" x="544" y="106" font-size="9.5">changed: waits for the result</text>
+<text class="t-mut" x="14" y="196" font-size="10" letter-spacing=".07em">WHAT CROSSES COMPONENTS</text>
+<text class="t-mut" x="14" y="212" font-size="9.5" letter-spacing=".07em">BEFORE</text>
+<line x1="64" y1="242" x2="64" y2="384" stroke="var(--axis)" stroke-width="1"/>
+<rect x="18" y="220" width="92" height="22" rx="5" fill="var(--panel)" stroke="var(--axis)" stroke-width="1.5"/>
+<text class="t-pri" x="64" y="235" font-size="10.5" text-anchor="middle" font-weight="600">Checkout page</text>
+<line x1="164" y1="242" x2="164" y2="384" stroke="var(--axis)" stroke-width="1"/>
+<rect x="118" y="220" width="92" height="22" rx="5" fill="var(--panel)" stroke="var(--axis)" stroke-width="1.5"/>
+<text class="t-pri" x="164" y="235" font-size="10.5" text-anchor="middle" font-weight="600">Payments</text>
+<line x1="304" y1="242" x2="304" y2="384" stroke="var(--axis)" stroke-width="1"/>
+<rect x="258" y="220" width="92" height="22" rx="5" fill="var(--panel)" stroke="var(--axis)" stroke-width="1.5"/>
+<text class="t-pri" x="304" y="235" font-size="10.5" text-anchor="middle" font-weight="600">Card network</text>
+<g><title>Checkout page → Payments: charge(order) (unchanged)</title><line x1="67" y1="262" x2="155" y2="262" stroke="var(--lab)" stroke-width="1.5" stroke-linecap="round"/><polygon points="161,262 155,258.28 155,265.72" fill="var(--lab)"/><text class="t-sec" x="114" y="257" font-size="10" text-anchor="middle">charge(order)</text></g>
+<g><title>Payments → Card network: authorize(order) (unchanged)</title><line x1="167" y1="284" x2="295" y2="284" stroke="var(--lab)" stroke-width="1.5" stroke-linecap="round"/><polygon points="301,284 295,280.28 295,287.72" fill="var(--lab)"/><text class="t-sec" x="234" y="279" font-size="10" text-anchor="middle">authorize(order)</text></g>
+<g><title>Card network → Payments: timeout (unchanged)</title><line x1="301" y1="306" x2="173" y2="306" stroke="var(--lab)" stroke-width="1.5" stroke-linecap="round"/><polygon points="167,306 173,302.28 173,309.72" fill="var(--lab)"/><text class="t-sec" x="234" y="301" font-size="10" text-anchor="middle">timeout</text></g>
+<g><title>Payments → Checkout page: 502 (unchanged)</title><line x1="161" y1="328" x2="73" y2="328" stroke="var(--lab)" stroke-width="1.5" stroke-linecap="round"/><polygon points="67,328 73,324.28 73,331.72" fill="var(--lab)"/><text class="t-sec" x="114" y="323" font-size="10" text-anchor="middle">502</text></g>
+<g><title>Checkout page → Payments: charge(order) again (removed)</title><line x1="67" y1="350" x2="155" y2="350" stroke="var(--s2)" stroke-width="2" stroke-linecap="round" stroke-dasharray="5 4"/><polygon points="161,350 155,346.28 155,353.72" fill="var(--s2)"/><text class="t-sec" x="114" y="345" font-size="10" text-anchor="middle">charge(order) again</text></g>
+<g><title>Payments → Card network: authorize(order), no key (removed)</title><line x1="167" y1="372" x2="295" y2="372" stroke="var(--s2)" stroke-width="2" stroke-linecap="round" stroke-dasharray="5 4"/><polygon points="301,372 295,368.28 295,375.72" fill="var(--s2)"/><text class="t-sec" x="234" y="367" font-size="10" text-anchor="middle">authorize(order), no key</text></g>
+<text class="t-mut" x="368" y="212" font-size="9.5" letter-spacing=".07em">AFTER</text>
+<line x1="418" y1="242" x2="418" y2="384" stroke="var(--axis)" stroke-width="1"/>
+<rect x="372" y="220" width="92" height="22" rx="5" fill="var(--panel)" stroke="var(--axis)" stroke-width="1.5"/>
+<text class="t-pri" x="418" y="235" font-size="10.5" text-anchor="middle" font-weight="600">Checkout page</text>
+<line x1="518" y1="242" x2="518" y2="384" stroke="var(--axis)" stroke-width="1"/>
+<rect x="472" y="220" width="92" height="22" rx="5" fill="var(--panel)" stroke="var(--axis)" stroke-width="1.5"/>
+<text class="t-pri" x="518" y="235" font-size="10.5" text-anchor="middle" font-weight="600">Payments</text>
+<line x1="658" y1="242" x2="658" y2="384" stroke="var(--axis)" stroke-width="1"/>
+<rect x="612" y="220" width="92" height="22" rx="5" fill="var(--panel)" stroke="var(--axis)" stroke-width="1.5"/>
+<text class="t-pri" x="658" y="235" font-size="10.5" text-anchor="middle" font-weight="600">Card network</text>
+<g><title>Checkout page → Payments: charge(order) (unchanged)</title><line x1="421" y1="262" x2="509" y2="262" stroke="var(--lab)" stroke-width="1.5" stroke-linecap="round"/><polygon points="515,262 509,258.28 509,265.72" fill="var(--lab)"/><text class="t-sec" x="468" y="257" font-size="10" text-anchor="middle">charge(order)</text></g>
+<g><title>Payments → Card network: authorize(order, key) (changed)</title><line x1="521" y1="284" x2="649" y2="284" stroke="var(--chg)" stroke-width="2" stroke-linecap="round"/><polygon points="655,284 649,280.28 649,287.72" fill="var(--chg)"/><text class="t-sec" x="588" y="279" font-size="10" text-anchor="middle">authorize(order, key)</text></g>
+<g><title>Card network → Payments: timeout (unchanged)</title><line x1="655" y1="306" x2="527" y2="306" stroke="var(--lab)" stroke-width="1.5" stroke-linecap="round"/><polygon points="521,306 527,302.28 527,309.72" fill="var(--lab)"/><text class="t-sec" x="588" y="301" font-size="10" text-anchor="middle">timeout</text></g>
+<g><title>Payments → Card network: authorize again, same key (added)</title><line x1="521" y1="328" x2="649" y2="328" stroke="var(--s1)" stroke-width="2" stroke-linecap="round"/><polygon points="655,328 649,324.28 649,331.72" fill="var(--s1)"/><text class="t-sec" x="588" y="323" font-size="10" text-anchor="middle">authorize again, same key</text></g>
+<g><title>Card network → Payments: approved (added)</title><line x1="655" y1="350" x2="527" y2="350" stroke="var(--s1)" stroke-width="2" stroke-linecap="round"/><polygon points="521,350 527,346.28 527,353.72" fill="var(--s1)"/><text class="t-sec" x="588" y="345" font-size="10" text-anchor="middle">approved</text></g>
+<g><title>Payments → Checkout page: approved (changed)</title><line x1="515" y1="372" x2="427" y2="372" stroke="var(--chg)" stroke-width="2" stroke-linecap="round"/><polygon points="421,372 427,368.28 427,375.72" fill="var(--chg)"/><text class="t-sec" x="468" y="367" font-size="10" text-anchor="middle">approved</text></g>
+<text class="t-mut" x="14" y="410" font-size="10" letter-spacing=".07em">LINES CHANGED PER FILE · +219 −67 ACROSS 7 FILES</text>
+<text class="t-mut" x="392" y="430" font-size="9.5" text-anchor="end">removed</text>
+<text class="t-mut" x="408" y="430" font-size="9.5">added</text>
+<text class="t-sec" x="14" y="448" font-size="10" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace">payments/tests/charge_retry.rs</text>
+<g><title>payments/tests/charge_retry.rs: 88 lines added, 0 removed</title><path d="M401,439 H634.6 a4,4 0 0 1 4,4 V447 a4,4 0 0 1 -4,4 H401 z" fill="var(--s1)"/><text class="t-sec" x="643.6" y="448" font-size="10">+88</text></g>
+<text class="t-sec" x="14" y="469" font-size="10" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace">payments/src/retry.rs</text>
+<g><title>payments/src/retry.rs: 56 lines added, 0 removed</title><path d="M401,460 H548.2 a4,4 0 0 1 4,4 V468 a4,4 0 0 1 -4,4 H401 z" fill="var(--s1)"/><text class="t-sec" x="557.2" y="469" font-size="10">+56</text></g>
+<text class="t-sec" x="14" y="490" font-size="10" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace">payments/src/charge.rs</text>
+<g><title>payments/src/charge.rs: 42 lines added, 9 removed</title><path d="M399,481 H378.7 a4,4 0 0 0 -4,4 V489 a4,4 0 0 0 4,4 H399 z" fill="var(--s2)"/><text class="t-sec" x="369.7" y="490" font-size="10" text-anchor="end">−9</text><path d="M401,481 H510.4 a4,4 0 0 1 4,4 V489 a4,4 0 0 1 -4,4 H401 z" fill="var(--s1)"/><text class="t-sec" x="519.4" y="490" font-size="10">+42</text></g>
+<text class="t-sec" x="14" y="511" font-size="10" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace">web/checkout/PayButton.tsx</text>
+<g><title>web/checkout/PayButton.tsx: 7 lines added, 31 removed</title><path d="M399,502 H319.3 a4,4 0 0 0 -4,4 V510 a4,4 0 0 0 4,4 H399 z" fill="var(--s2)"/><text class="t-sec" x="310.3" y="511" font-size="10" text-anchor="end">−31</text><path d="M401,502 H415.9 a4,4 0 0 1 4,4 V510 a4,4 0 0 1 -4,4 H401 z" fill="var(--s1)"/><text class="t-sec" x="424.9" y="511" font-size="10">+7</text></g>
+<text class="t-sec" x="14" y="532" font-size="10" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace">web/checkout/PayButton.test.tsx</text>
+<g><title>web/checkout/PayButton.test.tsx: 5 lines added, 22 removed</title><path d="M399,523 H343.6 a4,4 0 0 0 -4,4 V531 a4,4 0 0 0 4,4 H399 z" fill="var(--s2)"/><text class="t-sec" x="334.6" y="532" font-size="10" text-anchor="end">−22</text><path d="M401,523 H410.5 a4,4 0 0 1 4,4 V531 a4,4 0 0 1 -4,4 H401 z" fill="var(--s1)"/><text class="t-sec" x="419.5" y="532" font-size="10">+5</text></g>
+<text class="t-sec" x="14" y="553" font-size="10" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace">payments/src/card_client.rs</text>
+<g><title>payments/src/card_client.rs: 12 lines added, 3 removed</title><path d="M399,544 H394.9 a4,4 0 0 0 -4,4 V552 a4,4 0 0 0 4,4 H399 z" fill="var(--s2)"/><text class="t-sec" x="385.9" y="553" font-size="10" text-anchor="end">−3</text><path d="M401,544 H429.4 a4,4 0 0 1 4,4 V552 a4,4 0 0 1 -4,4 H401 z" fill="var(--s1)"/><text class="t-sec" x="438.4" y="553" font-size="10">+12</text></g>
+<text class="t-sec" x="14" y="574" font-size="10" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace">docs/payments.md</text>
+<g><title>docs/payments.md: 9 lines added, 2 removed</title><path d="M399,565 H396.3 a2.7,2.7 0 0 0 -2.7,2.7 V574.3 a2.7,2.7 0 0 0 2.7,2.7 H399 z" fill="var(--s2)"/><text class="t-sec" x="388.6" y="574" font-size="10" text-anchor="end">−2</text><path d="M401,565 H421.3 a4,4 0 0 1 4,4 V573 a4,4 0 0 1 -4,4 H401 z" fill="var(--s1)"/><text class="t-sec" x="430.3" y="574" font-size="10">+9</text></g>
+<line class="ax" x1="400" y1="434" x2="400" y2="581"/>
+<text class="t-mut" x="14" y="612" font-size="10" letter-spacing=".07em">REVIEWER CHECKLIST</text>
+<rect x="14" y="623" width="10" height="10" rx="2" fill="none" stroke="var(--axis)" stroke-width="1.5"/>
+<text class="t-pri" x="32" y="632" font-size="10.5">The retry has no backoff: check the delay before the second authorize call.</text>
+<rect x="14" y="642" width="10" height="10" rx="2" fill="none" stroke="var(--axis)" stroke-width="1.5"/>
+<text class="t-pri" x="32" y="651" font-size="10.5">Both attempts must send the same key: check that it is created once per order.</text>
+<rect x="14" y="661" width="10" height="10" rx="2" fill="none" stroke="var(--axis)" stroke-width="1.5"/>
+<text class="t-pri" x="32" y="670" font-size="10.5">The page no longer retries: check that a 502 from an older payment service still shows an error.</text>
+</svg>
+<figcaption>An illustrative change, mostly in Rust. Nothing on the page needs Rust to read.</figcaption>
+</figure>
+
+<h2 id="discussion">Keep the discussion at the spec level</h2>
+<p>When I bring a change to my team, the views and the drafts set the agenda. We discuss whether the retry belongs in the service and what an older client gets, not lifetimes. Questions about details go to the agent.</p>
+<figure class="fig">
+<p class="ft">Where the person sits on the loop</p>
+<div class="lgd"><span><i style="background:var(--s1)"></i>Blind-spot reviewer</span><span><i style="background:var(--s2)"></i>Change visualizer</span><span><i style="border:1.5px solid var(--axis);background:none"></i>Other steps</span></div><svg viewBox="0 0 720 288" role="img" aria-labelledby="figM-t figM-d">
+<title id="figM-t">Where the person sits on the loop</title><desc id="figM-d">Two levels. On the loop, at the spec level, the person names the blind spots and edits the drafted findings, judges the boundaries, and decides together with others, with conclusions going into the spec. In the loop, at the code level, are the blind-spot review, the change visualizer, and rules and details: AutoSDE rules, the compiler, linters, and tests. Considerations and links go down to the blind-spot review, and findings come back up as questions. An optional focus goes down to the change visualizer, and views and a checklist come back up. Rules and details apply to every change.</desc>
+<rect x="8" y="8" width="704" height="96" rx="10" fill="var(--grid)" fill-opacity=".45"/>
+<text class="t-mut" x="30" y="25" font-size="10" letter-spacing=".07em">ON THE LOOP: THE PERSON, AT THE SPEC LEVEL</text>
+<g><title>Name the blind spots: considerations and design docs; then edit the drafted findings</title><rect x="30" y="34" width="204" height="60" rx="7" fill="var(--panel)" stroke="var(--axis)" stroke-width="1.5"/><text class="t-pri" x="42" y="54" font-size="12" font-weight="600">Name the blind spots</text><text class="t-sec" x="42" y="70" font-size="10.5">considerations and design docs;</text><text class="t-sec" x="42" y="84" font-size="10.5">then edit the drafted findings</text></g>
+<line x1="238" y1="64" x2="248" y2="64" stroke="var(--lab)" stroke-width="1.5" stroke-linecap="round"/><polygon points="254,64 248,60.28 248,67.72" fill="var(--lab)"/>
+<g><title>Judge the boundaries: what users see, what crosses components, before and after</title><rect x="258" y="34" width="204" height="60" rx="7" fill="var(--panel)" stroke="var(--axis)" stroke-width="1.5"/><text class="t-pri" x="270" y="54" font-size="12" font-weight="600">Judge the boundaries</text><text class="t-sec" x="270" y="70" font-size="10.5">what users see, what crosses</text><text class="t-sec" x="270" y="84" font-size="10.5">components, before and after</text></g>
+<line x1="466" y1="64" x2="476" y2="64" stroke="var(--lab)" stroke-width="1.5" stroke-linecap="round"/><polygon points="482,64 476,60.28 476,67.72" fill="var(--lab)"/>
+<g><title>Decide together: intent and trade-offs; conclusions go into the spec</title><rect x="486" y="34" width="204" height="60" rx="7" fill="var(--panel)" stroke="var(--axis)" stroke-width="1.5"/><text class="t-pri" x="498" y="54" font-size="12" font-weight="600">Decide together</text><text class="t-sec" x="498" y="70" font-size="10.5">intent and trade-offs;</text><text class="t-sec" x="498" y="84" font-size="10.5">conclusions go into the spec</text></g>
+<rect x="8" y="180" width="704" height="100" rx="10" fill="var(--grid)" fill-opacity=".45"/>
+<g><title>Blind-spot review: checks each changed file against each consideration</title><rect x="30" y="190" width="204" height="60" rx="7" fill="var(--panel)" stroke="var(--s1)" stroke-width="1.75"/><rect x="30" y="190" width="204" height="60" rx="7" fill="var(--s1)" fill-opacity=".12"/><text class="t-pri" x="42" y="210" font-size="12" font-weight="600">Blind-spot review</text><text class="t-sec" x="42" y="226" font-size="10.5">checks each changed file</text><text class="t-sec" x="42" y="240" font-size="10.5">against each consideration</text></g>
+<g><title>Change visualizer: lifts the diff to views, with a reviewer checklist</title><rect x="258" y="190" width="204" height="60" rx="7" fill="var(--panel)" stroke="var(--s2)" stroke-width="1.75"/><rect x="258" y="190" width="204" height="60" rx="7" fill="var(--s2)" fill-opacity=".12"/><text class="t-pri" x="270" y="210" font-size="12" font-weight="600">Change visualizer</text><text class="t-sec" x="270" y="226" font-size="10.5">lifts the diff to views,</text><text class="t-sec" x="270" y="240" font-size="10.5">with a reviewer checklist</text></g>
+<g><title>Rules and details: AutoSDE rules on every change; compiler, linters, tests</title><rect x="486" y="190" width="204" height="60" rx="7" fill="var(--panel)" stroke="var(--axis)" stroke-width="1.5"/><text class="t-pri" x="498" y="210" font-size="12" font-weight="600">Rules and details</text><text class="t-sec" x="498" y="226" font-size="10.5">AutoSDE rules on every change;</text><text class="t-sec" x="498" y="240" font-size="10.5">compiler, linters, tests</text></g>
+<text class="t-mut" x="30" y="270" font-size="10" letter-spacing=".07em">IN THE LOOP: THE AGENT AND THE CHECKS, AT THE CODE LEVEL</text>
+<g><title>Down: considerations, links</title><line x1="60" y1="98" x2="60" y2="179" stroke="var(--s1)" stroke-width="1.75" stroke-linecap="round"/><polygon points="60,186 55.66,179 64.34,179" fill="var(--s1)"/><text class="t-sec" x="68" y="136" font-size="10.5">considerations, links</text></g>
+<g><title>Up: findings, as questions</title><line x1="204" y1="186" x2="204" y2="105" stroke="var(--s1)" stroke-width="1.75" stroke-linecap="round"/><polygon points="204,98 199.66,105 208.34,105" fill="var(--s1)"/><text class="t-sec" x="196" y="158" font-size="10.5" text-anchor="end">findings, as questions</text></g>
+<g><title>Down: a focus, if any</title><line x1="288" y1="98" x2="288" y2="179" stroke="var(--s2)" stroke-width="1.75" stroke-linecap="round"/><polygon points="288,186 283.66,179 292.34,179" fill="var(--s2)"/><text class="t-sec" x="296" y="136" font-size="10.5">a focus, if any</text></g>
+<g><title>Up: views and a checklist</title><line x1="432" y1="186" x2="432" y2="105" stroke="var(--s2)" stroke-width="1.75" stroke-linecap="round"/><polygon points="432,98 427.66,105 436.34,105" fill="var(--s2)"/><text class="t-sec" x="424" y="158" font-size="10.5" text-anchor="end">views and a checklist</text></g>
+<text class="t-mut" x="588" y="147" font-size="10.5" text-anchor="middle">applied to every change</text>
+</svg>
+<figcaption>The person supervises on the loop, at the spec level, and the agent works in the loop, at the code level.</figcaption>
+</figure>
+<p>When the discussion settles a question, I write the answer into the spec, or into a rule if it applies to every change. Either way, every later review checks it.</p>
+<hr>
+<p>Code will keep getting faster to write, and I will not get back to reading every line. For systems with a high change blast radius, keep a person on the loop, and make their part easy: delegate the details and the repeated rules, bring the rest of the context in through considerations, and bring the change out at the spec level. Their attention then goes to the boundaries, the user experience, and the decision.</p>
+
+<h3 id="references">References</h3>
+<ul><li><a href="https://www.anthropic.com/research/redesigning-source-control">Redesigning source control at Anthropic</a> — Anthropic, 13 October 2026</li><li><a href="https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/submitting-patches/">Submitting contributions: automated AI reviews</a> — Django documentation</li><li><a href="https://doi.org/10.1145/3188720">Lessons from Building Static Analysis Tools at Google</a> — Caitlin Sadowski et al., Communications of the ACM, April 2018</li><li><a href="https://www.rfc-editor.org/rfc/rfc2119">RFC 2119: Key words for use in RFCs to Indicate Requirement Levels</a> — Scott Bradner, IETF, March 1997</li></ul>
+</main>
+</div></body></html>
