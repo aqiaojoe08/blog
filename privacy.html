@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy · Yuliang Qiao's Tech Blog</title>
+<meta name="description" content="How this blog handles optional Google Analytics and your privacy choices.">
+<style>
+:root{--bg:#fbfaf8;--panel:#fff;--ink:#1c1b1a;--muted:#5f5b56;--rule:#e6e2dc;--accent:#8a5a2b;--accent-soft:#f4ede4}
+@media(prefers-color-scheme:dark){:root{--bg:#16171a;--panel:#1c1e22;--ink:#e8e6e3;--muted:#a7a29b;--rule:#2d3035;--accent:#d9a05b;--accent-soft:#25262a}}
+*{box-sizing:border-box}
+body{margin:0;padding:2rem 1.25rem 6rem;background:var(--bg);color:var(--ink);font:17px/1.72 ui-serif,Georgia,serif}
+.wrap{max-width:46rem;margin:auto}
+nav,footer,.date{font: .85rem/1.6 ui-sans-serif,system-ui,sans-serif;color:var(--muted)}
+h1{font-size:2.3rem;line-height:1.2;margin:3rem 0 1rem}
+h2{font-size:1.4rem;line-height:1.3;margin-top:2.5rem}
+a{color:var(--accent)}
+li{margin-bottom:.6rem}
+.privacy-choice{padding:1.2rem;border:1px solid var(--rule);border-radius:8px;background:var(--panel)}
+.privacy-choice p{margin:0 0 .6rem}
+</style>
+<link rel="stylesheet" href="assets/analytics-consent.css">
+<script defer src="assets/analytics-consent.js"></script>
+</head>
+<body><div class="wrap">
+<nav><a href="./">&larr; All posts</a></nav>
+<main>
+<h1>Privacy</h1>
+<p class="date">Last updated: November 22, 2026</p>
+<p>This is Yuliang Qiao's technical blog. Reading it does not require an account or consent to analytics.</p>
+<div class="privacy-choice">
+<p data-analytics-status>Analytics stays off until you choose to accept it.</p>
+<button type="button" data-analytics-settings hidden>Change analytics choice</button>
+<noscript>JavaScript is disabled, so this blog does not load analytics in your browser.</noscript>
+</div>
+<h2>Optional analytics on two articles</h2>
+<p>I am testing Google Analytics on <a href="innovation-tree.html">Innovation Tree</a> and <a href="llm-world-model-decision-making.html">Faster Decisions in Complex Systems with LLMs and World Models</a>. The homepage, this privacy page, and the other articles do not load this analytics integration.</p>
+<p>The Google tag loads only after you choose <strong>Accept analytics</strong>. Choosing <strong>Reject analytics</strong>, or leaving the choice unanswered, keeps it off. Google Analytics helps me understand article visits, referrals, engagement time, and interactions such as scrolling and following links.</p>
+<h2>Information sent to Google</h2>
+<p>If you accept, Google may receive the page URL and title, referring page, interaction events, browser and device details, approximate location, and cookie identifiers. The integration keeps advertising storage, advertising user data, and ad personalization consent disabled. It does not ask for your name or email.</p>
+<p>Google uses IP addresses during collection, including to estimate location, but says GA4 does not log or store individual IP addresses. Read <a href="https://policies.google.com/technologies/partner-sites" rel="noreferrer">how Google uses data from sites using its services</a> and <a href="https://policies.google.com/privacy" rel="noreferrer">Google's privacy policy</a> for its processing practices.</p>
+<h2>Cookies and your choice</h2>
+<p>The blog saves your accept or reject preference in browser storage for up to 180 days. If persistent storage is unavailable, it tries session storage; if both are unavailable, you may be asked again on the next page.</p>
+<p>After acceptance, Google Analytics uses first-party cookies with names beginning <code>blog_ga</code> to distinguish browsers and sessions. This integration requests a cookie lifetime of up to 180 days; your browser may shorten it.</p>
+<p>You can change your choice using the button above or <strong>Analytics choices</strong> at the bottom of either pilot article. Withdrawing consent removes this integration's accessible analytics cookies and stops future collection. An article with analytics already running reloads to stop its listeners. Events already collected while consent was granted may finish sending during that transition. Withdrawing does not delete information already sent to Google.</p>
+<h2>Hosting and questions</h2>
+<p>GitHub Pages hosts this website. Its handling of hosting requests is separate from optional analytics; see the <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" rel="noreferrer">GitHub privacy statement</a>.</p>
+<p>For questions about this blog, contact <a href="https://www.linkedin.com/in/yuliang-qiao-04512896/" rel="noreferrer">Yuliang Qiao on LinkedIn</a>.</p>
+</main>
+<footer class="analytics-footer"><a href="./">All posts</a><a href="https://github.com/aqiaojoe08/blog">Source on GitHub</a></footer>
+</div></body>
+</html>
