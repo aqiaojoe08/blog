@@ -1,0 +1,63 @@
+.analytics-footer {
+  margin-top: 3rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--rule, #e6e2dc);
+  color: var(--muted, #5f5b56);
+  font: .85rem/1.6 ui-sans-serif, system-ui, sans-serif;
+}
+.analytics-footer a, .analytics-footer button { margin-right: 1rem; }
+[data-analytics-settings] {
+  padding: 0;
+  border: 0;
+  border-bottom: 1px solid currentColor;
+  background: transparent;
+  color: var(--accent, #8a5a2b);
+  font: inherit;
+  cursor: pointer;
+}
+.analytics-banner {
+  position: fixed;
+  z-index: 1000;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(46rem, calc(100% - 2rem));
+  max-height: calc(100dvh - 2rem);
+  overflow: auto;
+  padding: 1.2rem 1.4rem;
+  border: 1px solid var(--rule, #e6e2dc);
+  border-radius: 10px;
+  background: var(--panel, #fff);
+  color: var(--ink, #1c1b1a);
+  box-shadow: 0 6px 30px #0002;
+  font: .9rem/1.55 ui-sans-serif, system-ui, sans-serif;
+}
+.analytics-banner[hidden], .analytics-banner [hidden], [data-analytics-settings][hidden] { display: none; }
+.analytics-banner strong { font-size: 1rem; }
+.analytics-banner p { margin: .4rem 0 .75rem; }
+.analytics-banner a { color: var(--accent, #8a5a2b); text-decoration: underline; }
+.analytics-current { color: var(--muted, #5f5b56); font-size: .8rem; }
+.analytics-current:empty { display: none; }
+.analytics-actions { display: flex; flex-wrap: wrap; gap: .6rem; }
+.analytics-actions button {
+  min-height: 44px;
+  padding: .55rem 1rem;
+  border: 1px solid var(--accent, #8a5a2b);
+  border-radius: 5px;
+  background: var(--panel, #fff);
+  color: var(--accent, #8a5a2b);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.analytics-actions button:hover { background: var(--accent-soft, #f4ede4); }
+.analytics-actions .analytics-close { border-color: var(--rule, #e6e2dc); color: var(--muted, #5f5b56); }
+.analytics-banner :focus-visible, [data-analytics-settings]:focus-visible {
+  outline: 2px solid var(--accent, #8a5a2b);
+  outline-offset: 4px;
+}
+@media (max-width: 480px) {
+  .analytics-banner { padding: 1rem; }
+  .analytics-actions button { flex: 1 1 auto; }
+}
+@media print { .analytics-banner, [data-analytics-settings] { display: none !important; } }
