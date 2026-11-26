@@ -97,7 +97,7 @@ tbody tr:last-child td{border-bottom:0}
 <nav style="padding-top:1.6rem;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.85rem"><a href="./" style="border:0">&larr; All posts</a></nav>
 <header class="mast">
 <h1>Lead with Intent: Why I Stopped Writing Detailed Instructions for AI</h1>
-<p class="sub">What I learned from building software outside my expertise, from my team's move from SOPs to skills to intent, and from a small meta-instruction skill that changed how I lead AI.</p>
+<p class="sub">What I learned from building software outside my expertise, from my team's move from SOPs to skills to intent, and from a small always-on steering file that changed how I lead AI.</p>
 <div class="meta"><span>2,200 words</span><span>~10 min read</span><span>2026-11-26</span></div>
 </header>
 <main>
@@ -107,7 +107,7 @@ tbody tr:last-child td{border-bottom:0}
 <li>I wrote detailed, prescriptive prompts because early models needed them. In areas outside my expertise, like UI design, that capped the result at my own guesses.</li>
 <li>When I stated the intent instead (“this UI doesn’t look good; how can we improve it?”), results improved and the back-and-forth dropped sharply.</li>
 <li>My team went through the same arc: SOPs, then parameterized skills, then cutting most of the how from those skills and organizing by intent.</li>
-<li>A small meta-instruction skill makes the agent reverse-engineer the intent behind my prescriptive requests and propose better options.</li>
+<li>A small always-on steering file makes the agent state the intent behind my prescriptive requests, take a better path when there is one, and show me how I could have asked.</li>
 <li>Leading AI is like leading people: lead a senior AI like a junior one and you waste it. Each model generation asks us to unlearn and relearn, and uber-instructions make that scale.</li>
 </ul>
 </div>
@@ -135,41 +135,47 @@ tbody tr:last-child td{border-bottom:0}
 <p><strong>Stage 1: SOPs.</strong> We started by writing standard operating procedures for our teams: step-by-step documents for oncall triage, deployments, code reviews, and other recurring work. An SOP captures how an experienced engineer does a task, so that anyone, human or agent, can follow it.</p>
 <p><strong>Stage 2: Skills.</strong> Next we turned those SOPs into parameterized skills and user skills that agents could run directly. This was real progress. A procedure that once lived in a wiki became something an agent could execute on demand, with inputs for the team, package, or pipeline it applied to.</p>
 <p><strong>Stage 3: Intent.</strong> Then we noticed a problem. The skills were over-prescriptive. They encoded every step of the procedure, and with the latest models those steps were often getting in the way. The model could reach a better result on its own, but the skill forced it down the path we had written for an older generation. So we started removing content, a lot of it. We kept what had to be true (the goal, the hard constraints, the definition of done) and cut most of the how.</p>
+<p>Here is what that looked like on our company-wide skill catalog. We first pruned by usage: 35 entries with zero runs in 90 days came out, taking the core catalog from 86 entries to 59. Then we slimmed the prompts that remained. Our most-used code review skill, at 1,893 runs in 90 days, went from 101 lines to 42. Four batches covering 26 more skills went from 4,158 lines to 2,561, about 38% shorter, and one skill was removed outright.</p>
+<p>A shorter prompt is only a win if the results hold, so we regression-tested every change. For each skill, the old and new versions ran on the same real input as separate agents in dry-run mode, with every write, post and send held back. A blind judge then compared the two outputs without knowing which was which. Across 23 skills and 50 dry runs, 6 skills produced equivalent output, 16 showed minor differences that came from run-to-run variance, and 1 regressed.</p>
+<p>The regression taught us the most. In one skill, slimming had folded an unconditional “confirm before acting” step into a conditional paragraph. That step was a hard constraint, not part of the how, so we put it back word for word. The skills that shrank least were the ones made mostly of constraints: SQL queries, output templates and tables that had to stay exactly as written.</p>
 <p>That led us to reorganize our work by intent instead of by procedure. We grouped our teams around the outcome each kind of work is trying to achieve (see <a href="slice-by-intent-not-by-phase.html">Slice by Intent, Not by Phase</a>), and began experimenting with a simple approach: provide the intent, and put our effort into making the intent more precise. A precise intent turned out to be more useful than a detailed procedure. It tells the agent what success looks like and leaves it room to find the best way there.</p>
 <p>That doesn't mean constraints go away. Hard requirements such as an API contract, a security rule, or a compliance boundary still need to be stated precisely. The point is to separate what must be true from how we happen to imagine getting there.</p>
-<h2 id="making-it-a-habit-a-meta-instruction-skill">Making it a habit: a meta-instruction skill</h2>
-<p>Knowing this didn't stop me from slipping back into prescriptive prompts. Old habits come back when I'm in a hurry or when I think I already know the answer. So instead of relying on discipline, I wrote a skill: a meta-instruction that tells the agent how to treat my instructions.</p>
-<p>The core of it looks like this:</p>
+<h2 id="making-it-a-habit-an-always-on-steering-file">Making it a habit: an always-on steering file</h2>
+<p>Knowing this didn't stop me from slipping back into prescriptive prompts. Old habits come back when I'm in a hurry or when I think I already know the answer. So instead of relying on discipline, I wrote a steering file: a meta-instruction that tells the agent how to treat my instructions. A skill loads only when the agent decides it is relevant. A steering file marked <code>inclusion: always</code> applies to every request, which matters because the requests that need it most are the ones where I don't think to ask.</p>
+<p>Here is the file, lightly edited for this post:</p>
 <pre><code>---
-name: lead-with-intent
-description: When the user gives prescriptive, step-by-step instructions,
-  infer the underlying intent before executing, and propose alternatives
-  that may serve that intent better.
+inclusion: always
+name: intent-over-instructions
+description: Coach me from step-by-step instructions toward stating intent
 ---
 
-# Lead with intent
+# Intent over instructions
 
-When my request is prescriptive (specific layout, specific implementation,
-specific steps), do not execute it right away. First:
+When my message is a sequence of steps or a low-level spec (exact CSS, exact
+commands, exact wording), do this:
 
-1. **State the intent.** In one or two sentences, describe what you believe
-   I am actually trying to achieve and why. Name the user or system outcome,
-   not the mechanism.
-2. **Separate constraints from suggestions.** List which parts of my request
-   look like hard requirements (contracts, security, compliance, explicit
-   "must") and which look like my guess at a solution.
-3. **Propose options.** Offer two or three approaches aligned with that
-   intent, including my original instruction if it is a reasonable choice.
-   For each, give the trade-off in a line.
-4. **Recommend one.** Say which you would pick and why.
-5. **Proceed.** If my original instruction is clearly the best fit, or the
-   task is trivial, say so briefly and execute it without the ceremony.
+1. Infer the intent: the outcome, who it is for, and what "done" looks like.
+   State it in one line at the top: "Intent I'm working from: ...".
+2. If my steps conflict with that intent, or a better path exists, say so in
+   one sentence and take the better path, unless the steps look deliberate.
+3. At the end, in one line, show how I could have said it as intent, e.g.
+   "Next time: 'Ops managers should see stuck POs at a glance'."
+   Skip this when my message was already intent-level.
 
-If you are unsure of my intent, ask one focused question rather than guessing.</code></pre>
-<p>Two details matter in practice. First, the skill keeps my original instruction as one of the options. Sometimes I do know the right answer, and the skill shouldn't argue with me for the sake of it. Second, the skill skips the ceremony for trivial requests. A one-line rename doesn't need three alternatives.</p>
+When I give intent, fill in the how yourself and don't ask me for it:
+- UI: I'm not a UI person. Show 2-3 mockups and let me pick. Never ask me
+  for layout, color or spacing values.
+- My own domain (for me, supply chain): that is my expertise. Ask me about
+  business rules, metrics and which system owns the data when they're
+  ambiguous. Don't ask me about implementation details.
+
+A good intent covers: goal, audience, constraints, and done-when. If one of
+those is missing and it matters, ask for that one only.
+</code></pre>
+<p>Three details matter in practice. First, it coaches me as well as the agent. Every prescriptive request ends with a one-line rewrite as intent, so over time I write fewer of them. Second, it tells the agent where my expertise is. For UI, where my instructions are guesses, it shows me mockups and never asks me for spacing values. For supply chain, where my instructions usually encode good answers, it asks me about business rules instead. Third, it leaves room for me to be right. If my steps look deliberate, the agent follows them, and if my request was already intent-level, it skips the coaching line.</p>
 <h2 id="what-changed">What changed</h2>
-<p>With the skill in place, my overly prescriptive requests became a starting point instead of a final spec. Typical results:</p>
-<ul><li>The agent restates my intent, and I often realize it is different from what my instruction implied. That alone catches mistakes before any code is written.</li><li>The alternatives regularly include an approach I hadn't considered, especially in domains where I lack depth.</li><li>When my instruction was right, I lose only a few seconds reading a short confirmation.</li></ul>
+<p>With the steering file in place, my overly prescriptive requests became a starting point instead of a final spec. Typical results:</p>
+<ul><li>The agent restates my intent, and I often realize it is different from what my instruction implied. That alone catches mistakes before any code is written.</li><li>The agent regularly takes a path I hadn't considered, especially in domains where I lack depth.</li><li>The “Next time” line shows me, one request at a time, how I could have said it as intent.</li><li>When my instruction was right, I lose only a few seconds reading the one-line intent.</li></ul>
 <p>The outcome is better whenever my initial instructions are too prescriptive and hide the real intent behind them, which, honestly, is more often than I expected.</p>
 <h2 id="a-mental-model-leading-ai-with-commander-s-intent">A mental model: leading AI with commander's intent</h2>
 <p>Looking back, both my personal story and the team's journey come down to one idea: working with AI is a leadership problem, and the right leadership style depends on who you are leading.</p>
