@@ -32,6 +32,8 @@ article p{margin:0 0 .8rem;color:var(--muted)}
   font-size:.76rem;letter-spacing:.09em;text-transform:uppercase;color:var(--faint)}
 .sec{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.78rem;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);font-weight:600;margin:2.8rem 0 0}
 .meta a{color:var(--accent)}
+nav.themes{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.85rem;color:var(--faint);margin:0 0 .4rem}
+nav.themes a{color:var(--accent)}
 footer{margin-top:2.4rem;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.85rem;color:var(--faint)}
 footer a{color:var(--accent);border-bottom:1px solid color-mix(in oklab,var(--accent) 35%,transparent)}
 </style>
@@ -43,6 +45,9 @@ footer a{color:var(--accent);border-bottom:1px solid color-mix(in oklab,var(--ac
 </header>
 <main>
 
+<nav class="themes"><a href="#leading-ai">Leading AI and people</a> · <a href="#software-factories">Software factories</a> · <a href="#agentic-architecture">Agentic systems and architecture</a> · <a href="#specs-verification">Specs and verification</a> · <a href="#papers">Papers</a></nav>
+
+<h2 class="sec" id="leading-ai">Leading AI and people</h2>
 <article>
 <h2><a href="lead-with-intent.html">Lead with Intent: Why I Stopped Writing Detailed Instructions for AI</a></h2>
 <p>Prescriptive prompts are a habit from weaker models, and they cap the result at your own expertise. Hand over the intent instead, prune skills as models improve, and encode the unlearning in a meta-instruction so it scales.</p>
@@ -56,6 +61,13 @@ footer a{color:var(--accent);border-bottom:1px solid color-mix(in oklab,var(--ac
 </article>
 
 <article>
+<h2><a href="innovation-tree.html">Innovation Tree: From Fragmented Innovation to Collective Innovation</a></h2>
+<p>Use LLMs and an Innovation Evolution Graph to trace origins, recognize improvements, and help teams build together.</p>
+<div class="meta"><span>2026-11-14</span><span>~5 min read</span></div>
+</article>
+
+<h2 class="sec" id="software-factories">Software factories</h2>
+<article>
 <h2><a href="from-merge-queues-to-merge-plans.html">From Merge Queues to Merge Plans: What OpenAI’s and Anthropic’s Git Rewrites Leave Unsolved</a></h2>
 <p>Agents pushed both labs past what their source control could handle. They rebuilt the servers and fixed the bytes, but not the race of many writers on one trunk. With agents as the writers, a planner can schedule the writes before any code exists, and a conflict that still happens is fixed by rebasing the spec instead of the code.</p>
 <div class="meta"><span>2026-11-19</span><span>~14 min read</span></div>
@@ -68,40 +80,9 @@ footer a{color:var(--accent);border-bottom:1px solid color-mix(in oklab,var(--ac
 </article>
 
 <article>
-<h2><a href="stateless-apps-central-data.html">Stateless Apps, Central Data: What the Agentic Ecosystem Is Missing</a></h2>
-<p>Apps are cheap to build now; their state is not. Documents, agent memory, and heavy capabilities like a 0.5 GB speech-to-text model should live on one shared floor, with every app a replaceable view on top.</p>
-<div class="meta"><span>2026-11-17</span><span>~7 min read</span></div>
-</article>
-
-<article>
-<h2><a href="innovation-tree.html">Innovation Tree: From Fragmented Innovation to Collective Innovation</a></h2>
-<p>Use LLMs and an Innovation Evolution Graph to trace origins, recognize improvements, and help teams build together.</p>
-<div class="meta"><span>2026-11-14</span><span>~5 min read</span></div>
-</article>
-
-<article>
-<h2><a href="llm-world-model-decision-making.html">Faster Decisions in Complex Systems with LLMs and World Models</a></h2>
-<p>An LLM proposes a small set of strategies. An optimizer fills in the details. A world model tests what happens next.</p>
-<div class="meta"><span>2026-11-14</span><span>~4 min read</span></div>
-</article>
-
-
-<article>
-<h2><a href="software-is-a-cache-of-data.html">The Cache Inversion: Software Is Becoming a Cache of Data</a></h2>
-<p>We used to store data to cache the results of software. Increasingly, the model is a cache of the data. Code that models a system’s dynamics stays essential, but the trend changes how we version, maintain, and test software.</p>
-<div class="meta"><span>2026-11-12</span><span>~7 min read</span></div>
-</article>
-
-<article>
 <h2><a href="slice-by-intent-not-by-phase.html">Slice by Intent (10x+), Not by Phase (2x)</a></h2>
 <p>Slicing AI adoption by SDLC phase got us a 2x productivity increase. Getting to 10x or 100x takes end-to-end thinking: organize the work by what triggered each change, and let the system run one team-level agent.</p>
 <div class="meta"><span>2026-11-12</span><span>~10 min read</span></div>
-</article>
-
-<article>
-<h2><a href="testing-is-sampling-proof-is-proof.html">Two Ways to Verify Software: Sample the Behavior, or Prove It</a></h2>
-<p>Tests are behavior samples, and the best samples come from production. When 99.99% is not enough, you need a proof, and proofs just got much cheaper.</p>
-<div class="meta"><span>2026-11-04</span><span>~9 min read</span></div>
 </article>
 
 <article>
@@ -110,10 +91,36 @@ footer a{color:var(--accent);border-bottom:1px solid color-mix(in oklab,var(--ac
 <div class="meta"><span>2026-10-11</span><span>~11 min read</span></div>
 </article>
 
+<h2 class="sec" id="agentic-architecture">Agentic systems and architecture</h2>
+<article>
+<h2><a href="stateless-apps-central-data.html">Stateless Apps, Central Data: What the Agentic Ecosystem Is Missing</a></h2>
+<p>Apps are cheap to build now; their state is not. Documents, agent memory, and heavy capabilities like a 0.5 GB speech-to-text model should live on one shared floor, with every app a replaceable view on top.</p>
+<div class="meta"><span>2026-11-17</span><span>~7 min read</span></div>
+</article>
+
+<article>
+<h2><a href="llm-world-model-decision-making.html">Faster Decisions in Complex Systems with LLMs and World Models</a></h2>
+<p>An LLM proposes a small set of strategies. An optimizer fills in the details. A world model tests what happens next.</p>
+<div class="meta"><span>2026-11-14</span><span>~4 min read</span></div>
+</article>
+
+<article>
+<h2><a href="software-is-a-cache-of-data.html">The Cache Inversion: Software Is Becoming a Cache of Data</a></h2>
+<p>We used to store data to cache the results of software. Increasingly, the model is a cache of the data. Code that models a system’s dynamics stays essential, but the trend changes how we version, maintain, and test software.</p>
+<div class="meta"><span>2026-11-12</span><span>~7 min read</span></div>
+</article>
+
 <article>
 <h2><a href="agent-memory-is-a-team-document.html">Agent Memory Is a Team Document, Not a Personal Recall</a></h2>
 <p>Two arguments that end in the same place: write knowledge down where the whole team can read it, and treat everything else as hidden state.</p>
 <div class="meta"><span>2026-10-05</span><span>~9 min read</span></div>
+</article>
+
+<h2 class="sec" id="specs-verification">Specs and verification</h2>
+<article>
+<h2><a href="testing-is-sampling-proof-is-proof.html">Two Ways to Verify Software: Sample the Behavior, or Prove It</a></h2>
+<p>Tests are behavior samples, and the best samples come from production. When 99.99% is not enough, you need a proof, and proofs just got much cheaper.</p>
+<div class="meta"><span>2026-11-04</span><span>~9 min read</span></div>
 </article>
 
 <article>
