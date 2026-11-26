@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lead with Intent: Why I Stopped Writing Detailed Instructions for AI</title>
+<style>
+:root{
+  --bg:#fbfaf8; --panel:#fff; --ink:#1c1b1a; --muted:#5f5b56; --faint:#8b857e;
+  --rule:#e6e2dc; --accent:#8a5a2b; --accent-soft:#f4ede4; --code-bg:#f6f4f1;
+}
+@media (prefers-color-scheme:dark){
+  :root{ --bg:#16171a; --panel:#1c1e22; --ink:#e8e6e3; --muted:#a7a29b; --faint:#857f78;
+         --rule:#2d3035; --accent:#d9a05b; --accent-soft:#25262a; --code-bg:#21242a; }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:17px/1.72 ui-serif,Georgia,'Iowan Old Style','Times New Roman',serif;
+  padding:0 1.25rem 6rem;}
+.wrap{max-width:46rem;margin:0 auto}
+header.mast{padding:4.5rem 0 0;border-bottom:1px solid var(--rule);margin-bottom:2.5rem}
+h1{font-size:2.3rem;line-height:1.18;letter-spacing:-.02em;margin:0 0 1rem;font-weight:600}
+header.mast p.sub{color:var(--muted);font-style:italic;margin:0 0 2.2rem;font-size:1.02rem}
+.meta{display:flex;gap:1.4rem;flex-wrap:wrap;font-family:ui-sans-serif,system-ui,sans-serif;
+  font-size:.76rem;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);
+  padding-bottom:1.4rem}
+h2{font-size:1.5rem;line-height:1.25;letter-spacing:-.01em;margin:3.4rem 0 1rem;font-weight:600;
+  padding-top:.4rem}
+h3{font-size:1.13rem;margin:2.4rem 0 .7rem;font-weight:600;
+  font-family:ui-sans-serif,system-ui,sans-serif;letter-spacing:-.005em}
+p{margin:0 0 1.15rem}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid color-mix(in oklab,var(--accent) 35%,transparent)}
+a:hover{border-bottom-color:var(--accent)}
+strong{font-weight:650}
+hr{border:0;height:1px;background:var(--rule);margin:2.8rem 0}
+ul,ol{margin:0 0 1.3rem;padding-left:1.35rem}
+li{margin:0 0 .62rem}
+li>p{margin:0 0 .6rem}
+blockquote{margin:1.5rem 0;padding:.2rem 0 .2rem 1.3rem;border-left:3px solid var(--accent);
+  color:var(--muted)}
+blockquote p{margin:0 0 .6rem}
+blockquote p:last-child{margin:0}
+code{font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,monospace;font-size:.855em;
+  background:var(--code-bg);padding:.13em .38em;border-radius:4px;
+  border:1px solid color-mix(in oklab,var(--rule) 70%,transparent)}
+pre{background:var(--code-bg);border:1px solid var(--rule);border-radius:8px;
+  padding:1rem 1.1rem;overflow-x:auto;margin:0 0 1.4rem}
+pre code{background:none;border:0;padding:0;font-size:.8rem;line-height:1.62}
+.tw{overflow-x:auto;margin:0 0 1.6rem;border:1px solid var(--rule);border-radius:8px;
+  background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-family:ui-sans-serif,system-ui,sans-serif;
+  font-size:.845rem;line-height:1.5}
+th{text-align:left;font-weight:600;background:var(--accent-soft);color:var(--ink);
+  padding:.68rem .8rem;border-bottom:1px solid var(--rule);vertical-align:bottom;
+  font-size:.78rem;letter-spacing:.02em}
+td{padding:.66rem .8rem;border-bottom:1px solid color-mix(in oklab,var(--rule) 60%,transparent);
+  vertical-align:top;color:var(--muted)}
+td:first-child{color:var(--ink)}
+tbody tr:last-child td{border-bottom:0}
+@media (max-width:640px){
+  body{font-size:16px;padding:0 1rem 4rem}
+  h1{font-size:1.85rem} h2{font-size:1.32rem}
+  header.mast{padding-top:2.5rem}
+}
+@media print{
+  body{background:#fff;color:#000;font-size:11pt}
+  .tw,pre{break-inside:avoid} h2,h3{break-after:avoid}
+}
+.tldr{background:var(--accent-soft);border:1px solid var(--rule);border-radius:8px;padding:1.1rem 1.3rem .4rem;margin:0 0 2.4rem;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.93rem;line-height:1.6}
+.tldr .tl-h{font-size:.74rem;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);margin:0 0 .5rem}
+.tldr ul{margin:0 0 .8rem}
+.tldr li{margin:0 0 .45rem}
+.fig{--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--o1:#1c5cab;--o2:#2a78d6;--o3:#5598e7;--o4:#86b6ef;
+  --grid:#e1e0d9;--axis:#c3c2b7;--lab:#898781;
+  margin:2.1rem 0 2.3rem;border:1px solid var(--rule);border-radius:8px;background:var(--panel);
+  padding:1.1rem 1.15rem .95rem}
+@media (prefers-color-scheme:dark){.fig{--s1:#3987e5;--s2:#d95926;--s3:#199e70;
+  --o1:#184f95;--o2:#256abf;--o3:#3987e5;--o4:#6da7ec;--grid:#2c2c2a;--axis:#383835}}
+.fig svg{display:block;width:100%;height:auto}
+.fig .ft{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.86rem;font-weight:600;
+  color:var(--ink);margin:0 0 .55rem;line-height:1.35}
+.fig figcaption{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.76rem;line-height:1.55;
+  color:var(--muted);margin:.8rem 0 0}
+.fig .lgd{display:flex;flex-wrap:wrap;gap:.3rem 1.1rem;font-family:ui-sans-serif,system-ui,sans-serif;
+  font-size:.76rem;color:var(--muted);margin:0 0 .75rem}
+.fig .lgd span{display:inline-flex;align-items:center;gap:.4rem}
+.fig .lgd i{width:10px;height:10px;border-radius:3px;display:inline-block;flex:0 0 auto}
+.fig text{font-family:ui-sans-serif,system-ui,sans-serif}
+.fig .t-pri{fill:var(--ink)}.fig .t-sec{fill:var(--muted)}.fig .t-mut{fill:var(--lab)}
+.fig .gr{stroke:var(--grid);stroke-width:1;fill:none}
+.fig .ax{stroke:var(--axis);stroke-width:1;fill:none}
+.fig .ln{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.fig .dsh{fill:none;stroke-width:1.5;stroke-dasharray:4 5}
+.fig .box{fill:none;stroke-width:1.5}
+</style>
+</head><body><div class="wrap">
+<nav style="padding-top:1.6rem;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.85rem"><a href="./" style="border:0">&larr; All posts</a></nav>
+<header class="mast">
+<h1>Lead with Intent: Why I Stopped Writing Detailed Instructions for AI</h1>
+<p class="sub">What I learned from building software outside my expertise, from my team's move from SOPs to skills to intent, and from a small meta-instruction skill that changed how I lead AI.</p>
+<div class="meta"><span>2,200 words</span><span>~10 min read</span><span>2026-11-26</span></div>
+</header>
+<main>
+<div class="tldr">
+<p class="tl-h">In short</p>
+<ul>
+<li>I wrote detailed, prescriptive prompts because early models needed them. In areas outside my expertise, like UI design, that capped the result at my own guesses.</li>
+<li>When I stated the intent instead (“this UI doesn’t look good; how can we improve it?”), results improved and the back-and-forth dropped sharply.</li>
+<li>My team went through the same arc: SOPs, then parameterized skills, then cutting most of the how from those skills and organizing by intent.</li>
+<li>A small meta-instruction skill makes the agent reverse-engineer the intent behind my prescriptive requests and propose better options.</li>
+<li>Leading AI is like leading people: lead a senior AI like a junior one and you waste it. Each model generation asks us to unlearn and relearn, and uber-instructions make that scale.</li>
+</ul>
+</div>
+
+<h2 id="how-i-started">How I started</h2>
+<p>When I first used large language models to build software, I treated them the way the early models deserved to be treated. They lost track of long requests, filled gaps with confident guesses, and drifted away from what I asked for. The safe strategy was to be prescriptive. If I spelled out every step, the model had less room to go wrong, and I would get at least the result I had in mind.</p>
+<p>That habit stayed with me as the models improved. It felt responsible. A detailed prompt looked like a well-written spec, and a well-written spec is supposed to produce good software.</p>
+<h2 id="the-ui-that-kept-coming-back">The UI that kept coming back</h2>
+<p>The habit broke down on a project where I had to build a user interface. I am not a UI designer. I don't have a trained eye for layout, spacing, typography, or interaction design. But I still wrote instructions as if I did:</p>
+<blockquote><p>Put the filter panel on the left, 240px wide. Use a card for each item with the title in bold and the status as a colored badge on the top right. Add a search bar above the list.</p></blockquote>
+<p>The agent did exactly what I asked. Then I looked at the screen and saw that it didn't work. The filter panel crowded the content. The badges competed with the titles. The search bar sat in a spot nobody would look. So I wrote another round of instructions: move this, shrink that, change this color. Then another round after that.</p>
+<p>Each turn fixed the thing I had pointed at and exposed the next problem. I was steering pixel by pixel, and the bottleneck was my own design knowledge. The agent was capable of much more, and I was using it as a typist for my second-rate design decisions.</p>
+<h2 id="saying-what-i-actually-wanted">Saying what I actually wanted</h2>
+<p>At some point, out of frustration, I stopped listing changes and wrote something closer to how I felt:</p>
+<blockquote><p>This UI doesn't look good and it's awkward to use. How can we improve the visual design and the user experience?</p></blockquote>
+<p>The result was better than anything I had reached through rounds of detailed instructions. The agent reorganized the information hierarchy, fixed the spacing system as a whole instead of one element at a time, and changed interactions I hadn't thought to question. The number of back-and-forth turns dropped sharply, because the agent was no longer waiting for me to discover each problem and describe the fix.</p>
+<p>What changed was not the model. It was what I handed over. My detailed instructions were my <em>solution</em> to a problem I hadn't stated. When the solution was weak, the agent faithfully executed a weak solution. When I gave it the <em>intent</em>, "make this look good and feel easy to use", it could apply its own knowledge, which in this domain was far better than mine.</p>
+<h2 id="instructions-hide-intent">Instructions hide intent</h2>
+<p>The lesson generalizes beyond UI. Every prescriptive instruction is a compressed form of some intent, and compression loses information:</p>
+<ul><li>"Add a retry with three attempts" may really mean "this call fails intermittently and I don't want users to see errors." Maybe the right answer is a circuit breaker, a cache, or fixing the upstream timeout.</li><li>"Split this function into three helpers" may really mean "I find this code hard to review." Maybe the right answer is better naming, or a test that documents the behavior.</li><li>"Put the button on the right" may really mean "users keep missing this action."</li></ul>
+<p>When I give only the instruction, the agent optimizes for the instruction. When I give the intent, the agent can optimize for the outcome, and it can tell me when my proposed instruction is not the best way to get there.</p>
+<p>The weaker my expertise in a domain, the more this matters. In areas I know well, my instructions tend to encode good solutions. In areas I don't, they encode my guesses, and the agent ends up limited by my guesses.</p>
+<h2 id="what-i-saw-in-the-team-s-ai-transformation">What I saw in the team's AI transformation</h2>
+<p>When I joined my team's AI transformation, I saw the same pattern play out at team scale, in three stages.</p>
+<p><strong>Stage 1: SOPs.</strong> We started by writing standard operating procedures for our teams: step-by-step documents for oncall triage, deployments, code reviews, and other recurring work. An SOP captures how an experienced engineer does a task, so that anyone, human or agent, can follow it.</p>
+<p><strong>Stage 2: Skills.</strong> Next we turned those SOPs into parameterized skills and user skills that agents could run directly. This was real progress. A procedure that once lived in a wiki became something an agent could execute on demand, with inputs for the team, package, or pipeline it applied to.</p>
+<p><strong>Stage 3: Intent.</strong> Then we noticed a problem. The skills were over-prescriptive. They encoded every step of the procedure, and with the latest models those steps were often getting in the way. The model could reach a better result on its own, but the skill forced it down the path we had written for an older generation. So we started removing content, a lot of it. We kept what had to be true (the goal, the hard constraints, the definition of done) and cut most of the how.</p>
+<p>That led us to reorganize our work by intent instead of by procedure. We grouped our teams around the outcome each kind of work is trying to achieve (see <a href="slice-by-intent-not-by-phase.html">Slice by Intent, Not by Phase</a>), and began experimenting with a simple approach: provide the intent, and put our effort into making the intent more precise. A precise intent turned out to be more useful than a detailed procedure. It tells the agent what success looks like and leaves it room to find the best way there.</p>
+<p>That doesn't mean constraints go away. Hard requirements such as an API contract, a security rule, or a compliance boundary still need to be stated precisely. The point is to separate what must be true from how we happen to imagine getting there.</p>
+<h2 id="making-it-a-habit-a-meta-instruction-skill">Making it a habit: a meta-instruction skill</h2>
+<p>Knowing this didn't stop me from slipping back into prescriptive prompts. Old habits come back when I'm in a hurry or when I think I already know the answer. So instead of relying on discipline, I wrote a skill: a meta-instruction that tells the agent how to treat my instructions.</p>
+<p>The core of it looks like this:</p>
+<pre><code>---
+name: lead-with-intent
+description: When the user gives prescriptive, step-by-step instructions,
+  infer the underlying intent before executing, and propose alternatives
+  that may serve that intent better.
+---
+
+# Lead with intent
+
+When my request is prescriptive (specific layout, specific implementation,
+specific steps), do not execute it right away. First:
+
+1. **State the intent.** In one or two sentences, describe what you believe
+   I am actually trying to achieve and why. Name the user or system outcome,
+   not the mechanism.
+2. **Separate constraints from suggestions.** List which parts of my request
+   look like hard requirements (contracts, security, compliance, explicit
+   "must") and which look like my guess at a solution.
+3. **Propose options.** Offer two or three approaches aligned with that
+   intent, including my original instruction if it is a reasonable choice.
+   For each, give the trade-off in a line.
+4. **Recommend one.** Say which you would pick and why.
+5. **Proceed.** If my original instruction is clearly the best fit, or the
+   task is trivial, say so briefly and execute it without the ceremony.
+
+If you are unsure of my intent, ask one focused question rather than guessing.</code></pre>
+<p>Two details matter in practice. First, the skill keeps my original instruction as one of the options. Sometimes I do know the right answer, and the skill shouldn't argue with me for the sake of it. Second, the skill skips the ceremony for trivial requests. A one-line rename doesn't need three alternatives.</p>
+<h2 id="what-changed">What changed</h2>
+<p>With the skill in place, my overly prescriptive requests became a starting point instead of a final spec. Typical results:</p>
+<ul><li>The agent restates my intent, and I often realize it is different from what my instruction implied. That alone catches mistakes before any code is written.</li><li>The alternatives regularly include an approach I hadn't considered, especially in domains where I lack depth.</li><li>When my instruction was right, I lose only a few seconds reading a short confirmation.</li></ul>
+<p>The outcome is better whenever my initial instructions are too prescriptive and hide the real intent behind them, which, honestly, is more often than I expected.</p>
+<h2 id="a-mental-model-leading-ai-with-commander-s-intent">A mental model: leading AI with commander's intent</h2>
+<p>Looking back, both my personal story and the team's journey come down to one idea: working with AI is a leadership problem, and the right leadership style depends on who you are leading.</p>
+<p>Think about how you would lead people at different levels. A junior engineer needs clear steps, close review, and narrow tasks. A senior engineer needs context and a goal, and does their best work when you stay out of the how. A strong autonomous team needs only the mission and the boundaries. If you manage a senior engineer like a junior one, you waste their ability and cap the result at your own.</p>
+<p>Military organizations solved a version of this problem long ago with <strong>commander's intent</strong>. Orders don't only say what to do; they state the purpose of the mission and the end state that counts as success. Plans break on contact with reality, and when they do, people who understand the intent can adapt without waiting for new orders. The less a leader can see from where they stand, the more the intent matters and the less the detailed plan does.</p>
+<p>That is exactly the situation with a capable model. It often sees more of the solution space than I do, especially outside my expertise. A detailed plan from me breaks the moment it meets the problem. A clear intent survives.</p>
+<p>AI is moving through those levels quickly. The way we led a junior AI, an earlier model that needed every step spelled out, is the wrong way to lead a senior AI. Leading an agent that plans and acts over many steps is different again, and leading whatever comes after, up to systems that are more capable than us across most domains, will be different once more. Each generation asks us to <strong>unlearn</strong> the habits that worked for the last one and <strong>learn</strong> a new way to lead.</p>
+<p>The hard part is that unlearning by hand doesn't scale. I can't count on myself to notice, in every prompt, that I'm leading a capable model like a junior one. My team can't rewrite every skill each time a new model ships. That is why I think the answer is an uber-instruction: steering files and meta-skills, like the one above, that help us:</p>
+<ul><li><strong>Unlearn</strong>, by catching prescriptive habits as they happen and turning them back into intent.</li><li><strong>Admit our limitations</strong>, by making it normal for the agent to say "here is a better way" when our instruction reflects our gaps more than the problem.</li><li><strong>Learn from AI</strong>, by asking for options and reasoning instead of execution only, so each interaction teaches us something.</li></ul>
+<p>The underlying stance is to treat AI as very capable engineers and very capable colleagues. You don't scale a team of strong engineers by writing longer procedures for them. You scale it by giving them clear intent, firm boundaries, and room to work. Leadership that relies on prescribing every step is bounded by how much one person can prescribe. Leadership that hands over intent scales with the capability of whoever, or whatever, receives it, and that capability keeps growing.</p>
+<h2 id="takeaways">Takeaways</h2>
+<ol><li><strong>Prescriptive prompting is a habit from weaker models.</strong> Revisit it. Current models can do more with a clear goal than with a list of steps.</li><li><strong>Your instructions are only as good as your expertise.</strong> In areas you don't know well, hand over the intent and let the agent bring its knowledge.</li><li><strong>Separate constraints from solutions.</strong> State hard requirements precisely; offer everything else as a suggestion, or leave it out.</li><li><strong>Prune your skills as models improve.</strong> SOPs and skills written for earlier models often over-prescribe. Cut the how, keep the goal and the boundaries, and make the intent more precise.</li><li><strong>Lead AI for the level it is at.</strong> Leading a senior AI like a junior one wastes it. Expect to unlearn your style with every model generation.</li><li><strong>Encode the unlearning, don't rely on willpower.</strong> Uber-instructions and steering files that make the agent reverse-engineer your intent catch the times you forget.</li><li><strong>Your job moves from writing steps to judging outcomes.</strong> Spend your effort describing what good looks like and reviewing whether you got it.</li></ol>
+<p>Leading with intent sounds like a small change: tell the agent <em>why</em> and <em>what good looks like</em>, not <em>how</em>. In my experience, it changed the quality of the results more than any prompt template I've written.</p>
+</main>
+</div></body></html>
