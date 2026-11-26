@@ -135,15 +135,18 @@ tbody tr:last-child td{border-bottom:0}
 <p><strong>Stage 1: SOPs.</strong> We started by writing standard operating procedures for our teams: step-by-step documents for oncall triage, deployments, code reviews, and other recurring work. An SOP captures how an experienced engineer does a task, so that anyone, human or agent, can follow it.</p>
 <p><strong>Stage 2: Skills.</strong> Next we turned those SOPs into parameterized skills and user skills that agents could run directly. This was real progress. A procedure that once lived in a wiki became something an agent could execute on demand, with inputs for the team, package, or pipeline it applied to.</p>
 <p><strong>Stage 3: Intent.</strong> Then we noticed a problem. The skills were over-prescriptive. They encoded every step of the procedure, and with the latest models those steps were often getting in the way. The model could reach a better result on its own, but the skill forced it down the path we had written for an older generation. So we started removing content, a lot of it. We kept what had to be true (the goal, the hard constraints, the definition of done) and cut most of the how.</p>
+<p>Here is what that looked like on our company-wide skill catalog. We first pruned by usage: 35 entries with zero runs in 90 days came out, taking the core catalog from 86 entries to 59. Then we slimmed the prompts that remained. Our most-used code review skill, at 1,893 runs in 90 days, went from 101 lines to 42. Four batches covering 26 more skills went from 4,158 lines to 2,561, about 38% shorter, and one skill was removed outright.</p>
+<p>A shorter prompt is only a win if the results hold, so we regression-tested every change. For each skill, the old and new versions ran on the same real input as separate agents in dry-run mode, with every write, post and send held back. A blind judge then compared the two outputs without knowing which was which. Across 23 skills and 50 dry runs, 6 skills produced equivalent output, 16 showed minor differences that came from run-to-run variance, and 1 regressed.</p>
+<p>The regression taught us the most. In one skill, slimming had folded an unconditional “confirm before acting” step into a conditional paragraph. That step was a hard constraint, not part of the how, so we put it back word for word. The skills that shrank least were the ones made mostly of constraints: SQL queries, output templates and tables that had to stay exactly as written.</p>
 <p>That led us to reorganize our work by intent instead of by procedure. We grouped our teams around the outcome each kind of work is trying to achieve (see <a href="slice-by-intent-not-by-phase.html">Slice by Intent, Not by Phase</a>), and began experimenting with a simple approach: provide the intent, and put our effort into making the intent more precise. A precise intent turned out to be more useful than a detailed procedure. It tells the agent what success looks like and leaves it room to find the best way there.</p>
 <p>That doesn't mean constraints go away. Hard requirements such as an API contract, a security rule, or a compliance boundary still need to be stated precisely. The point is to separate what must be true from how we happen to imagine getting there.</p>
 <h2 id="making-it-a-habit-an-always-on-steering-file">Making it a habit: an always-on steering file</h2>
 <p>Knowing this didn't stop me from slipping back into prescriptive prompts. Old habits come back when I'm in a hurry or when I think I already know the answer. So instead of relying on discipline, I wrote a steering file: a meta-instruction that tells the agent how to treat my instructions. A skill loads only when the agent decides it is relevant. A steering file marked <code>inclusion: always</code> applies to every request, which matters because the requests that need it most are the ones where I don't think to ask.</p>
-<p>Here is the whole file:</p>
+<p>Here is the file, lightly edited for this post:</p>
 <pre><code>---
 inclusion: always
 name: intent-over-instructions
-description: Coach Yuliang from step-by-step instructions toward stating intent
+description: Coach me from step-by-step instructions toward stating intent
 ---
 
 # Intent over instructions
@@ -162,7 +165,7 @@ commands, exact wording), do this:
 When I give intent, fill in the how yourself and don't ask me for it:
 - UI: I'm not a UI person. Show 2-3 mockups and let me pick. Never ask me
   for layout, color or spacing values.
-- Supply chain and Amazon internals: that is my expertise. Ask me about
+- My own domain (for me, supply chain): that is my expertise. Ask me about
   business rules, metrics and which system owns the data when they're
   ambiguous. Don't ask me about implementation details.
 
